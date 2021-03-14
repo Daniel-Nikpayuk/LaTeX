@@ -1,0 +1,219 @@
+% Copyright 2015 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\newcommand{\st}{$ ^{\mbox{\scriptsize st}} $ }
+\newcommand{\nd}{$ ^{\mbox{\scriptsize nd}} $ }
+\newcommand{\rd}{$ ^{\mbox{\scriptsize rd}} $ }
+
+\renewcommand{\th}{$ ^{\mbox{\scriptsize th}} $ }
+%\th command exists, it gives the old english symbol used for `theta' IPA (voiceless)
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\newenvironment{proof}[1][Proof]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1:}]}{\end{trivlist}}
+\newenvironment{example}[1][Example]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{remark}[1][Remark]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{note}[1][Note]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+\newcommand{\qed}{\nobreak \ifvmode \relax \else
+      \ifdim\lastskip<1.5em \hskip-\lastskip
+      \hskip1.5em plus0em minus0.5em \fi \nobreak
+      \vrule height0.75em width0.5em depth0.25em\fi}
+
+\title{Computability Space}
+\author{Daniel Nikpayuk}
+\date{June 14, 2015}
+\pagenumbering{alph}
+\pagestyle{empty}
+
+\begin{document}
+\maketitle
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+\section*{Motivation:}
+
+Having a background in the landscape of mathematics and some of its history, I don't think this period in time of science
+and math in general is as much one for ``new discovery'' than it is for cleaning up and consolidation of existing theories.
+
+In particular, my plan here is to take all\footnote{as problematic as a qualifier such as \emph{all} may be.} the existing
+ideas of computing science and rework them into a single narrative.  What I've learned about computing science is that
+computing like the \emph{humanities} tries to {\bfseries mitigate the complexity} of stories and narratives and paradigms
+within their respective literatures---which is why computing for the social coder is much more connected to creative writing
+than it is math.
+
+Engineering is the originator of ``mitigating complexity'' as a \emph{way of thinking} and is certainly an inspiration to what I'm
+trying to do here\footnote{I have most definitely also been inspired by ``The Structure and Interpretation of Computer Programs (SICP)}.
+As a mathematician, I can honestly say that no existing branch of pure mathematics tries to mitigate complexity; each branch of math
+exposes and expounds a narrative; a worldview; a perspective; a single recursive way of interacting with the world.
+
+As the humanities have been around for a long while now, they have the intuitive framework to explicate the human experience, and so
+I have borrowed my central ideas from them: Context, Semiotics, Media. I have reoriented this intuitive language as a formal structure
+I call a \emph{technology space}. A way to think about it is, a technology space consists of a context space, a semiotic space, and a
+media space; each being independent of each other in a formal sense; each you can think of as a branch of mathematics---each has its
+own axiomatic worldview, but none by themselves mitigate complexity. It's when you take the three together, within their interplay do
+you get an \emph{emergent} approximation of the complexity you're trying to model. You start with the axioms of each, and they help each
+other to build each other further, allowing for a co-evolution of all three.
+
+In particular, I aim to change the narratives of what currently exists in the landscape, recentering the philosophical idea of
+``a computation''\footnote{This idea is not to be taken lightly, there are many years of research by brilliant scholars about it.}
+around the coevolution of three axiomatic spaces: {\bfseries Reference, Application, Evaluation.} A reference space being the context
+space, an application space being the semiotic space and an evaluation space being the media space. Such a technology space would be
+called a \emph{computability space}.
+
+Keep in mind, this idea already exists under a different package: The Lambda Calculus, which takes as its three primitives: Abstraction,
+Application, and Reduction. Here, an abstraction space is the context space, an application space is again the semiotic space, and a
+reduction space is the media space. The Lambda Calculus is a formal branch of applied mathematics, but focuses more on self-contained
+formal proofs than it does on mitigating complexity and expressivity of computation for the general creative designer of code.
+
+In terms of computability spaces, one actually starts out philosophically, asking what it means to ``reference''. We can play with that
+idea and its connotations for a while and figure out what the minimal number of assumptions needed are (before the concept loses its
+emergent meaning) and those will be our axioms for a reference space. We will play a similar game to determine the simplest natures
+of our application and evaluation spaces. Finally, we can then start using these minimal spaces to help build upon each other to form
+more complicated versions of each, creating new paradigms and modular forms along the way which will inevitably lead us to our mitigating
+of the complexity of computability we so seek as writers of code.
+
+\subsection*{summary}
+
+To reiterate: A computability space is a technology space with the following bindings of undefined terms:
+
+\begin{eqnarray}
+\mbox{context space} & := & \mbox{reference} \\
+\mbox{semiotic space} & := & \mbox{application} \\
+\mbox{media space} & := & \mbox{evaluation}
+\end{eqnarray}
+
+To intuitively validate this against the \emph{lambda calculus}, our context is \emph{abstraction}, our semiotics is \emph{application},
+while our media is \emph{reduction}.
+
+\section*{Computability}
+
+What does it mean to ``compute'' something? Intuitively we start with an \emph{input} and result in an \emph{output}. The part
+in-between is the hidden and mysterious computation. Let's suspend our disbelief momentarily, and assume we {\bfseries do} already
+know what it means to compute something, then we could immediately start looking at the broader patterns.
+
+From this perspective, two main patterns would stand out:
+
+\begin{enumerate}
+\item	Once we were comfortable with the existence of our computations, we would start to see them as \emph{substitutions} and we
+	would thus start to \emph{compose} them. It would then become a matter of becoming comfortable with the practice of taking
+	the input of these compositions, substitute and resubstitute (repeatedly) until we reached a point where we had reduced our
+	input to an expression where we had nothing left to substitute, in which case we would have our final output.
+\item	Once we were comfortable with forming expressions of composition and evaluating their substitutions, we would start to see
+	patterns within these broader initial compositions.  We would abstract out such common patterns into what would end up being
+	a \emph{compressed} representation of our initial computation.  Once we became comfortable enough with these ``factorized''
+	expressions, we would simply write them in the compressed form to begin with when coding new computations---the assumption
+	is we'd let the {\bfseries computer} expand (or \emph{decompress}) the representation to form the tree expression of our
+	composite; and then the computer would additionally perform the necessary substitutions and reductions and thus compute
+	the output of interest; leaving as little tedious work to be done by the coder.
+\end{enumerate}
+
+In a way, we are looking at things backward, or we are jumping ahead, but doing so helps to build a \emph{specification} of our
+simplest and initial spaces for computation. From these we can then fill in those other details of more ``realistic'' and
+complicated systems of computation.
+
+Already in this very broad approach we are running into problematics: These tree composites, how do we represent them? There's
+certainly more than one way, and in the general sense no best way. Since this is the case, for the simplicity of explanation,
+we will choose one approach and try to keep it consistent until we reach a competency in which we can go back and start looking
+at alternatives, there benefits and costs.
+
+The above second pattern ($ 2. $) is where things really begin to show their complexity: Let's say we stick with one representation
+of composite trees: We may ourselves as coders become comfortable enough in compressing these expressions to write out ``compressed''
+code from the get-go, but the truth of the matter is for many trees of composite substitutions there is more than one way to compress
+(regardless of representation), and for many of those there is in no general sense a best way of doing so. It then becomes a matter
+of {\bfseries modularization semantics}.
+
+The intention then here is to explore such different strategies for compression, and when we become comfortable with this and the
+existing landscape of such semantic constructs, we can then learn to apply such code based on context, optimization constraints,
+and ones individual life experience.
+
+\subsection*{References}
+
+Getting to the core of the material then: What does it mean to ``reference'' a computation?
+
+Any way you look at it, in its simplest form, a computation takes an \emph{input} and produces an \emph{output}. In mathematics
+this is called a \emph{mapping} or a \emph{function}, but from the worldview of a computability narrative, it is better to say this
+is a substitution.\footnote{a computation is an act of doing, and so is a substitution.} The ideal form of substitution is to use
+a mapping with complete and instantaneously accessible information: This is to say, for whatever input we're given, when we call
+our function of interest, it will immediately tell us one of two things: Is this input computable? This is to say, is this input
+even associated with the mapping. If the answer is {\bfseries no}, then that in itself is the computation---this we refer to as a
+\emph{null substitution}. If the answer is {\bfseries yes}, then the mapping immediately provides the output bound to the input.
+A function such as this is known as a {\bfseries recursive function} in the general literature, but we ourselves will refer to it
+as a {\bfseries lookup table}.
+
+This is just a single lookup table, the reality is in practice we tend to start with several such \emph{primitive} lookup tables,
+which brings up another issue. When we're given input to compute, how do we know which lookup table to call? From a \emph{meta}
+perspective, one could say we will know by matter of discourse and context of the coder, which is true, but at the same time this
+way of looking at it breaks the design constraint that our system of reference is as simple as possible.\footnote{such a meta-lens
+assumes additional systems of reference regarding context and discourse.} As such, we will here say that the necessary information
+is stored as part of the input and thus provides no redundancy of input/output bindings, in which case we can say there our reference
+space is a single \emph{universal} lookup table which takes the function names as part of the input and provides the output for that
+function given the input (minus the function name) applied to that function.
+
+\subsection*{Applications}
+
+What does it mean to ``apply'' a computation?
+
+Our context space is a lookup table of bindings where the full input includes a recursive function name and \emph{its}
+respective input.  Our semiotic space in general is a representation of this context (of bindings) which itself forms
+some kind of algebra allowing for the---ideally---convenient representation of the composition of these contextual
+input/output pairs.
+
+Intuitively, if this were our specification constraint, it makes the most sense to be able to take any arbitrary collection
+of \emph{finite} input and \emph{concatenate} them into another input, one which already exists within the application space.
+This is to say, the basic axiom of our semiotic space is that it is \emph{self similar}.
+
+\subsection*{Evaluations}
+
+What does it mean to ``evaluate'' a computation in as simple a way as possible?
+
+It is described as the simplest ideal relationship between our context and its semiotics---our media space. In particular,
+any signifier of input which is itself a self similar concatenation will satisfy the very important constraint:
+
+The output bound to this input within the lookup table matches the output given by \emph{evaluating} the component input.
+This is to say, mapping each concatenated input to its respective output, and remapping the resultant output (reinterpreted
+as a new input) by means of the lookup table. This process continues until no further mapping is possible, or the mapping
+becomes constant.
+
+This basic self-similar property forms our initial evaluation space.
+
+\subsection*{An example of a finite computability space}
+
+\section*{Expanding the context}
+
+What would happen if we relaxed our assumption of a system of reference as function of bindings?
+
+Regarding the how of it: As our narrative focuses on \emph{computation as an act of doing}, what if we were able to \emph{create}
+new bindings within our system of reference as the computation progressed? What then would it mean to reference bindings? What if
+creating new bindings reassigned input new output? Our system of reference would no longer be a function of bindings; would such
+a system of computation be worth it?
+
+From an existential point of view, assuming the full lookup table in advance, we would now be dealing with a general relation instead
+of the more constrained mathematical function.  How would we keep track of the problems that arise?
+
+\section*{\emph{fin}}
+
+Pijariiqpunga.
+
+\end{document}
+

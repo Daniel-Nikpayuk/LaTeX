@@ -1,0 +1,526 @@
+% Copyright 2017 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1in,right=1in,top=1in,bottom=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hhline}
+
+\newcommand{\bb}[1][u]{\ensuremath{\mathbf{#1}}}
+\newcommand{\nthps}[2][P]{\ensuremath{\mathbb{#1}^{#2}}}
+\newcommand{\nthpt}[2][T]{\ensuremath{\mathbb{#1}^{#2}}}
+\newcommand{\nthus}[2][U]{\ensuremath{\mathbb{#1}^{#2}}}
+\newcommand{\nthut}[2][V]{\ensuremath{\mathbb{#1}^{#2}}}
+\newcommand{\psunion}[2][P]{\ensuremath{\bigcup_{#2\ge 0}\mathbb{#1}^{#2}}}
+\newcommand{\ptunion}[2][T]{\ensuremath{\bigcup_{#2\ge 0}\mathbb{#1}^{#2}}}
+\newcommand{\usunion}[2][U]{\ensuremath{\bigcup_{#2\ge 0}\mathbb{#1}^{#2}}}
+\newcommand{\utunion}[2][V]{\ensuremath{\bigcup_{#2\ge 0}\mathbb{#1}^{#2}}}
+\newcommand{\stratified}{\ensuremath{\mathbb{U}^\infty}}
+\newcommand{\restratified}{\ensuremath{\mathbb{V}^\infty}}
+\newcommand{\of}[1]{\ensuremath{(\mathcal{#1})}}
+\newcommand{\sifter}[3]{\ensuremath{s^{(#1, #2)}_{#3}}}
+
+\newcommand{\then}{\ensuremath{\quad\Longrightarrow\quad}}
+\newcommand{\but}{\ensuremath{\quad\mbox{but}\quad}}
+\newcommand{\with}{\ensuremath{\quad\mbox{with}\quad}}
+\newcommand{\equals}{\ensuremath{\quad =\quad}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\newenvironment{proof}[1][Proof]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1:}]}{\end{trivlist}}
+\newenvironment{example}[1][Example]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{remark}[1][Remark]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{concept}[1][Concept]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+\newcommand{\qed}{\nobreak \ifvmode \relax \else
+      \ifdim\lastskip<1.5em \hskip-\lastskip
+      \hskip1.5em plus0em minus0.5em \fi \nobreak
+      \vrule height0.75em width0.5em depth0.25em\fi}
+
+\title{A Computational Model of Reference by means of Stratified Powertuples (Part Two)}
+\author{Daniel Nikpayuk}
+\date{October 14, 2017}
+
+\pagestyle{empty}
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+\begin{abstract}
+In part two we take the mathematical model resulting from part one and translate it to derive a computing science
+specification for a universal data structure---a structure which can represent all other finite computable data structures.
+
+Before this, we first introduce a variant mathematical model which is better optimized towards register machine architectures.
+The benefit in doing this is it allows for a natural translation of our mathematical model into the desired computatational
+specification.
+\end{abstract}
+
+\section*{Review}
+
+In part one we introduced our universe of discourse $ \stratified $:
+\begin{definition}[Stratified Powerset]
+$$ \begin{array}{rcl}
+\stratified\of{S}	& :=	& \usunion{n}\of{S},\quad\mbox{where}		\\
+										\\
+\nthus{n}\of{S}		& :=	& \psunion{k}(\nthus{n-1}\of{S}),\quad n\ge 1	\\
+										\\
+\nthus{0}\of{S}		& :=	& \mathcal{S}
+\end{array} $$
+\end{definition}
+and we showed that this \emph{low-level} \emph{space} could be equipped with an algebra
+(a few rules of grammar satisfying closure within the space) modelling all the computable data structures we'd be interested
+in\ \footnote{It was not discussed in part one, but our rules of grammar only allow us to construct finite data structures,
+leaving out those infinite structures accessible through the lazy evaluation paradigm. I would point out this may be
+a limitation of expressive potential, but not of data structure potential.}\ :
+\begin{theorem}[Closure of Pair]
+$$ A,B\in\stratified\then\{A,B\}\in\stratified $$
+\end{theorem}
+
+\begin{theorem}[Near Algebra of Sets]
+Let $ A,B\in\stratified $ with $ A,B $ as collectibles:
+\begin{enumerate}
+\item $ A\cup B\in\stratified $
+\item $ A\cap B\in\stratified $
+\item $ A-B\in\stratified $
+\end{enumerate}
+\end{theorem}
+
+\section*{Stratified Powertuples}
+
+Before we discuss the proposed implementation, we need to soften the translation process by first reorienting our mathematical
+model around \emph{sequences} instead of sets. As it turns out, this sequence based theory is equipotent to our set-theoretic
+orientation---in fact it almost identically parallels what was covered in \emph{part one}---and so we won't need to discuss it
+at length here.
+
+Our ``stratified powertuple'' is defined as follows:
+
+\begin{definition}[Stratified Powertuple]
+$$ \begin{array}{rcl}
+\restratified\of{S}	& :=	& \utunion{n}\of{S},\quad\mbox{where}		\\
+										\\
+\nthut{n}\of{S}		& :=	& \ptunion{k}(\nthut{n-1}\of{S}),\quad n\ge 1	\\
+\nthut{0}\of{S}		& :=	& \mathcal{S}
+\end{array} $$
+\end{definition}
+Our notation needs names, so from now on we refer to $ \mathcal{S} $ as our content set, while $ \nthpt{k} $ are \emph{powertuples},
+and $ \nthut{n} $ then are \emph{unified powertuples}. At this level we have effectively only substituted the letters $ \mathbb{V} $
+for $ \mathbb{U} $ as well as $ \mathbb{T} $ for $ \mathbb{P} $ in our modified mathematical model. So if our use of $ \mathbb{P} $
+was to denote a powerset, what then is a \emph{powertuple}? You can think of it as taking the elements of a set $ \mathcal{S} $
+and collecting them into all possible finite sequences of those elements:
+
+$$ \begin{array}{rcl}
+\mathbb{T}\of{S}	& :=	& \bigcup_{n\ge 0}\mathcal{S}^n,\quad\mbox{where}					\\
+															\\
+\mathcal{S}^n		& :=	& \{\ \langle s_0,\ldots,s_{n-1}\rangle\ |\ s_k\in\mathcal{S},\ 0\le k < n\ \}		\\
+			&	& \mbox{that is, all sequences of elements of }\mathcal{S}\mbox{ of length } n
+\end{array} $$
+
+From part one, many of the lemmas immediately translate, and as they do not rely on the definition of a \emph{powertuple}
+their proofs are identical as well. We thus offer the following without proof:
+
+\begin{lemma}[Monotonicity]
+$$ 0\le m\le n\then\nthut{m}\subseteq\nthut{n} $$
+\end{lemma}
+
+\begin{corollary}[Mobility]
+$$ 0\le m\le n,\qquad A\in\nthut{m}\then A\in\nthut{n} $$
+\end{corollary}
+
+\begin{lemma}[Reduction]
+$$ A,B\in\restratified\then\exists m\ge 0,\quad A,B\in\nthut{m} $$
+\end{lemma}
+
+\begin{lemma}[Stratification]
+$$ \nthut{n}\equals\nthut{0}\cup\bigcup_{\substack{k\ge 1 \\ 0\le m < n}}\nthpt{k}(\nthut{m}),\quad n\ge 1 $$
+\end{lemma}
+As was the case in part one, if the context is clear or no confusion will arise, we omit the content set $ \mathcal{S} $.
+Moving forward, in regards to translation the definition of \emph{collectible} has an immediate dual as well:
+
+\begin{definition}[Sequentiable]
+Let $ A\in\restratified $, with $ A\neq\langle\rangle $. $ A $ is said to be \emph{sequentiable} if
+$$ \exists j\ge 0, \mbox{ and }\exists k\ge 1,\quad\mbox{such that}\quad A\in\nthpt{k}(\nthut{j}) $$
+\end{definition}
+here though the definition is subtly different than that of a collectible because our element $ A $ of interest
+cannot be the empty sequence $ \langle\rangle $. Again, the intuitive idea behind a sequentiable is that it is
+an element which belongs to some powertuple of the whole construct. The value of this definition is it allows
+us to distinguish between content and structure. You might argue we could define a sequentiable then as those
+non-content set elements. Unfortunately we cannot assume that an element in the content set doesn't show up by
+chance elsewhere (as we do not in general know the nature of the content set). As such we will continue to rely
+on the weaker definition given above.
+
+From here, we turn to the algebra of this data structure \emph{space}. The idea behind the following \emph{closure}
+theorems is inspired by that of the \emph{lifecycle} of a data structure in real world machine processes.
+We will need to assure our ability to grow and shrink arbitrary data structures, both within a given level of complexity
+as well as across levels of complexity.
+
+We start \emph{across} levels of complexity, allowing us to build up \emph{nested} sequences:
+
+\begin{theorem}[Capsulation]
+$$ a_0,\ldots,a_M\in\restratified\then\langle a_0,\ldots,a_M\rangle\in\restratified $$
+\end{theorem}
+
+\begin{proof}
+$$ \begin{array}{rcl}
+a_0,\ldots,a_M\in\restratified	& \then	& \exists m\ge 0,\quad a_0,\ldots,a_M\in\nthut{m}			\\
+														\\
+				& \then & \langle a_0,\ldots,a_M\rangle\in\mathbb{T}(\nthut{m})
+                                          \subseteq\nthut{m+1}\subseteq\restratified				\\
+														\\
+				& \then & \langle a_0,\ldots,a_M\rangle\in\restratified\qed 
+\end{array} $$
+\end{proof}
+
+We also need to be able to break down nested sequences:
+
+\begin{theorem}[Decapsulation]
+Let $ A\in\restratified $ with $ A $ as sequentiable, then there exists $ M, m\ge 0 $ such that:
+$$ A=\langle a_0,\ldots, a_M\rangle,\qquad\mbox{with}\quad a_0,\ldots, a_M\in\nthut{m}  $$
+\end{theorem}
+
+\begin{proof}
+$$ \begin{array}{rcl}
+A\mbox{ is sequentiable}	& \then & \exists m\ge 0,\quad\exists k\ge 1,\quad A\in\nthpt{k}(\nthut{m})			\\
+																\\
+				& \then & \exists m\ge 0,\quad\exists\ell\ge 0,\quad A\in\mathbb{T}(\nthpt{\ell}(\nthut{m}))	\\
+																\\
+				& \but	& \mathbb{T}\of{S}:=\bigcup_{n\ge 0}S^n							\\
+																\\
+				& \then & \exists m,\ell,M\ge 0,\quad A\in[\nthpt{\ell}(\nthut{m})]^{M+1}			\\
+																\\
+				& \then & \exists m,\ell,M\ge 0,\quad A=\langle a_0,\ldots,a_M\rangle				\\
+																\\
+				& \with & a_0,\ldots,a_M\in\nthpt{\ell}(\nthut{m})\subseteq\nthut{m+1}
+\end{array} $$
+
+In the case that $ \ell=0 $ we have $ a_0,\ldots,a_M\in\nthut{m} $, otherwise $ a_0,\ldots,a_M\in\nthut{m+1} $. In either
+case this can be simplified to saying there exists $ m\ge 0 $.\qed
+\end{proof}
+
+Following this, we are ready to prove the elements of our stratified powertuple also grow and shrink \emph{within} a given level of
+complexity while remaining in the space. In the context of sequences, this is naturally interpreted as a \emph{lengthwise} property:
+
+\begin{theorem}[Catenation/Decatenation]
+Let $ A,B\in\restratified $ with $ A,B $ as sequentiables:
+\begin{enumerate}
+\item $ A|B\in\restratified $
+\item $ A\backslash B\in\restratified $
+\end{enumerate}
+\end{theorem}
+
+As we have not introduced the above notation previously, $ A|B $ just means joining two sequences to become one long sequence,
+while $ A\backslash B $ splits $ A $ returning the prefix of $ A $ that does not coincide with $ B $. In the case $ B $ doesn't
+match as a suffix, $ A $ itself is returned. This operator can loosely be thought to parallel the \emph{set difference} operator
+from set theory.
+
+\begin{proof}
+$$ \begin{array}{rcl}
+A,B\mbox{ are sequentiable}	& \then & \exists M,N,m,n\ge 0,\quad A=\langle a_0,\ldots,a_M\rangle,
+					  \quad B=\langle b_0,\ldots,b_N\rangle							\\
+																\\
+				& \with & a_0,\ldots,a_M\in\nthut{m}\quad\mbox{and}\quad b_0,\ldots,b_N\in\nthut{n}		\\
+																\\
+				&	& \mbox{without loss of generality let } m\le n						\\
+																\\
+				& \then & a_0,\ldots,a_M,b_0,\ldots,b_N\in\nthut{n}						\\
+																\\
+				& \then & \langle a_0,\ldots,a_M,b_0,\ldots,b_N\rangle\in\nthut{n+1}\subseteq\restratified\qed
+\end{array} $$
+\end{proof}
+
+\begin{proof}
+$$ \begin{array}{rcl}
+A,B\mbox{ are sequentiable}	& \then & \exists M,N,m\ge 0,\quad A=\langle a_0,\ldots,a_M,b_0,\ldots,b_N\rangle,
+					  \quad B=\langle b_0,\ldots,b_N\rangle							\\
+																\\
+				& \with & a_0,\ldots,a_M, b_0,\ldots,b_N\in\nthut{m}						\\
+																\\
+				& \then & \langle a_0,\ldots,a_M\rangle\in\nthut{m+1}\subseteq\restratified\qed
+\end{array} $$
+\end{proof}
+
+These four operators though not computationally practical, or user-friendly as an interface grammar, are sufficiently powerful
+in their potential. Any implementation can easily extend these to more powerful versions optimized with intuitive grammars
+and acceptable efficiency standards.
+
+With this we have now introduced our variant mathematical model. Before moving on to the implementation, a potential criticism
+does arise: If such a ``stratified powertuple'' model of reference is equal in potential, and is a better fit for translation,
+\emph{why then was the set-theoretic version introduced in part one}?
+
+It's not a bad question, but I've thought it over long enough I've decided it was worth keeping. A better question to ask to
+aid us in our understanding would be: \emph{Let's say we had introduced the sequence-theoretic approach first (and only),
+what would we have lost in doing so}?
+
+\begin{enumerate}
+\item Set theory offers a foundation for all of math, allowing us a universal language to represent any mathematical
+      or computational pattern we're able to recognize in our lives. There is no equivalent theory of sequences as
+      a general theory of all mathematics. In the limited case of finite and computable, set theory and sequence theory
+      can be considered equipotent because each construct can be used to represent the other, but without introducing
+      the set-theoretic version first, we would potentially be restricting the theoretical limits of our theory as a whole.
+\item Future computers such as quantum computers might not adhere to register machine architectures. Thus by introducing
+      the set-theoretic version, we have introduced a version which is conceptually ideal, we are left with a template
+      to which we can create any other variant model necessary when required. Powertuples are an optimization toward register
+      machine architecture, but future architectures may differ, as such it is worth introducing this theory with as few
+      structural constraints as possible, and set-theory offers that.
+\end{enumerate}
+The value of introducing the set-theoretic version then is to maintain a higher level of abstraction and theoretical
+\emph{portability}.
+
+\section*{Implementation}
+
+Implementation comes in two parts: Our \emph{definition}, then our \emph{algebra}.
+
+\subsection*{Definition}
+
+The implementation of our stratified powertuple definition can be summarized visually as follows:
+
+$$ \begin{array}{r|l|l|l|l}
+									&
+\nthpt{0}								&
+\nthpt{1}								&
+\nthpt{2}								& \ldots \\
+									& & & & \\
+\hhline{=|=|=|=|=}
+									& & & & \\
+\nthut{0}								&
+\sifter{0}{0}{0}, \sifter{0}{0}{1}, \sifter{0}{0}{2}, \ldots\qquad	&
+\sifter{0}{1}{0}, \sifter{0}{1}{1}, \sifter{0}{1}{2}, \ldots\qquad	&
+\sifter{0}{2}{0}, \sifter{0}{2}{1}, \sifter{0}{2}{2}, \ldots\qquad	& \ldots \\
+									& & & & \\
+\hhline{=|=|=|=|=}
+									& & & & \\
+\nthut{1}								&
+									&
+\sifter{1}{1}{0}, \sifter{1}{1}{1}, \sifter{1}{1}{2}, \ldots\qquad	&
+\sifter{1}{2}{0}, \sifter{1}{2}{1}, \sifter{1}{2}{2}, \ldots\qquad	& \ldots \\
+									& & & & \\
+\hhline{=|=|=|=|=}
+									& & & & \\
+\nthut{2}								&
+									&
+\sifter{2}{1}{0}, \sifter{2}{1}{1}, \sifter{2}{1}{2}, \ldots\qquad	&
+\sifter{2}{2}{0}, \sifter{2}{2}{1}, \sifter{2}{2}{2}, \ldots\qquad	& \ldots \\
+									& & & & \\
+\hhline{=|=|=|=|=}
+									& & & & \\
+\vdots	& \vdots & \vdots & \vdots & \ddots
+\end{array} $$
+This table is at the \emph{intersection} between a data structure specification versus its implementation, of our mathematical model.
+You could consider it a psuedo description, but it's meant to be more refined than that: It's intended to be midway between
+any actual specification and any actual implementation. This is to say, it's abstract enough be refined to match any
+interface and policy specification, but it also has enough detail to offer a way of translating to any actual programming
+language or register machine architecture. This is its intention, but for the purposes of this article we will consider
+it on the side of a weak specification.
+
+Before heading into it, we need a name for this data structure. As it's based off our stratified powertuple,
+for the remainder I will refer to this computing science style construct as a \emph{stratituple}.
+
+So let's explain how our stratituple works. The rows $ \nthut{n} $ can be thought of as the unified powertuples,
+and the columns $ \nthpt{k} $ as the regular powertuples of our mathematical model. We'll call the locations where
+the rows and columns intersect \emph{cells}. Looking back at the definition of a stratified powertuple, we constructively
+started with the content set $ \mathcal{S} $. The elements of this set are translated into our stratituple as contents
+of its top left corner $ \nthut{0}\nthpt{0} $ cell:
+$$ \sifter{0}{0}{0}, \sifter{0}{0}{1}, \sifter{0}{0}{2}, \ldots $$
+
+We then construct each powertuple cell $ \nthut{0}\nthpt{k+1} $ iteratively from this basis. The second cell constructed
+in the column to the right of our initial cell is translated as the first powertuple of the elements in our initial cell.
+This is to say \emph{only}\ \footnote{In the mathematical model we define a powertuple as \emph{all} possible finite sequences
+of elements, but as we are dealing with an implementation with assumed limited resources we defer to a lazy constructive paradigm
+where we only construct what we use.} finite sequences of elements of the initial cell belong. So for example,
+our second cell might actually look like:
+$$ \begin{array}{l}
+\langle\sifter{0}{0}{0}, \sifter{0}{0}{3}\rangle,			\\
+									\\
+\langle\sifter{0}{0}{1}, \sifter{0}{0}{2}, \sifter{0}{0}{5}\rangle,	\\
+									\\
+\langle\sifter{0}{0}{3}\rangle,						\\
+									\\
+\langle\sifter{0}{0}{2}, \sifter{0}{0}{4}, \sifter{0}{0}{2}\rangle
+\end{array} $$
+
+This example does bring up a subtlety. In the main table our second cell is as follows:
+$$ \sifter{0}{1}{0}, \sifter{0}{1}{1}, \sifter{0}{1}{2}, \ldots $$
+so where did these names go?
+
+The difference is that the sequences shown above are the real contents of the cell,
+but for the sake of \emph{ease of reference} we give them all simplified names:
+$$ \begin{array}{rcl}
+\sifter{0}{1}{0} & : & \langle\sifter{0}{0}{0}, \sifter{0}{0}{3}\rangle,			\\
+		       										\\
+\sifter{0}{1}{1} & : & \langle\sifter{0}{0}{1}, \sifter{0}{0}{2}, \sifter{0}{0}{5}\rangle,	\\
+		       										\\
+\sifter{0}{1}{2} & : & \langle\sifter{0}{0}{3}\rangle,						\\
+		       										\\
+\sifter{0}{1}{3} & : & \langle\sifter{0}{0}{2}, \sifter{0}{0}{4}, \sifter{0}{0}{2}\rangle
+\end{array} $$
+
+To construct the next cell to the right (in the same row) then, we again construct sequences
+of names within the previous cell:
+$$ \begin{array}{rcl}
+\sifter{0}{2}{0} & : & \langle\sifter{0}{1}{0}\rangle,								\\
+		        											\\
+\sifter{0}{2}{1} & : & \langle\sifter{0}{1}{8}, \sifter{0}{1}{0}, \sifter{0}{1}{5}, \sifter{0}{1}{5}\rangle,	\\
+		       												\\
+\sifter{0}{2}{2} & : & \langle\sifter{0}{1}{2}\rangle
+\end{array} $$
+
+It ends up being the same pattern of construction this way: You continue adding sequences to new cells to the right
+of the previous one---using names from the previous one---and all of this, as long as you stay within the same row.
+
+We continue this process, but at some point we want to move on, we want to construct the next row, we
+want to translate to constructing the next unified powertuple. We start with the first cell of the next row.
+In the table, all rows following the first have their initial cell as empty. The reason for this is that
+$$ \nthpt{0}(\nthut{n})\quad :=\quad\nthut{n}\quad :=\quad\ptunion{k}(\nthut{n-1}) $$
+which is to say the first cell translates to being the accumulated names of all the previous cells.
+As they already exist in the previous rows---and as this is a practical implementation---we only
+need specify them once without duplication where we first encounter them.
+
+As for the next cell to the right (which we intuitively consider to be the \emph{actual} initial cell for this row),
+here you again create sequences of names from the previous, but instead of the previous cell which is empty,
+you now have access to all the names within all the cells of the previous row. It doesn't stop there though:
+As you construct all such following ``initial'' cells in rows below, not only do you have access to the names of the previous row,
+you also have access to all the names within all the previous rows, to which you can mix and match to create new sequences.
+
+After that, as you construct cells rightward within the same row, it's very much like the first row: You can only use
+names from the previous cell.
+
+If you do things this way, then the whole structure of our stratituple corresponds (in potential)
+to the definition of the more theoretical stratified powertuple that inspired it.
+
+\subsection*{Algebra}
+
+When we look to introduce an algebra for our stratituple, some subtleties of intepretation arise.
+
+The main issue boils down to the fact that though our stratituple is a data structure in its own right, it can also be
+considered a \emph{universal data structure}, which is to say it's meant to simulate all other finite computable data structures.
+In particular, any such simulated data structure internally would be expressed through the nested sequences we've described within.
+For example if you unravelled one of the previously mentioned example sequences, say $ \sifter{0}{2}{1} $, you'd
+get\ \footnote{Technically this example is incomplete, as names belonging to $ \nthut{0}\nthpt{1} $ only exist if they point to
+something within $ \nthut{0}\nthpt{0} $, though in this example we leave some of that information out for simplicity of concept.} :
+
+$$ \begin{array}{ll}
+\sifter{0}{2}{1}		& 									\\
+\vline													\\
+\langle\sifter{0}{1}{8},	& \sifter{0}{1}{0}, \sifter{0}{1}{5}, \sifter{0}{1}{5}\rangle		\\
+				& \vline								\\
+				& \langle\sifter{0}{0}{0}, \sifter{0}{0}{3}\rangle
+\end{array} $$
+
+Effectively, you have a bunch of tree structures, refactored to share resources to reduce memory usage (among other reasons).
+From a theory of sequences---where the game is to represent everything else in the finite mathematical universe as sequences---you
+can reinterpret these trees as any other type of data structure, such as a \emph{set}, \emph{list}, \emph{graph}, \emph{hash table},
+etc. You might ask if that's even possible, but as it stands these constructs are already implemented in many well known programming
+languages for use within register machine architectures as address based memory (sequences), and although this is not a theoretical
+proof, it will here be taken for granted as close enough.
+
+So when we speak of an algebra for our stratituple, what level of implementation are we looking to introduce its operators?
+Low level nested sequences? Optimized grammar for high level abstract semantic data types?
+
+The level with which we've introduced the stratituple, is itself our solution. The main realization is that we introduced
+our stratituple by translating from the mathematical model. We furthermore explained how one would construct the cells
+(row by row, left to right, the first cell down has access to all previous names\ldots), and it is at this level we introduce
+our operators of interest. At this level of implementation it should be noted we are again at a \emph{midway}, a point of
+intersection between specification and implementation: Operators that focus on introducing sequences into cells are the basis
+for any specification we may refine later on, but also offer enough flexibility themselves to still be decomposed and optimized
+for any actual architectural implementation.
+
+To be fair, this is all a long winded way of saying we are focusing on operators which act on the stratituple as data structure
+itself. We will standardize our approach by means of considering its lifecycle, for which we've already informally described
+as part of its definition.
+
+When focusing on the lifecycle aspect of it, I would say the main trends are: \emph{birth, growth, change, decline, death},
+not to sound too poetic or anything. As for a computing lens, this might translate to: \emph{construction, extension, mutation,
+restriction, destruction}. As mentioned above, we are looking for midway operators, which are sufficiently powerful and expressive
+on their own, yet can be used to compose more structured operators representing the lifecycle changes of our stratituple.
+
+\subsubsection*{construction}
+
+Construction would more or less consist of creating a dynamic list (rows) of unified powertuples, where each row
+is itself a dynamic list (cells) of regular powertuples, where each cell is then a dynamic list of \emph{sifter} names
+\footnote{The idea of a \emph{sifter} will be elaborated upon in part three.} . It's kind of like a 3-dimensional
+nested dynamic list. Such structures (N-dimensional) I prefer to call \emph{plots}.
+
+Otherwise each cell would start empty. Keep in mind construction is effectively initialization, so we create
+the overall structure and leave it in a state ready for extension.
+
+\subsubsection*{destruction}
+
+Destruction would mean destroying each dynamic list accordingly, which is to say deleting all the sifter names
+within cells so that we return to an empty structure, then destroying the structure.
+
+\subsubsection*{extension}
+
+Extension in the broadest sense is to supply a sequence of sifter names to the stratituple, and request that the
+sequence be added to the appropriate cell.
+
+In this situation, our operator dispatches according to sequence \emph{type}. Interestingly, the means to which
+we've created cells within the stratituple table supplies us with a natural type system for which we now compare
+these structures. Two sequences have the same type if they belong to the same cell. As such, the idea
+of \emph{cell matching} and any related subroutines are instrumental to the extension operators we specify.
+
+Our operator then would start by taking its input sequence and analyzing it to know which cell it belongs to.
+In order for it to be successfully added, we would then verify that the sifter names that make up
+its components each belong to previous cells. In such a case, before we add it to the appropriate cell,
+we'd first check if it already belongs. If not, then we could finally add it.
+
+\subsubsection*{restriction}
+
+Restriction is more subtle as it has an important constraint. Namely, in theory when looking to remove a given sequence,
+you should be able to specify its cell location and its name, and if it's there it would be removed. The subtlety
+comes from the fact that other sequences in other cell locations may depend on this sequence (rather its name),
+and so if removed, you'd have a dangling pointer more or less.
+
+There's no single best policy to handle this: We have a point of modular divergence in the design of our
+stratituple specification. I myself have chosen a design such that sequence removal {\bf is allowed},
+but only if no other sequences depend on the sequence in question.
+
+This actually suggests an extension to our stratituple to include count information embedded in each
+name.\ \footnote{Such a counter system is reminiscent of the pushdown automata of a context free grammar.
+It might be worth researching whether such an implementation has a context free grammar embedded within.}
+This of course is an optimization, and could be considered later, but I thought it worth introducing here anyway.
+
+\subsubsection*{mutation}
+
+With a design policy that allows for restriction, we also now have the possibility of mutation. Technically
+it exists because in theory you can remove a sequence, and then add another sequence in the same location
+with the same name. Strictly speaking these are separate actions, but in effect they could be interpreted
+as mutation. In which case, it makes sense to allow it so that it can be optimized accordingly, and in
+particular: \emph{safely}. Of course its inclusion would be constrained under the policy that you can
+only mutate a sequence if no other sequence in any other cell depends on it.
+
+\section*{Conclusion}
+
+Now that we have our weakly specified stratituple data structure, how do we implement it into a computational model of reference?
+
+Turing machines are effective because universal machines exist---machines which simulate all other Turing machines.
+The greatest strength of our stratituple as a data structure when used toward a theory of computation is that it is
+a \emph{universal} structure---a structure which simulates all other data structures. How is this relevant to computation?
+We now have a medium to navigate any data structure in a unified way. It gives us a universal grammar to reference
+content and express the ways in which we wish for that content to change computationally.
+
+It may not be clear yet, but this opens up new ways to express all existing computational concepts used
+in the design of a modern programming language, which offers a foundation to a new genre of languages in general.
+This of course will be the topic of \emph{part three}.
+
+Pijariiqpunga.
+
+\end{document}
+

@@ -1,0 +1,750 @@
+% Copyright 2019 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=2.5cm,right=2.5cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{asymptote}
+
+\newcommand{\then}{\ensuremath{\quad\Longrightarrow\quad}}
+\newcommand{\equals}{\ensuremath{\quad =\quad}}
+
+\newcommand{\fourqquad}{\ensuremath{\qquad\qquad\qquad\qquad}}
+
+\begin{asydef}
+// this comment prevents a compilation bug.
+
+real direction(bool value)
+{
+	return value ? 1 : -1;
+}
+
+pair segment(pair current = (0,0), string align, real angle, real projection)
+{
+	bool   nonnegative = (angle >= 0);
+		     angle = nonnegative ? angle : -angle;
+	real perpendicular = Tan(angle);
+
+	pair initialVertex = (align == "E" || align == "W") ?
+			     (               direction(align == "E"), direction(nonnegative) * perpendicular) :
+			     (direction(nonnegative) * perpendicular,                direction(align == "N")) ;
+
+	pair scaledVertex  = scale(projection) * initialVertex;
+	pair shiftedVertex = shift(current)    * scaledVertex;
+
+	return shiftedVertex;
+}
+
+pair left(real height, real angle, pair current = (0,0))
+{
+//	return segment(current, "S", angle, height);
+
+	real width = height*Tan(angle);
+
+	return current - (width, height);
+}
+
+pair Left(real height, real angle, path p)
+{
+	real width = height*Tan(angle);
+	pair last  = point(p, size(p)-1);
+
+	return last + (-width, -height);
+}
+
+pair right(real height, real angle, pair current = (0,0))
+{
+//	return segment(current, "S", angle, height); // left
+
+	real width = height*Tan(angle);
+
+	return current + (width, -height);
+}
+
+pair Right(real height, real angle, path p)
+{
+	real width = height*Tan(angle);
+	pair last  = point(p, size(p)-1);
+
+	return last + (width, -height);
+}
+
+//
+
+void drawpath(path p)
+{
+	draw(p);
+
+	for (int k=0; k < size(p); ++k)
+	{
+		dot(point(p, k));
+	}
+}
+
+void safeLabel(picture pic = currentpicture, Label L, pair position, real width, real height,
+		align align = NoAlign, pen p = currentpen, filltype filltype = NoFill)
+{
+	pair sw = position + (-width,-height);
+	pair se = position + (-width, height);
+	pair nw = position + ( width,-height);
+	pair ne = position + ( width, height);
+
+	filldraw(pic, sw--se--ne--nw--cycle, white, p);
+	label(pic, L, position, align, p, filltype);
+}
+
+void rotatedLabel(picture pic = currentpicture, Label L, pair position,
+		align align = NoAlign, real angle, pen p = currentpen, filltype filltype = NoFill)
+{
+	picture lpic;
+
+	label(lpic, L, align, p, filltype);
+
+	pic.add(shift(position)*rotate(angle)*lpic);
+}
+
+\end{asydef}
+
+\title{kin}
+\author{Daniel Nikpayuk}
+\date{August 20, 2019}
+\pagestyle{empty}
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\ \\[3cm]
+
+\noindent\begin{minipage}{7cm}
+\begin{asy}
+unitsize(1cm);
+
+//
+
+real                angle = 30;
+real          offsetangle = 90 - angle;
+pair        perpendicular = (Tan(angle), 1);
+
+//
+
+pair            leftbase0 = (0,   0);
+pair          leftoffset0 = (0, 0.5);
+
+pair  leftbaseleftcorner0 = segment(leftbase0, "N", -angle, 5);
+pair leftbaserightcorner0 = segment(leftbase0, "N", angle, 5);
+
+draw(leftbase0--leftbaseleftcorner0, mediumred);
+draw(leftbase0--leftbaserightcorner0, mediumred);
+
+rotatedLabel("concept theory", leftoffset0, W, -offsetangle, blue);
+rotatedLabel("specification lang", leftoffset0 + 0.75*perpendicular, E, offsetangle, blue);
+
+//
+
+pair            leftbase1 = (0,   2);
+pair          leftoffset1 = (0, 2.5);
+
+pair  leftbaseleftcorner1 = segment(leftbase1, "N", -angle, 3);
+pair leftbaserightcorner1 = segment(leftbase1, "N", angle, 3);
+
+draw(leftbase1--leftbaseleftcorner1, heavyred);
+draw(leftbase1--leftbaserightcorner1, heavyred);
+
+rotatedLabel("type theory", leftoffset1, W, -offsetangle, blue);
+
+//
+
+pair            rightbase0 = (10,   0);
+pair          rightoffset0 = (10, 0.5);
+
+pair  rightbaseleftcorner0 = segment(rightbase0, "N", -angle, 5);
+pair rightbaserightcorner0 = segment(rightbase0, "N", angle, 5);
+
+draw(rightbase0--rightbaseleftcorner0, mediumred);
+draw(rightbase0--rightbaserightcorner0, mediumred);
+
+rotatedLabel("assembly", rightoffset0, W, -offsetangle, blue);
+rotatedLabel("implementation lang", rightoffset0 + 0.75*perpendicular, E, offsetangle, blue);
+
+//
+
+draw((3,2)--(7,2), orange, Arrow);
+
+\end{asy}
+\end{minipage}\\[1cm]
+
+
+\noindent\begin{minipage}{7cm}
+\begin{asy}
+unitsize(1cm);
+
+//
+
+pair p    = (0,0);
+pair p0   = (0,-1.5);
+pair p00  = (0,-3);
+
+pair c    = (5.5,0);
+
+pair c0   = Left(1.5, 55, c);
+pair c00  = Left(1.5, 35, c0);
+pair c01  = Right(1.5, 35, c0);
+pair c000 = Right(1.5, 35, c00);
+
+pair c1   = Right(1.5, 55, c);
+pair c10  = Left(1.5, 35, c1);
+pair c11  = Right(1.5, 35, c1);
+pair c100 = Right(1.5, 35, c10);
+
+//
+
+draw(p--p0--p00);
+
+draw(c--c0);
+draw(c0--c00);
+draw(c0--c01);
+draw(c00--c000);
+draw(c01--c000);
+
+draw(c--c1);
+draw(c1--c10);
+draw(c1--c11);
+draw(c10--c100);
+draw(c11--c100);
+
+draw(shift(4.5,-2)*scale(6.5, 4.5)*unitcircle);
+
+draw(shift(14,1)*scale(1, 0.5)*unitcircle);
+draw(shift(14,-2)*scale(1, 0.5)*unitcircle);
+draw(shift(14,-5)*scale(1, 0.5)*unitcircle);
+
+draw((11, 0.5)--(12.5, 0.75), Arrow);
+draw((11.5, -2)--(12.5, -2), Arrow);
+draw((11, -4.5)--(12.5, -4.75), Arrow);
+
+//
+
+safeLabel("step", p, 0.50, 0.25);
+safeLabel("path", p0, 0.50, 0.25);
+safeLabel("trail", p00, 0.50, 0.25);
+
+safeLabel("concept", c, 0.80, 0.25);
+
+safeLabel("mutable", c0, 0.80, 0.25);
+safeLabel("kind", c00, 0.50, 0.25);
+safeLabel("occurrence", c01, 1.05, 0.25);
+safeLabel("idea", c000, 0.45, 0.25);
+
+safeLabel("immutable", c1, 1.05, 0.25);
+safeLabel("type", c10, 0.50, 0.25);
+safeLabel("instance", c11, 0.85, 0.25);
+safeLabel("judgement", c100, 1.05, 0.25);
+
+label("{\bfseries symbolic category}:", (3, 1));
+
+label("{\bfseries numeric category}:", (14, 2));
+label("\ldots", (14, 1));
+
+label("{\bfseries graphic category}:", (14, -1));
+label("\ldots", (14, -2));
+
+label("\textless hardware\textgreater\ {\bfseries category}:", (14, -4));
+label("\ldots", (14, -5));
+
+\end{asy}
+\end{minipage}\\[1cm]
+
+When you get down to basics, programming languages require {\bf grammar} for \emph{data structures} and \emph{algorithms}.
+Algorithms tend to be defined as functions, which are used to manipulate the data in the structures. Beyond this,
+all you really need is a system to diagnose design correctness, and everything else is just details.
+
+Today's Programming languages generally follow the \emph{variable} + \emph{type} + \emph{instance} paradigm:
+$$ \begin{array}{rcl}
+\mbox{int } x			& =			& 5;									\\
+																\\
+				& \mbox{which}		&									\\
+				& \mbox{binds as}	&									\\
+																\\
+\langle\mbox{variable}\rangle	& \to			& (\langle\mbox{type}\rangle, \langle\mbox{instance}\rangle)		\\
+x				& \to			& (\mbox{int}, 5)							\\
+																\\
+\end{array} $$
+
+The kin programming language on the other hand breaks from this
+traditional \emph{genre} by instead interpreting variables as follows:
+$$ \langle\mbox{variable}\rangle\ \to\ \langle\mbox{concept}\rangle\ +\ \langle\mbox{sifter}\rangle\ +\ \langle\mbox{target}\rangle $$
+
+\section*{Level 0 {\normalfont (grammar for near-linear constructs)}}
+
+Intuitively, {\bf concepts} are a deconstruction of {\bf trees}.\\[0.1cm]
+
+\begin{minipage}{4cm}
+\begin{asy}
+unitsize(1cm);
+
+//
+
+pair p      = (0, 0);
+pair p0     = right(1, 25, p);
+pair p1     = left(1, 25, p);
+pair p1p0   = left(1, 30, p1);
+pair p0p0   = right(1, 25, p0);
+pair p0p1   = p0 - (0,1);
+pair p0p2   = left(1, 25, p0);
+pair p1p0p0 = right(1, 25, p1p0);
+pair p1p0p1 = left(1, 25, p1p0);
+pair p0p1p0 = p0p1 - (0,1);
+
+//
+
+draw(p--p0);
+draw(p--p1);
+draw(p1--p1p0);
+draw(p0--p0p0);
+draw(p0--p0p1);
+draw(p0--p0p2);
+draw(p1p0--p1p0p0);
+draw(p1p0--p1p0p1);
+draw(p0p1--p0p1p0);
+
+//
+
+dot(p);
+dot(p0);
+dot(p1);
+dot(p1p0);
+dot(p0p0);
+dot(p0p1);
+dot(p0p2);
+dot(p1p0p0);
+dot(p1p0p1);
+dot(p0p1p0);
+
+//
+
+label("r", p, N, blue);
+label("e", p0p0, S, blue);
+label("d", p0p1p0, S, blue);
+label("c", p0p2, S, blue);
+label("b", p1p0p0, S, blue);
+label("a", p1p0p1, S, blue);
+
+\end{asy}
+\end{minipage}\begin{minipage}{12cm}
+Why {\bf Trees}?
+
+\begin{enumerate}
+\item They're sufficiently and minimally connected. They offer navigational access to
+      all data points in the structure while maintaining minimal navigational overhead.
+\item They are recursive and thus self-similar. Structures are most expressive when all
+      combinatorial substructures are easy to represent.
+\end{enumerate}
+
+\end{minipage}\\[0.1cm]
+
+Trees are ideal structures. As I'm designing a language with a highly expressive math-like (entropic) grammar the notion of
+``structure'' has high utility when it's highly navigable, which is achieved if one can express all possible substructures
+with ease. Trees are ideal in this way because there's a natural bijection between initial subpaths (from the root) and
+subtrees. Any computationally effective data structure used in a programming language often has a similar patterning,
+thus trees are the starting point for this design.
+
+Concepts are derived as follows: Trees can be represented as a collection of paths, and a collection of (refactorable) paths
+can represent a tree, but \emph{not all} collections of paths can be converted into trees. This is the basic idea of a concept,
+it's a weakening of the idea of a tree.
+
+\noindent\begin{minipage}{6cm}
+\begin{asy}
+unitsize(1cm);
+
+//
+
+path p0 = (0, 0);
+p0      = p0--Right(1, 20, p0);
+p0      = p0--Left(1, 30, p0);
+p0      = p0--Left(1, 20, p0);
+
+path p1 = (0.5, 0);
+p1      = p1--Right(1, 15, p1);
+p1      = p1--Left(1, 30, p1);
+p1      = p1--Right(1, 20, p1);
+
+path p2 = (1, 0);
+p2      = p2--Right(1, 20, p2);
+p2      = p2--Left(1, 30, p2);
+
+path p3 = (1.5, 0);
+p3      = p3--Right(1, 20, p3);
+p3      = p3--Left(1, 30, p3);
+p3      = p3--Left(1, 20, p3);
+
+path p4 = (2, 0);
+p4      = p4--Right(1, 20, p4);
+p4      = p4--Right(1, 30, p4);
+
+//
+
+drawpath(p0);
+drawpath(p1);
+drawpath(p2);
+drawpath(p3);
+drawpath(p4);
+
+//
+
+label("r", point(p0, 0), N, blue);
+label("r", point(p1, 0), N, blue);
+label("r", point(p2, 0), N, blue);
+label("r", point(p3, 0), N, blue);
+label("r", point(p4, 0), N, blue);
+
+label("a", point(p0, size(p0)-1), S, blue);
+label("b", point(p1, size(p1)-1), S, blue);
+label("c", point(p2, size(p2)-1), S, blue);
+label("d", point(p3, size(p3)-1), S, blue);
+label("e", point(p4, size(p4)-1), S, blue);
+
+label("$ \left\{\begin{array}{cccccccccccc} & & & & & & & & & & & \\ \\ \\ \\ \\ \\ \\ \\ \end{array}\right\} $", (-1.35,0.65), SE);
+
+\end{asy}
+\end{minipage}\begin{minipage}{10.5cm}
+Why {\bf Concepts}?
+
+\begin{enumerate}
+\item Concepts can represent trees and are the starting point for data structures, but they can also represent primitive functions.
+      This extends to function composition (tree composites), which can can then be used to express primitive recursive functions.
+\item Concepts maintain the same ideal sub-structuring and navigability patterns seen within trees, but are
+      \emph{not} restricted to the same expectation that they should form semantically complete objects.
+\end{enumerate}
+
+\end{minipage}\\[0.5cm]
+
+Concepts are ideal prototypes. Let's go over these points in more detail.
+
+To start, since concepts within the kin language privilege expressivity of substructuring,
+we define {\bf sifters} to be the use of predicate logic analogous to set theoretic \emph{subsetting}:
+$$ \{\ x\in \mbox{Concept}\quad | \quad \mbox{Sifter}(x)\ \} $$
+To be fair, I could use the word ``filter'' instead here, but I have chosen against it as it is already overused in the literature.
+Besides, ``sifter'' more accurately portrays the idea that our focus is on what's being kept rather than what's being cut.
+
+Next, although research into \emph{Concept Theory} is ongoing, it is intended to be compatible with \emph{Type Theory}.
+As example, let's construct the classic {\bf byte type}. We start with a concept as a byte prototype:\\[0.1cm]
+
+\noindent $ \mbox{\bf ProtoByte}\quad :=\quad \mbox{\bf /[0-7]/[0-1]} $\\[0.1cm]
+
+\begin{asy}
+unitsize(1cm);
+
+//
+
+pair r0      = (0,0);
+
+pair inc     = (-1, 0);
+pair nextL   = (0.25, -1);
+pair nextR   = (-0.25, -1);
+
+pair[] r1    = {(3.5, -1)};
+
+pair[][] r2  = {{r1[0] + nextL, r1[0] + nextR}};
+
+for (int k=1; k < 8; ++k)
+{
+	r1.push(r1[0] + k*inc);
+
+	pair[] last = {r1[k] + nextL, r1[k] + nextR};
+	r2.push(last);
+}
+
+//
+
+for (int k=0; k < 8; ++k)
+{
+	draw(r0--r1[k]);
+	draw(r1[k]--r2[k][0]);
+	draw(r1[k]--r2[k][1]);
+
+	dot(r1[k]);
+	dot(r2[k][0]);
+	dot(r2[k][1]);
+
+	label("0", r2[k][0], S, blue);
+	label("1", r2[k][1], S, blue);
+}
+
+dot(r0);
+
+//
+
+label("r", r0, N, blue);
+
+label("$ \left\{\begin{array}{ccccccccccccccccccccccc} & & & & & & & & & & & & & & & & & & & & & & \\ \\ \\ \\ \\ \\ \\ \\
+                \end{array}\right\} $", (-4.45,1.05), SE);
+
+\end{asy}
+
+\noindent we can then use this protobyte to define byte instances:\\[0.1cm]
+
+\noindent $ \mbox{\bf Byte Instance}\quad :=\quad \mbox{\bf ProtoByte/[0-7]/}\quad\to\quad \mbox{\bf 0+1} $\\[0.1cm]
+
+\begin{asy}
+unitsize(1cm);
+
+//
+
+pair r0      = (0,0);
+
+pair inc     = (-1, 0);
+pair nextL   = (0.25, -1);
+pair nextR   = (-0.25, -1);
+
+pair[] r1    = {(3.5, -1)};
+
+pair[] r2    = {r1[0] + nextR};
+
+for (int k=1; k < 8; ++k)
+{
+	r1.push(r1[0] + k*inc);
+}
+
+r2.push(r1[1] + nextL);
+r2.push(r1[2] + nextL);
+r2.push(r1[3] + nextR);
+r2.push(r1[4] + nextR);
+r2.push(r1[5] + nextL);
+r2.push(r1[6] + nextL);
+r2.push(r1[7] + nextR);
+
+//
+
+for (int k=0; k < 8; ++k)
+{
+	draw(r0--r1[k]);
+	draw(r1[k]--r2[k]);
+
+	dot(r1[k]);
+	dot(r2[k]);
+}
+
+label("1", r2[0], S, blue);
+label("0", r2[1], S, blue);
+label("0", r2[2], S, blue);
+label("1", r2[3], S, blue);
+label("1", r2[4], S, blue);
+label("0", r2[5], S, blue);
+label("0", r2[6], S, blue);
+label("1", r2[7], S, blue);
+
+dot(r0);
+
+//
+
+label("r", r0, N, blue);
+
+label("$ \left\{\begin{array}{ccccccccccccccccccccccc} & & & & & & & & & & & & & & & & & & & & & & \\ \\ \\ \\ \\ \\ \\ \\
+                \end{array}\right\} $", (-4.45,1.05), SE);
+
+\end{asy}
+
+\noindent where ``0+1'' is the ``or'' operator (disjoint union, coproduct), which is to say it is a grammar indicating
+\emph{alternatives}. In this way, since we can use concepts to define type instances, we can use them to define types
+themselves. So long as we restrict ourselves to this level, we can make use of all the benefits of type theory as well.
+
+The general extension of this is to define {\bf higher concepts}. From a concept theory perspective, a type is a collection
+of concepts, but it would be ideal for such a collection to be a concept as well. The intention of defining such constructs
+would be that they would behave the way initial concepts do, meaning they are highly expressive (and thus navigable) when
+it comes to substructures. This would allow us to maintain the \emph{sifter} style grammar for sub-structuring
+and navigation throughout the language.
+
+Next are {\bf functions}. Functions and function composition are intuitively represented as trees as follows:\\[0.5cm]
+
+\noindent\begin{minipage}{2cm}
+\begin{asy}
+unitsize(1cm);
+
+//
+
+pair p = (0,0);
+pair p0 = Left(1, 20, p);
+pair p1 = Right(1, 25, p);
+pair p2 = Right(1, 50, p);
+
+//
+
+draw(p--p0);
+draw(p--p1);
+draw(p--p2);
+
+//
+
+safeLabel("+", p, 0.25, 0.25);
+safeLabel("a", p0, 0.25, 0.25);
+safeLabel("b", p1, 0.25, 0.25);
+safeLabel("c", p2, 0.25, 0.25);
+
+\end{asy}
+$$ a = b + c $$
+\end{minipage}\begin{minipage}[b]{6cm}
+$$ \begin{array}{rcl}
++/0 & := & a \\
++/1 & := & b \\
++/2 & := & c
+\end{array} $$
+\end{minipage}\begin{minipage}{4cm}
+\begin{asy}
+unitsize(1cm);
+
+//
+
+pair p = (0,0);
+pair p0 = Left(1, 20, p);
+pair p1 = Right(1, 25, p);
+pair p2 = Right(1, 50, p);
+pair p2p0 = Left(1, 20, p2);
+pair p2p1 = Right(1, 25, p2);
+pair p2p2 = Right(1, 50, p2);
+
+//
+
+draw(p--p0);
+draw(p--p1);
+draw(p--p2);
+draw(p2--p2p0);
+draw(p2--p2p1);
+draw(p2--p2p2);
+
+//
+
+safeLabel("$\times$", p, 0.25, 0.25);
+safeLabel("d", p0, 0.25, 0.25);
+safeLabel("e", p1, 0.25, 0.25);
+safeLabel("+", p2, 0.25, 0.25);
+safeLabel("a", p2p0, 0.25, 0.25);
+safeLabel("b", p2p1, 0.25, 0.25);
+safeLabel("c", p2p2, 0.25, 0.25);
+
+\end{asy}
+$$ d = e(b+c) $$
+\end{minipage}\begin{minipage}[b]{4cm}
+$$ \begin{array}{lcl}
+\times/0 & := & d \\
+\times/1 & := & e \\
+\times/2 & := & (a=b+c) \\
+\times/2/0 & := & a \\
+\times/2/1 & := & b \\
+\times/2/2 & := & c
+\end{array} $$
+\end{minipage}\\[0.1cm]
+
+The advantage in representing functions as concepts is it allows the idea of a semantically incomplete function,
+an idea we will return to in Level 2.
+
+\section*{Level 1 {\normalfont (grammar for constructs with cycles)}}
+
+If we have tree navigable structures and functions, we can extend structures to be cyclical. In comparison, languages such as C/C++
+use arrays and pointers (dereference to obtain a numerical value which can be reinterpreted/cast as an array address). In the kin
+language, the equivalent is to define cyclic data structures as combinations of tree data structures plus primitive functions
+which map tree nodes to other tree nodes. Functions used in such definitions are called \emph{navigational functions}.
+
+\section*{Level 2 {\normalfont (grammar for functors)}}
+
+The kin language modularizes compile time objects and run time objects into their own categories:\\[0.1cm]
+
+\begin{asy}
+unitsize(1cm);
+
+//
+
+label("\parbox{3.5cm}{\centering compile time\\objects}", (0,0));
+label("\parbox{3.5cm}{\centering run time\\objects}", (10,0));
+label("target functor", (5,0.4));
+
+draw((3.5,0)--(6.5,0), Arrow);
+draw(scale(3,1)*unitcircle);
+draw(shift(10,0)*scale(3,1)*unitcircle);
+
+\end{asy}
+\\[0.1cm]
+
+\noindent which is where {\bf targets} come in. As stated at the beginning, a variable in the kin language can be extended
+to include target information which allows it to map to a run time object. For example, the byte type from earlier could
+be mapped to an 8-bit register on the target architecture.
+
+The value in modularizing compile time from run time is that it encourages the use of compile time concepts as incomplete
+run time objects (as mentioned previously). This might upon first glance appear to be a bug, but is in fact a feature: Concepts
+which do not map to run time objects may still express useful patterns which can be combined and recombined in the production
+of source code, thus increasing the overall expressivity of the language further. Beyond this, if we view the independent
+compile time category as \emph{symbolic}, it is then the starting place for \emph{semantic verification}, not to mention
+\emph{code generation} (given an appropriate type theoretic engine).
+
+Next, this symbolic approach combined with sifters creates a natural language for describing \emph{weak specifications}.
+Weak specifications are known to useful on their own (any proof experienced mathematician knows this), and in any case can
+always be extended and resolved if need be. Resolving the identity of a spec is equivalent to translating it into
+a \emph{run time object}.
+
+Lastly, this approach creates an expressive alternative to \emph{polymorphism}: In practice the kin language is intended
+to offer computational efficiency comparable to C++ but with a clean type system, and which furthermore prevents the sort
+of code bloat you might see in template metaprogramming with redundant type/procedure instantiation.
+
+\section*{experimental}
+
+This section is auxiliary to the main essay, as kin is in its developmental stage, I am still testing out ideas.
+There's no narrative flow to this section, just random ideas I'm trying that make sense to me.\\[0.1cm]
+
+$$ \begin{array}{rclclcl}
+\langle\mbox{variable}\rangle & = & \langle\mbox{graph}\rangle & + &\langle\mbox{predicate}\rangle & + &\langle\mbox{functor}\rangle \\
+\langle\mbox{concept}\rangle & = & \langle\mbox{prototype}\rangle & + &\langle\mbox{sifter}\rangle & + &\langle\mbox{target}\rangle \\
+\end{array} $$\\[0.1cm]
+
+\noindent\begin{minipage}{7cm}
+\begin{asy}
+unitsize(1cm);
+
+//
+
+pair p = (0,0);
+pair p0 = Left(2, 20, p);
+pair p1 = Right(2, 25, p);
+pair p2 = Right(2, 50, p);
+pair p3 = Right(2, 65, p);
+
+//
+
+draw(p--p0);
+draw(p--p1);
+draw(p--p2);
+draw(p--p3);
+
+//
+
+safeLabel("if", p, 0.25, 0.25);
+safeLabel("a+c", p0, 0.45, 0.25);
+safeLabel("t+f", p1, 0.45, 0.25);
+safeLabel("a", p2, 0.25, 0.25);
+safeLabel("c", p3, 0.25, 0.25);
+
+\end{asy}
+\end{minipage}\begin{minipage}{5cm}
+$$ \begin{array}{lclcl}
+\mbox{sifter } cond	& ::	& /\mbox{predicate}/\mbox{true}			& \then	& /0/ = \mbox{/antecedent/}		\\
+			&	& /\mbox{predicate}/\mbox{false}		& \then	& /0/ = \mbox{/consequent/}		\\
+																\\
+																\\
+\mbox{concept}		& ::	& \mbox{if}											\\
+\mbox{if.prototype}	& ::	& /0						&	& \texttt{\% unaliased}			\\
+			&	& /\mbox{predicate}\backslash\mbox{false}	&	& \texttt{\% /1\textbackslash 0}	\\
+			&	& /\mbox{predicate}\backslash\mbox{true}	&	& \texttt{\% /1\textbackslash 1}	\\
+			&	& /\mbox{antecedent}				&	& \texttt{\% /2}			\\
+			&	& /\mbox{consequent}				&	& \texttt{\% /3}			\\
+\mbox{if.sifter}	& ::	& cond												\\
+\mbox{if.target}	& ::	& \mbox{identity}										\\
+\end{array} $$
+\end{minipage}\\[1cm]
+
+Syntactic sugar for a function call:
+$$ \langle\,\mbox{if } pred\ ante\ conse\,\rangle $$
+
+\noindent\begin{minipage}{5cm}
+$$ \begin{array}{lcl}
+\mbox{type byte}					\\
+\mbox{prototype}	& ::	& /[0-3]/{0,1}		\\
+\end{array} $$
+\end{minipage}
+
+\end{document}
+

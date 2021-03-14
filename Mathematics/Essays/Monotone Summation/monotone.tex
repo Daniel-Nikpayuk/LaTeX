@@ -1,0 +1,97 @@
+% Copyright 2019 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amsmath}
+
+\newcommand{\bu}[1][u]{\ensuremath{\mathbf #1}}
+\newcommand{\eq}{\ensuremath{\quad=\quad}}
+
+\title{Monotone Summation Identities}
+\author{Daniel Nikpayuk}
+\date{December 8, 2019}
+\begin{document}
+\maketitle
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+\section{Terminology}
+
+Monotone sums are of the following form:
+$$ \sum_{0\le u_1\le u_2\le u_3\le\ldots\le u_{k-1}\le u_k\le n}f(u_1, u_2, u_3,\ldots, u_{k-1}, u_k) $$
+As is, this is quite tedious to parse so we shorten our notation as follows:
+$$ \sum_{(0\le\bu\le n)}^k\!\!\!\!\! f(\bu)  $$
+where
+$$ \bu\ :=\ (u_1, u_2,\ldots, u_{k-1}, u_k)  $$
+belongs to the montone $ k $-space: The set of monotonically increasing sequences of integers of length $ k $.
+
+This inspires further notation: In particular, if you wish to refer the $ j^{\mbox{\scriptsize th}} $ coordinate
+of $ \bu $, you simply write:
+$$  \bu_{/j}  $$
+Such notation is analogous to being able to access the \emph{real} and \emph{imaginary} components of a complex number:
+$$ \mathcal{R}e(z),\ \mathcal{I}m(z) $$
+
+We will also want a \emph{concatenation} operator:
+$$  \bu \mid \bu[v]\ :=\ (\bu_{/1},\ldots ,\bu_{/k},\bu[v]_{\!/1}, \ldots ,\bu[v]_{\!/\ell})  $$
+
+We can now express our summand switch laws:
+\begin{align*}
+\sum_{(0\le\bu\mid\bu[v]\le n)}^{j,k}                                       
+       \!\!\!\!\!\!\! f(\bu\mid\bu[v])                                 
+ &\eq \sum_{(0\le\bu\le n)}^j                                           
+       \sum_{(\bu\le\bu[v]\le n)}^k\!\!\!\!\! f(\bu\mid\bu[v])     \\  
+ &\eq \sum_{(0\le\bu[v]\le n)}^k                                          
+       \sum_{(0\le\bu\le\bu[v])}^j\!\!\!\!\! f(\bu\mid\bu[v])      \\
+\end{align*}
+
+\section{Identities}
+
+These sums are able to provide discrete closed forms for well known combinatorial numbers:
+\begin{align*}
+{k+n\choose n}
+ &\eq \sum_{(0\le\bu\le n)}^k \!\!\! 1						\\
+\left\{\!\!\!\begin{array}{c} k+n+1 \\ n+1 \end{array}\!\!\!\right\}
+ &\eq \sum_{(0\le\bu\le n)}^k \!\!\!\!
+	(\bu_{/1}+1)(\bu_{/2}+1)\ldots(\bu_{/k}+1)				\\
+\left[\!\!\!\begin{array}{c} k+n+1 \\ n+1 \end{array}\!\!\!\right]   
+ &\eq \sum_{(0\le\bu\le n)}^k \!\!\!\!
+	(\bu_{/1}+1)(\bu_{/2}+2)\ldots(\bu_{/k}+k)				\\
+\end{align*}
+
+As for general identities, if we denote $ 1\cdot\bu := \bu_{/1} + \ldots + \bu_{/k} $, then:
+\begin{align*}
+\sum_{(0\le\bu\le n)}^k\!\!\!\!\! \bu_{\!/s}
+ &\eq s{k+n\choose k+1}                                                    \\
+\sum_{(0\le\bu\le n)}^k\!\!\!\!\! 1\cdot\bu  
+ &\eq \frac{kn}{2} {k+n\choose k}                                          \\ 
+\sum_{(0\le\bu\le n)}^k\!\!\!\!\! t^{\bu_{\!/1}} 
+ &\eq \sum_{0\le j\le n}{k+n\choose k+j}(t-1)^j                            \\
+\sum_{(0\le\bu\le n)}^k\!\!\!\!\! t^{\bu_{\!/k}} 
+ &\eq \sum_{0\le j\le n}{k+n\choose k+j}t^{n-j}(t-1)^j                     \\
+\sum_{(0\le\bu\le n)}^k\!\!\!\!\! t^{1\cdot\bu}           
+ &\eq \prod_{1\le j\le k}\frac{1-t^{n+j}}{1-t^{j\ \ \ }}                   
+ &									   \\
+\sum_{(0\le\bu\le n)}^k\!\!\!\!\! \bu_{\!/s+1}^m 
+ &\eq \sum_{1\le j\le m}j!\left\{\!\!\!\begin{array}{c} m \\ j 
+       \end{array}\!\!\!\right\}{s+j\choose j}{k+n\choose k+j}              \\
+\sum_{(0\le\bu\le n)}^k\!\!\!\!\! (\bu_{\!/1}^m+\ldots +\bu_{\!/k}^m)
+ &\eq \sum_{1\le j\le m}j!\left\{\!\!\!\begin{array}{c} m \\ j 
+       \end{array}\!\!\!\right\}{k+j\choose 1+j}{k+n\choose k+j}            \\
+\sum_{(0\le\bu\le n)}^k\!\!\!\!\! t^{\bu_{\!/s+1}}
+ &\eq \sum_{0\le j\le n}{s+j\choose j}{k+n\choose k+j}(t-1)^j                
+\end{align*} 
+
+\begin{thebibliography}{99}
+\bibitem{gkp} R.L. Graham, D.E. Knuth, O. Patashnik.  Concrete
+         Mathematics.  Addison-Wesley Publishing (1994).
+\end{thebibliography}
+
+\end{document} 

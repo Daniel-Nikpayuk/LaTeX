@@ -1,0 +1,123 @@
+% Copyright 2019 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=2.5cm,right=2.5cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{asymptote}
+
+\newcommand{\then}{\ensuremath{\quad\Longrightarrow\quad}}
+\newcommand{\equals}{\ensuremath{\quad =\quad}}
+
+\newcommand{\fourqquad}{\ensuremath{\qquad\qquad\qquad\qquad}}
+
+\begin{asydef}
+// this comment prevents a compilation bug.
+
+pair left(real angle, real height, pair current = (0,0))
+{
+	real width = height*Tan(angle);
+
+	return current + (-width, -height);
+}
+
+pair Left(real angle, real height, path p)
+{
+	real width = height*Tan(angle);
+	pair last  = point(p, size(p)-1);
+
+	return last + (-width, -height);
+}
+
+pair right(real angle, real height, pair current = (0,0))
+{
+	real width = height*Tan(angle);
+
+	return current + (width, -height);
+}
+
+pair Right(real angle, real height, path p)
+{
+	real width = height*Tan(angle);
+	pair last  = point(p, size(p)-1);
+
+	return last + (width, -height);
+}
+
+//
+
+void drawpath(path p)
+{
+	draw(p);
+
+	for (int k=0; k < size(p); ++k)
+	{
+		dot(point(p, k));
+	}
+}
+
+void safeLabel(picture pic = currentpicture, Label L, pair position, real width, real height,
+		align align = NoAlign, pen p = currentpen, filltype filltype = NoFill)
+{
+	pair sw = position + (-width,-height);
+	pair se = position + (-width, height);
+	pair nw = position + ( width,-height);
+	pair ne = position + ( width, height);
+
+//	filldraw(pic, sw--se--ne--nw--cycle, white, p);
+	filldraw(pic, shift(position)*scale(width, height)*unitcircle, white, p);
+	label(pic, L, position, align, p, filltype);
+}
+
+\end{asydef}
+
+\title{Homotopy Type Theory}
+\author{Daniel Nikpayuk}
+\date{March 10, 2019}
+\pagestyle{empty}
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\noindent\begin{minipage}{7cm}
+\begin{asy}
+unitsize(1cm);
+
+//
+
+pair value = (0,0);
+
+pair x     = Left(25, 3, value);
+pair y     = Right(25, 3, value);
+
+pair alpha = x-(0,3);
+pair beta  = y-(0,3);
+
+//
+
+draw(x--value, MidArrow);
+draw(y--value, MidArrow);
+
+draw(alpha--x, MidArrow);
+draw(beta--y, MidArrow);
+
+//
+
+safeLabel("5", value, 0.25, 0.25);
+
+safeLabel("x", x, 0.25, 0.25);
+safeLabel("y", y, 0.25, 0.25);
+
+safeLabel("$ \alpha $", alpha, 0.25, 0.25);
+safeLabel("$ \beta $", beta, 0.25, 0.25);
+
+label("- {\bfseries value}", (0.65,0), E);
+
+label("- {\bfseries extensional equality}", (2,-3), E);
+label("$ = $", (0,-3));
+
+label("- {\bfseries intensional equality}", (2,-6), E);
+label("$ \sim $", (0,-6));
+
+\end{asy}
+\end{minipage}\\[1cm]
+
+\end{document}
+

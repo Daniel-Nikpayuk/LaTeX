@@ -1,0 +1,1130 @@
+% Copyright 2020-21 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=2cm,right=2cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{asymptote}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% latex symbols:
+
+\newcommand{\vn}{\ensuremath{\varnothing}}
+
+\newcommand{\RA}{\Rightarrow}
+\newcommand{\lra}{\longrightarrow}
+\newcommand{\then}{\ensuremath{\quad\Longrightarrow\quad}}
+\newcommand{\qmapsto}{\ensuremath{\quad \mapsto \quad}}
+\newcommand{\mapsfrom}{\mathrel{\reflectbox{\ensuremath{\mapsto}}}}
+
+\newcommand{\defeq}{\ensuremath{\ :=\ }}
+\newcommand{\qeq}{\ensuremath{\quad =\quad}}
+\newcommand{\qqeq}{\ensuremath{\qquad =\qquad}}
+\newcommand{\qdefeq}{\ensuremath{\quad :=\quad}}
+\newcommand{\qqdefeq}{\ensuremath{\qquad :=\qquad}}
+
+\newcommand{\quadbar}{\ensuremath{\quad |\quad}}
+\newcommand{\quadcomma}{\ensuremath{\quad ,\quad}}
+\newcommand{\equals}{\ensuremath{\quad =\quad}}
+\newcommand{\defequals}{\ensuremath{\quad :=\quad}}
+
+\newcommand{\qed}{\nobreak \ifvmode \relax \else
+      \ifdim\lastskip<1.5em \hskip-\lastskip
+      \hskip1.5em plus0em minus0.5em \fi \nobreak
+      \vrule height0.75em width0.5em depth0.25em\fi}
+
+% latex markup:
+
+\newcommand{\strong}[1]{{\bfseries #1}}
+\newcommand{\bfmbox}[1]{\mbox{\bfseries #1}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+% latex spacing:
+
+\newcommand{\twoquad}{\ensuremath{\quad\quad}}
+\newcommand{\threequad}{\ensuremath{\quad\quad\quad}}
+\newcommand{\fourquad}{\ensuremath{\quad\quad\quad\quad}}
+
+\newcommand{\twoqquad}{\ensuremath{\qquad\qquad}}
+\newcommand{\threeqquad}{\ensuremath{\qquad\qquad\qquad}}
+\newcommand{\fourqquad}{\ensuremath{\qquad\qquad\qquad\qquad}}
+
+% essay symbols:
+
+\newcommand{\bv}[1][v]{\ensuremath{\mathbf #1}}
+\newcommand{\powerset}[2][P]{\ensuremath{\mathbb{#1}(#2)}}
+\newcommand{\nthps}[2][P]{\ensuremath{\mathbb{#1}^{#2}}}
+\newcommand{\nthus}[2][U]{\ensuremath{\mathbb{#1}^{#2}}}
+\newcommand{\psunion}[2][P]{\ensuremath{\bigcup\limits_{#2\ge 0}\mathbb{#1}^{#2}}}
+\newcommand{\usunion}[2][U]{\ensuremath{\bigcup\limits_{#2\ge 0}\mathbb{#1}^{#2}}}
+\newcommand{\stratified}{\ensuremath{\mathbb{U}^\infty}}
+\newcommand{\of}[1]{\ensuremath{(\mathcal{#1})}}
+\newcommand{\ofbb}[1]{\ensuremath{(\mathbb{#1})}}
+
+\newcommand{\readleft}{\ensuremath{\,_{_\leftarrow}\,}}
+\newcommand{\readright}{\ensuremath{\,_{_\rightarrow}\,}}
+
+% essay formatting:
+
+\newcommand{\mss}[1]{\ensuremath{\mbox{\scriptsize #1}}}
+\newcommand{\bms}[1]{\ensuremath{_{\mbox{\bfseries\tiny #1}}}}
+\newcommand{\bnms}[2]{\ensuremath{\bms{#1,}{_#2}}}
+
+\newcommand{\tab}[1][1.125cm]{\hspace{#1}}
+
+\newcommand{\col}[1][0ex]{& \hspace{#1}}
+\newcommand{\scol}{\col[0.15cm]}
+\newcommand{\lcol}{\col[0.45cm]}
+
+\newcommand{\msbox}[1]{\ensuremath{_{\mbox{\scriptsize #1}}}}
+\newcommand{\cbox}[1]{\mbox{// #1}}
+
+\newenvironment{proof}[1][Proof]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1:}]}{\end{trivlist}}
+\newenvironment{example}[1][Example]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{remark}[1][Remark]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+% essay functions:
+
+\newcommand{\subcirc}[1][m]{\ensuremath{\underset{#1}{\circ}}}
+\newcommand{\lcirc}{\subcirc[\ell]}
+\newcommand{\rcirc}{\subcirc[r]}
+
+\newcommand{\subfunc}[1]{\ensuremath{\langle #1\rangle}}
+
+\newcommand{\id}{\mbox{id}}
+
+\newcommand{\compose}{\mbox{compose}}
+\newcommand{\precompose}[1]{\ensuremath{\mbox{precompose}_{#1}}}
+\newcommand{\postcompose}[1]{\ensuremath{\mbox{postcompose}_{#1}}}
+
+\newcommand{\ndopose}{\mbox{endopose}}
+\newcommand{\prendopose}[1]{\ensuremath{\mbox{preendopose}_{#1}}}
+\newcommand{\postndopose}[1]{\ensuremath{\mbox{postendopose}_{#1}}}
+
+\newcommand{\lift}{\mbox{lift}}
+\newcommand{\stem}{\mbox{stem}}
+\newcommand{\costem}{\mbox{costem}}
+\newcommand{\distem}{\mbox{distem}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{asydef}
+// this comment prevents a compilation bug.
+
+real direction(bool value)
+{
+	return value ? 1 : -1;
+}
+
+pair offset(pair current, string align, real x = 0.03)
+{
+	pair shifter =	(align == "E") ? (x, 0) :
+			(align == "N") ? (0, x) :
+			(align == "W") ? (-x, 0) :
+			(align == "S") ? (0, -x) : (0,0);
+
+	return shift(shifter)*current;
+}
+
+pair segment(pair current = (0,0), string align, real projection, real angle = 0)
+{
+	align = (align == "E") ? "EU" :
+		(align == "N") ? "NL" :
+		(align == "W") ? "WD" :
+		(align == "S") ? "SR" : align;
+
+	real base          = direction(substr(align, 0, 1) == "E" || substr(align, 0, 1) == "N");
+	real adjacent      = direction(substr(align, 1, 1) == "R" || substr(align, 1, 1) == "U") * Tan(angle);
+	pair initialVertex = (substr(align, 0, 1) == "E" || substr(align, 0, 1) == "W") ? (base, adjacent) : (adjacent, base);
+	pair scaledVertex  = scale(projection) * initialVertex;
+	pair shiftedVertex = shift(current)    * scaledVertex;
+
+	return shiftedVertex;
+}
+
+//
+
+void drawpath(path p)
+{
+	draw(p);
+
+	for (int k=0; k < size(p); ++k)
+	{
+		dot(point(p, k));
+	}
+}
+
+void safeLabel(picture pic = currentpicture, Label L, pair position, real width, real height,
+	align align = NoAlign, pen textpen = currentpen, pen borderpen = currentpen,
+	pen fillpen = white, filltype filltype = NoFill, string bordertype = "round")
+{
+	if (bordertype == "round")
+	{
+		pair w = position + (-width, 0);
+		pair e = position + ( width, 0);
+		pair n = position + (0, height);
+		pair s = position + (0,-height);
+
+		filldraw(pic, w{up}::n{right}::e{down}::s{left}::cycle, fillpen, borderpen);
+	}
+	else if (bordertype == "box")
+	{
+		pair sw = position + (-width,-height);
+		pair se = position + (-width, height);
+		pair nw = position + ( width,-height);
+		pair ne = position + ( width, height);
+
+		filldraw(pic, sw--se--ne--nw--cycle, fillpen, borderpen);
+	}
+
+	label(pic, L, position, align, textpen, filltype);
+}
+
+
+\end{asydef}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{Concept Theory}
+\author{Daniel Nikpayuk}
+\date{July 11, 2020}
+\pagestyle{empty}
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{../cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+\ \\
+\indent concept theory example: \tab[3.5cm] is there a relationship between \emph{concepts} and \emph{universe building} ?\\[-3ex]
+
+$$ \def\arraystretch{1.2}
+\tab[-0cm] \mbox{pair instance = }\left\{\begin{array}{rl}
+\bfmbox{path:}		& 0							\\
+			& 1							\\
+\bfmbox{target:}	& 0/ \quad \mbox{as } a					\\
+			& 1/ \quad \mbox{as } b					\\
+\bfmbox{sifter:}	& 0 < 1							\\
+\end{array}\right. \tab[1.25cm] \begin{array}{lll|lll}
+\bfmbox{path}		& \bfmbox{target}	& \bfmbox{sifter}		\tab[3ex]\col[3ex]
+\bfmbox{interface}	& \bfmbox{perspective}	& \bfmbox{lens}			\\
+
+\mbox{syntax}		& \mbox{semiotics}	& \mbox{semantics}		\tab[3ex]\col[3ex]
+\mbox{structure}	& \mbox{identity}	& \mbox{filter}			\\&&\col[3ex]
+\mbox{navigator}	& \mbox{proximity}	& \mbox{space}			\\&&\col[3ex]
+			& \mbox{embedding}
+\end{array} $$
+
+$$ \def\arraystretch{1.2}
+\tab[-3cm] \mbox{pair instance } (a,b)\ =\ \left\{\begin{array}{rl}
+\bfmbox{path:}		& 0							\\
+			& 1							\\[1ex]
+\bfmbox{target:}	& 0/ \quad \mbox{as } a					\\
+			& 1/ \quad \mbox{as } b					\\[1ex]
+\bfmbox{sifter:}	& 0 < 1							\\
+\end{array}\right. $$
+\ \\[-6ex]
+
+$$ \def\arraystretch{1.2}
+\tab[1ex] \begin{array}{lll}
+\bfmbox{path}		\col[2ex] \bfmbox{target}	\col[2ex] \bfmbox{sifter}		\\[2ex]
+
+\parbox{6cm}{
+Paths are the syntax of the expression. They are made up of \emph{steps}, and they offer a navigational component to expressions.
+} \col[2ex] \parbox{6cm}{
+Targets are the semiotics of the expression. They are the \emph{signs}, which are made up of \emph{signifiers} and \emph{signifieds}.
+} \col[2ex] \parbox{6cm}{
+Sifters are the semantics of the expression. They are the \emph{propositions} which describe relationships between the semiotics.
+}
+
+\end{array} $$
+\ \\[-3ex]
+
+\strong{Concepts} are meant to represent mathematical expressions in a rigorous way while maintaining a user-friendly interface.
+The intended intuitive appeal is that concepts offer a way to model natural language \emph{ways of thinking} such as:
+\begin{center}
+weak specification, specification refinement, specification resolution, implementation.
+\end{center}
+By \emph{modularizing} out the synactic from the semiotic from the semantic patterns, we can reuse components and express
+fully realized concepts in many alternative ways. For example instead of specifying a \emph{pair instance} in the above,
+we could have left the \texttt{target} component unassigned, thus only specifying a pair as a weak concept. In fact,
+this offers an alternative approach to type theoretic \emph{dependent function types} (polymorphism). Otherwise
+concept theory is flexible enough to model and include type theories directly.
+
+There is also an algebraic aspect to this interface. For example if we wanted to define a function instead of a pair,
+we would specify its syntactic structure and its semantic relationships. Function application would occur by refining
+enough of the semiotics that a specific \emph{evaluator} (or interpreter) could then resolve the remaining information.
+
+
+
+\ \\[0.5cm]
+
+$$ \begin{array}{rlrl}
+ \mbox{A \bfseries concept:}										\\
+													\\
+ \mbox{is a \bfseries model:}	&			&  \qquad\qquad \mbox{with a \bfseries filter:}	\\
+ & \left\{\begin{array}{rcl}
+   p_0	& :=		& /s_{0,0}/\ldots/s_{0,j}			\\
+   p_1	& :=		& /s_{1,0}/\ldots/s_{1,k}			\\
+         & \vdots	& 						\\
+   p_n	& :=		& /s_{n,0}/\ldots/s_{n,m}			\\
+   \end{array}\right\} && \left\{\begin{array}{c}
+   P_0(p_0,\ldots,p_n)							\\
+   P_1(p_0,\ldots,p_n)							\\
+   \vdots								\\
+   P_\ell(p_0,\ldots,p_n)						\\
+   \end{array}\right\}
+\end{array} $$
+
+A {\bfseries model} is a collection of \emph{paths} (each made up of \emph{steps}), while a {\bfseries filter} is a collection
+of \emph{properties} on those paths---paths can be bound to values, or can be said to relate to each other in some way.
+The model offers the syntax, while the filter provides the semantics.
+
+\ \\[0.5cm]
+
+Concept theory as a foundation for math/computing is oriented to be a language with more expressive grammar than existing set theories.
+For the sake of a casual explanation, you can think of concept theory as an alternative set theory with alternative constructions.
+This is to say: We can assume the axioms of \emph{finite set theory}, but instead of building constructs such as
+{\bfseries pairs, cartesian products, relations, functions}, etc. directly, we build {\bfseries concepts} and use concepts
+to construct everything else.
+
+My claim is that concepts are more expressive---especially in regards to programming languages---than existing set theories:
+$$ \begin{array}{lcllcll}
+\bfmbox{concept:} \quad & := \quad & \{ &  \bfmbox{model: } A & | & \bfmbox{filter: } B & \}		\\
+\bfmbox{subconcept}': \quad & := \quad & \{ & \bfmbox{model: } A' & | & \bfmbox{filter: } B' & \}	\\
+\bfmbox{subconcept}'': \quad & := \quad & \{ & \bfmbox{model: } A'' & | & \bfmbox{filter: } B'' & \}	\\
+\end{array} $$
+where
+$$ \begin{array}{rcl}
+A & = & A'\cup A''		\\
+B & = & B'\cup B''		\\
+\end{array} $$
+The reason for my claim is that concepts fundamentally represent expressive grammatical \emph{syntax} rather than
+\emph{semantics} (in regards to linguistics). This is to say we can decompose a concept into arbitrary (even non-intuitive)
+components which offers a finer approach to practical constructions, potentially reducing constructive redundancy.
+Again this is relevant to a computational way of thinking.
+
+\newpage
+
+There are some philosophical differences between concept theory and set theory:
+\begin{itemize}
+\item {\bfseries finite representations:} I've already stated that for convenience we can assume finite set theory to define
+concepts. The reason we don't need anything more potent is because concept theory models language itself, and if you look at
+all the math notation (language) used to express infinite sets, the notation itself is finite. Concept theory adheres to
+this philosophy.
+\item {\bfseries narrative decompression (bootstrapping):} There are several design subtleties the various set theories
+don't generally consider. For example, in the narrative construction of the language, one would define a
+\emph{set theoretic function} as a specialized set theoretic relation. Now, a relation is made up of ordered pairs,
+but if you give it some thought, to access the elements of a pair, you need in some form or another two functions
+(projections), but functions aren't yet defined.
+
+The way in which this subtlety is navigated is never formally expressed in the axioms of set theory itself. It is deferred
+to the linguistic / philosophy side of things, where one starts thinking about the nature of using an internal language to
+talk about other external languages. Concept theory formally solves this style of problem within the language itself
+by means of bootstrapping which we'll get to shortly.
+\end{itemize}
+
+A practical comparison between set theory and concept theory is the construction of the natural numbers $ \mathbb{N} $.
+In set theory we define the set operator succ$ (x) := x \cup \{x\} $, then we define an inductive set $ \mathcal{I} $ as:
+\begin{enumerate}
+\item There exists an $ e \in \mathcal{I} $ ($ \mathcal{I} $ is non-empty),
+\item For all $ n \in \mathcal{I} $ we have succ$ (n) \in \mathcal{I} $.
+\end{enumerate}
+We then axiomatically assume such an \emph{inductive set} exists because we cannot prove it. Finally, we use such an
+inductive set to define the natural numbers to be a smallest such inductive set (using subsets and intersections).
+
+On the other hand\ldots
+
+
+
+
+
+
+
+
+\newpage\begin{minipage}{12cm}
+\noindent\strong{\Large Near-linear function space:}\\[1ex]
+
+How does one define a function space? Or rather a \emph{function algebra}?
+
+We start with a baseline function space $ (\mathcal{F}, \circ) $:
+
+\begin{itemize}
+\item Composition is associative: If $ f,g,h\in\mathcal{F} $, then
+	$$ (f \circ g) \circ h = f \circ (g \circ h) $$
+\item Composition has identities: If $ f\in\mathcal{F} $, then there exist
+	$ \id_\alpha,\id_\beta\in\mathcal{F} $ such that
+	$$ f \circ \id_\alpha = f = \id_\beta \circ f $$
+\end{itemize}
+
+As is, one might think this would be enough, but we can do better.\\[1ex]
+
+When observing \emph{type theory} and data structures, we have access not only to the atomic types, but we can build more
+complex versions---known as algebraic data types---through the \emph{product} and \emph{coproduct} type constructors.
+Unfortunately, with our baseline function space, we only currently have an analog to the product constructor,
+which does allow us to build chains of functions:
+$$ \begin{array}{rcl}
+\readright f_0f_1f_2\ldots f_{n-1}f_n		& = & f_n \circ f_{n-1} \circ \ldots \circ f_2 \circ f_1\circ f_0	\\[1ex]
+						& = & f_nf_{n-1}\ldots f_2f_1f_0 \readleft 
+\end{array} $$
+but otherwise lacks more general expressivity.
+
+
+\end{minipage}\newpage\begin{minipage}{12cm}
+
+
+Fortunately, composition is such that we can use two of its core operators:
+$$ \def\arraystretch{1.5}
+\begin{array}{rclcl}
+\precompose{f}(g)	& = & f^\circ(g)	& := & g \circ f		\\
+\postcompose{f}(g)	& = & f_\circ(g)	& := & f \circ g
+\end{array} $$
+to extend $ \mathcal{F} $ to what's known as its \emph{continuation passing} space $ \mathcal{CP(F)} $.
+
+Intuitively, a continuation passing function $ f(x, c) $ takes the argument $ x $ as input, and applies
+it internally, for which it then takes the return value and passes it directly to the function $ c $:
+$$ f(x, c) \qdefeq c(\hat{f}(x)) $$
+As such, each $ \hat{f}\in\mathcal{F} $ lifts to a function $ f\in\mathcal{CP(F)} $. The continuation
+passing space is notable because it has its own composition operator $ \star $ called \emph{endoposition}:
+$$ f(x, c_1(y))\ \star\ g(y, c_2(z)) \qdefeq f(\,x,\ \lambda y.g(y)(c_2(z))\,) $$
+which behaves like any other composition operator:
+\begin{itemize}
+\item Endoposition is associative: If $ f,g,h\in\mathcal{CP(F)} $, then
+	$$ (f \star g) \star h = f \star (g \star h) $$
+\item Endoposition has identities: If $ f\in\mathcal{CP(F)} $, then there exist
+	$ \id_\alpha,\id_\beta\in\mathcal{CP(F)} $ such that
+	$$ f \star \id_\alpha = f = \id_\beta \star f $$
+\end{itemize}
+
+
+\end{minipage}\newpage\begin{minipage}{12cm}
+
+
+In this case, the continuation passing space also has a product constructor analogous
+to that of the baseline space. So how do we achieve a \emph{coproduct} constructor?
+
+We do this through what are called \emph{stem} constructors. Here I borrow
+notation from the \strong{C} programming language, with a slight modification:
+$$ \def\arraystretch{1}
+\begin{array}{rclcl}
+\stem		& := & (\ f\ ?\ g\!\centerdot |\ h\           )		\\
+\costem		& := & (\ f\ ?\ g\            |\ h\centerdot\ )		\\
+\distem		& := & (\ f\ ?\ g\            |\ h\           )
+\end{array} $$
+The \strong{C} language uses the notation $ (\,b\,?\,a:c\,) $ to mean the conditional operator, where if $ b $ is true
+then $ a $ is returned, otherwise $ c $ is returned. In the above I've replaced the colon `$ : $' with the bar `$ | $' which
+is better aligned with standard \emph{regular expression} notation in which bar `$ | $' indicates \emph{alternatives}.
+The difference between the three stem constructors is the use of the period `$ \centerdot $':
+\begin{enumerate}
+\item Stem says if $ f $ evaluates true, then evaluate $ g $ and \emph{stop} there,
+	otherwise evaluate $ h $ (and continue).
+\item Costem is dual to stem, and so says if $ f $ is true, then evaluate $ g $ (and continue)
+	 otherwise evaluate $ h $ and stop there.
+\item Distem has no period, and so it still branches, but it continues regardless.
+\end{enumerate}
+What's the difference between \emph{stopping} and \emph{continuing}? The notable thing about these stem operators
+is that each represents a continuation passing function. For example let $ f,g,h\in\mathcal{F} $, then
+$ (\,f\ ?\ g\ |\ h\,)\in\mathcal{CP(F)} $. As this is the case, we can now endopose these stem constructors.
+
+
+\end{minipage}\newpage\begin{minipage}{12cm}
+
+
+Finally, if we add to these constructors the initially discussed \emph{lift} constructor---where we took some function
+$ f\in\mathcal{F} $ and lifted it to $ \mathcal{CP(F)} $:\\[-1ex]
+$$ \lift \qdefeq (\,f\,) $$
+Then we have the means to build our \emph{near-linear} function space.
+
+I call it \emph{near linear} because it starts out being analogous to Linear Algebra, where we
+can speak of vectors as \emph{linear combinations}. Here, if we start by restricting ourselves to
+\emph{lift} and \emph{distem}, we have what can be considered the analog to linear combinations:\\[-1ex]
+$$ \readright c_0 \star c_1 \star c_2 \ldots \star c_{n-1}\star c_n
+	\quad,\quad c_k\ =\ \lift\mbox{ or }\distem
+	\quad,\quad 0\le k\le n $$
+If we then add in the \emph{stem} and \emph{costem} constructors, and allow for the possibility of recursion:\\[-1ex]
+$$ f \qeq \readright c_0c_1c_2\ldots c_{n-1}c_n \quad,\quad c_n = f $$
+we then have \emph{non-linear} combinations. I use the word ``near'' rather than ``non'' because we still have
+the constraint that \emph{only} the very last function $ c_n $ in the chain is allowed to circle back. In computing
+literature this is called \emph{tail recursion}, and as far as non-linear functions go, it's the nearest we
+can get to being linear, hence the term \emph{near-linear}.
+
+Now, to make these semi-formal definition rigorous, we would require a few additional considerations such as
+\emph{compositional coherence}, and that the recursive chains (being representations of functions we've already proven
+to exist) can be proven to halt. With that said, these near-linear chains are quite effective at representing many of
+the computable functions that mathematicians, computing scientists, and programmers interact with on a daily basis.
+
+
+\end{minipage}\newpage\begin{minipage}{12cm}
+
+
+\noindent\strong{Stem operator distributive laws:}\\[1ex]
+
+Let's focus on \emph{distem} as our case study:
+$$ (\,f\:?\:g\ |\ h\,) $$
+Given endoposition ($\star$\,; continuation passing composition),
+the left and right distributive laws are as follows:
+$$ \def\arraystretch{1.5}
+\begin{array}{rclcl}
+(f)\star(\,p\:?\:g\ |\ h\,)	& = & (\,p\:?\:f\circ g\ |\ f\circ h\,)		\\
+(\,p\:?\:g\ |\ h\,)\star(f)	& = & (\,p\:?\:g\circ f\ |\ h\circ f\,)
+\end{array} $$
+Given this, the expansion of two distems is then:
+$$ (\,p\:?\:f_1\ |\ f_2\,)(\,q\:?\:g_1\ |\ g_2\,) \qeq (\,pq\:?\:f_1g_1\ |\ f_1g_2\ |\ f_2g_1\ |\ f_2g_2\,) $$
+So how do we interpret the right hand side?
+$$ (\,pq\:?\:f_1g_1\ |\ f_1g_2\ |\ f_2g_1\ |\ f_2g_2\,) $$
+
+
+\end{minipage}\newpage\begin{minipage}{12cm}
+
+
+First, the alternatives can be thought of as a list:
+$$ \def\arraystretch{0.5}
+\begin{array}{l}
+(\,pq\:?\:f_1g_1\ |\ f_1g_2\ |\ f_2g_1\ |\ f_2g_2\,)			\\
+\tab[2.75em]\underset{\mbox{this is a list}}{\underbrace{\tab[10em]}}
+\end{array} $$
+Now about the conditional term $ pq $ ? It's not obvious at first, but it turns out to have a natural
+interpretation of its own:
+$$ \def\arraystretch{0.5}
+\begin{array}{l}
+(\,pq\:?\:f_1g_1\ |\ f_1g_2\ |\ f_2g_1\ |\ f_2g_2\,)			\\
+\tab[-4.15em]\underset{\mbox{this is a binary number}}{\underbrace{\tab[0em]}}
+\end{array} $$
+So for example set $ p = false $, and $ q = true $. Assuming $ false\to 0 $ and $ true\to 1 $, we have:
+$$ pq \qeq 01 $$
+Unfortunately, because of how the conditional operator $ (\,?\:|\:\,) $ is currently defined, we need to take
+the componentwise negation of this number:
+$$ \def\arraystretch{0.5}
+\begin{array}{l}
+(\,pq\:?\:f_1g_1\ |\ f_1g_2\ |\ f_2g_1\ |\ f_2g_2\,)			\\
+\tab[0.75em]	\underset{\sim}{\tab[0em]}
+\tab[1.15em]	\underset{00}{\underbrace{\tab[0em]}}
+\tab[1em]	\underset{01}{\underbrace{\tab[0em]}}
+\tab[1em]	\underset{10}{\underbrace{\tab[0em]}}
+\tab[1em]	\underset{11}{\underbrace{\tab[0em]}}			\\
+\tab[2.5em]	\underset{11}{\underbrace{\tab[0em]}}
+\tab[1em]	\underset{10}{\underbrace{\tab[0em]}}
+\tab[1em]	\underset{01}{\underbrace{\tab[0em]}}
+\tab[1em]	\underset{00}{\underbrace{\tab[0em]}}
+\end{array} $$
+which then is the position (in the list) we seek:
+$$ pq \qmapsto \sim 01 \qeq 10 \qmapsto f_2g_1 $$
+
+
+
+
+
+
+
+\end{minipage}\newpage\begin{minipage}{12cm}
+\noindent\strong{\large The Anatomy of a Computable Function}\\[1ex]
+
+What is a mathematical function?\\[1ex]
+
+In general, I don't fully know (yet). And I say this as I want to make it a completely clear realization:
+The nature of functions are that they suffer from complexity. With that said, I'm starting to understand
+the nature of \emph{computable} functions, enough to try to explain here what they are.
+
+A computable function is a triple:
+$$ (\,\bfmbox{text}\ ,\ \bfmbox{signature}\ ,\ \bfmbox{hermeneutic}\,) $$
+where:
+\begin{itemize}
+\item[\strong{text}] You can define texts as atomics, or data structures of such atomics. This is a constructive
+	model: Traditional grammar that allows for \emph{higher order functions/continuations} such as composition,
+	endoposition, lift, stem, costem, distem are what allow for these constructions.
+\item[\strong{signature}] Signatures are the memory models needed to actually compute specific functions.
+	In math we take them for granted, but in computing contexts resources factor in. To be fair, signatures
+	are more than just a ``practical concern''---they actually show up in theoretical math contexts,
+	it's only that mathematicians don't really have clear language to express them.
+\end{itemize}
+
+
+\end{minipage}\newpage\begin{minipage}{12cm}
+
+
+\begin{itemize}
+\item [\strong{signature}] (continued) Related to the idea of a signature is that of a \emph{facade},
+	which is a designated subsignature respective to a given function. Facades coincide with traditional
+	Eulerian notation for functions:
+	%\begin{comment}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                          %
+                                          %
+	\begin{center}
+	\begin{asy}
+	unitsize(1cm);
+
+	pair p00 = (    0  ,    0);
+	pair l00 = ( -0.45 , -0.3);
+	pair r00 = (  0.25 , -0.3);
+
+	pair p10 = segment(l00, "SL", 0.5, 40);
+	pair p11 = segment(r00, "SR", 0.5, 40);
+
+	pair l10 = shift(-1,0)*p10;
+	pair r11 = shift(-0.7,0)*p11;
+
+	draw(p10--l00, Arrow(size = 4));
+	draw(p11--r00, Arrow(size = 4));
+
+	string text      = "\parbox{5cm}{\scriptsize $ f $ represents\\the text of\\the function}";
+	string signature = "\parbox{5cm}{\scriptsize $ x $ represents\\the facade of\\the function's\\signature}";
+
+	safeLabel("$f(x)$", p00, 0.50, 0.30, borderpen = white);
+
+	label(text, l10, SE);
+	label(signature, r11, SE);
+
+	\end{asy}
+	\end{center}
+                                          %
+                                          %
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%\end{comment}
+	\ \\[-4ex]
+	Facades are especially relevant when discussing ideas of function composition.
+
+\item [\strong{hermeneutic}] The hermeneutic (as object) is the \emph{interpretation} of a text, which is to say: It is
+	the instruction set telling us how to actually evaluate a given function. Interestingly, because we've modularized
+	the text component out of functions, we can speak of the same text having more than one interpretation---this in the
+	sense that we can potentially equip a given text with more than one hermeneutic. Current programming languages don't
+	explicitly allow for this.
+
+	As for hemeneutic construction, we start by assuming primitive evaluators such as the apply operator:
+	$$ \mbox{apply}(f, x) \tab[1.5cm]
+		\parbox[t]{5cm}{where $ f $ is an atomic function, and $ x $ is a value instance of its facade} $$
+\end{itemize}
+
+
+\end{minipage}\newpage\begin{minipage}{12cm}
+
+
+\begin{itemize}
+\item [\strong{hermeneutic}] (continued)
+	So we have higher order constructors, and primitive applicators, and these make up the instruction set.
+	We interleave construction and application in order to evaluate a function. Functions with hermeneutics
+	that can be \emph{orthogonalized} are said to be \emph{well-behaved}.
+
+	Orthogonalization in this sense means we can separate out the constructors from the applicators, which is
+	to say we can construct the entire text independently of its applicative evaluation. We take such well-behaved
+	functions for granted given we interact with them all the time, but once we delve into recursive functions in
+	which construction and application can't be separated out, we then need language to make these distinctions.
+
+	Here is a conceptual overview of a well behaved function's decomposition:
+	\ \\[-4ex]
+	% y = f(x) = x(x+1)^2 , canonical construction
+	%\begin{comment}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	                                  %
+	                                  %
+	\begin{center}
+	 \begin{asy}
+	 unitsize(1cm);
+	
+	 pair p00 = (0,0);
+	
+	 pair p10 = segment(p00, "S", 1);
+	 pair p11 = segment(p10, "E", 6.5);
+	
+	 pair p20 = segment(p10, "S", 1);
+	 pair p30 = segment(p20, "S", 1);
+	 pair p40 = segment(p30, "S", 1);
+	 pair p50 = segment(p40, "S", 1);
+	
+	 //
+	
+	 pair q00 = segment(p10, "EU", 11, 5);
+	
+	 pair q10 = segment(q00, "S", 1);
+	 pair lq10 = offset(q10, "W", 0.06);
+	 pair rq10 = offset(q10, "E", 0.06);
+	
+	 pair q20 = segment(q10, "SL", 1, 65);
+	 pair lq20 = offset(q20, "W", 0.06);
+	 pair rq20 = offset(q20, "E", 0.06);
+	
+	 pair q21 = segment(q10, "SL", 1, 40);
+	 pair q22 = segment(q10, "SR", 1, 40);
+	
+	 pair q31 = segment(q22, "SL", 1, 45);
+	 pair q32 = segment(q22, "SR", 1, 45);
+	
+	 pair q41 = segment(q31, "SL", 1, 30);
+	 pair q42 = segment(q31, "SR", 1, 30);
+	 pair q43 = segment(q32, "SL", 1, 30);
+	 pair q44 = segment(q32, "SR", 1, 30);
+	
+	 //
+	 
+	 picture pic;
+	
+	 pen arrowcolor = mediumred;
+	
+	 draw(pic, shift(-1.5,0)*p11--shift(1.5,0)*p11, arrowcolor, Arrow);
+	 draw(pic, shift(0.4,-0.5)*p20--shift(0.4,0.5)*p20, arrowcolor, Arrow);
+	 draw(pic, shift(0.4,-0.5)*p40--shift(0.4,0.5)*p40, arrowcolor, Arrow);
+	 
+	 //
+	
+	 pen stepcolor = gray;
+	 pen bordercolor = heavygray;
+	 
+	 draw(pic, lq10--lq20, bordercolor);
+	 draw(pic, rq10--rq20, bordercolor);
+	
+	 draw(pic, q10--q21, bordercolor);
+	 draw(pic, q10--q22, bordercolor);
+	
+	 draw(pic, q22--q31, bordercolor);
+	 draw(pic, q22--q32, bordercolor);
+	
+	 draw(pic, q31--q41, bordercolor);
+	 draw(pic, q31--q42, bordercolor);
+	 draw(pic, q32--q43, bordercolor);
+	 draw(pic, q32--q44, bordercolor);
+	
+	 //
+	 
+	 int ss = 4;
+	 int fs = 8;
+	 
+	 label(pic, "$y = $", shift(0,-0.06)*p00, E, fontsize(fs));
+	 label(pic, "$f$", shift(0.775,0)*p00, E, heavyblue + fontsize(fs));
+	 label(pic, "$(x) = x(x+1)^2$", shift(1.015,0)*p00, E, fontsize(fs));
+	
+	 label(pic, "$(*, *, +, +, x, x, 1, x, 1)$", p10, E, fontsize(fs));
+	
+	 label(pic, "applicate", p11, N, arrowcolor + fontsize(ss));
+	
+	 label(pic, "duplicate", shift(0.5,-0.1)*p20, E, arrowcolor + fontsize(ss));
+	
+	 label(pic, "$(*, +, x, 1)$", p30, E, fontsize(fs));
+	
+	 label(pic, "prepare", shift(0.5,-0.1)*p40, E, arrowcolor + fontsize(ss));
+	
+	 label(pic, "$(x)$", p50, E, fontsize(fs));
+	
+	 //
+	
+	 label(pic, "$f$:", q00, W, heavyblue + fontsize(fs));
+	
+	 label(pic, "$0$", shift(0.6,0)*q20, NE, stepcolor + fontsize(ss));
+	 label(pic, "$1$", shift(0.2,0)*q21, NE, stepcolor + fontsize(ss));
+	 label(pic, "$2$", shift(-0.2,0)*q22, NW, stepcolor + fontsize(ss));
+	
+	 label(pic, "$1$", shift(0.4,0.17)*q31, NE, stepcolor + fontsize(ss));
+	 label(pic, "$2$", shift(-0.4,0.17)*q32, NW, stepcolor + fontsize(ss));
+	
+	 label(pic, "$1$", shift(0.2,0.17)*q41, NE, stepcolor + fontsize(ss));
+	 label(pic, "$2$", shift(-0.2,0.17)*q42, NW, stepcolor + fontsize(ss));
+	
+	 label(pic, "$1$", shift(0.2,0.17)*q43, NE, stepcolor + fontsize(ss));
+	 label(pic, "$2$", shift(-0.2,0.17)*q44, NW, stepcolor + fontsize(ss));
+	
+	 safeLabel(pic, "$*$", q10, 0.25, 0.25, textpen = fontsize(fs), borderpen = bordercolor);
+	
+	 safeLabel(pic, "$y$", q20, 0.25, 0.25, textpen = fontsize(fs), borderpen = bordercolor);
+	 safeLabel(pic, "$x$", q21, 0.25, 0.25, textpen = fontsize(fs), borderpen = bordercolor);
+	 safeLabel(pic, "$*$", q22, 0.25, 0.25, textpen = fontsize(fs), borderpen = bordercolor);
+	
+	 safeLabel(pic, "$+$", q31, 0.25, 0.25, textpen = fontsize(fs), borderpen = bordercolor);
+	 safeLabel(pic, "$+$", q32, 0.25, 0.25, textpen = fontsize(fs), borderpen = bordercolor);
+	
+	 safeLabel(pic, "$x$", q41, 0.25, 0.25, textpen = fontsize(fs), borderpen = bordercolor);
+	 safeLabel(pic, "$1$", q42, 0.25, 0.25, textpen = fontsize(fs), borderpen = bordercolor);
+	 safeLabel(pic, "$x$", q43, 0.25, 0.25, textpen = fontsize(fs), borderpen = bordercolor);
+	 safeLabel(pic, "$1$", q44, 0.25, 0.25, textpen = fontsize(fs), borderpen = bordercolor);
+	 
+	 add(scale(0.65)*pic);
+	
+	 \end{asy}
+	\end{center}
+	                                  %
+	                                  %
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%\end{comment}
+	\ \\[-5ex]
+	On the left we start with the facade, which---because it is a substructure of the full signature---we
+	can expand to make use of the full memory model. On the right we have the text, which is a composite
+	of atomic texts. We assume primitive applicators. In the middle is the hermeneutic, which due to it
+	being well behaved, we can speak of strictly as application.
+
+\end{itemize}
+
+
+\end{minipage}\newpage\begin{minipage}{12cm}
+
+
+To end, I would like to give an example, which will notably use addition ($ + $) and multiplication ($ \times $).
+For aesthetic reasons, I will instead use the greek letter sigma ($ \sigma $) to mean addition, while using mu
+($ \mu $) to mean multiplication.
+
+Now, if we let $ \circ $ represent composition (standard), we can then subscript this symbol to further represent
+curried composition, for example:\\[-2ex]
+$$ \def\arraystretch{1.5}
+\begin{array}{rcl}
+\sigma \lcirc f	& = & \sigma\ f\ \mbox{-}	\\
+\sigma \rcirc f	& = & \sigma\ \mbox{-}\ f
+\end{array} $$\\[-2ex]
+Returning to our previous example function:\\[-1ex]
+$$ f(x)\ =\ x(x+1)^2 $$\\[-3ex]
+We can now decompose it accordingly. First, its text:\\[-1ex]
+$$ (\mu \lcirc (\mu \rcirc \sigma)) \rcirc \sigma $$\\[-2ex]
+which I admit is a bit to get use to since we're not currently raised with this
+kind of math---but one does get use to it. Following this we have the signature:\\[-1ex]
+$$ (x, y) $$\\[-3ex]
+We shouldn't need more than a pair of memory to successfully evaluate.
+As for its hermeneutic, and given the memory constraint, we evaluate as follows:\\[-2ex]
+$$ (x, 1) \qmapsto (x, x+1) \qmapsto (x, (x+1)^2) \qmapsto (x, x(x+1)^2) $$
+Admittedly this isn't expressed as a language of construction and application. As of yet,
+research into such languages is ongoing. That's it for now. I hope it helps. Thanks!
+
+
+\end{minipage}\newpage\begin{minipage}{12cm}
+
+
+Let $ f $ be a function with signature $ s $ and facade $ x $. Partition $ x $ into subfacades:
+$$ x = v\,;w $$
+Then partial compositions of $ f $ are defined as follows:
+$$ \def\arraystretch{1.5}
+\begin{array}{rclclclcl}
+f \subcirc[v] g	& = & f(x) \subcirc[v] g	& = & f(v\,;w) \subcirc[v] g	& := & f(g(u)\,;w)	\\
+f \subcirc[w] g	& = & f(x) \subcirc[w] g	& = & f(v\,;w) \subcirc[w] g	& := & f(v\,;g(u))
+\end{array} $$\\[-2ex]
+In the simple case where the facade $ x $ is a pair,
+we can now define left and right \emph{curry composition}:
+$$ \def\arraystretch{1.5}
+\begin{array}{rclclcl}
+f \lcirc g	& = & f(x,y) \lcirc g	& = & f(g(w),y)	& = & f\ g\ \mbox{-}	\\
+f \rcirc g	& = & f(x,y) \rcirc g	& = & f(x,g(w))	& = & f\ \mbox{-}\ g
+\end{array} $$\\[-2ex]
+
+\end{minipage}
+\newpage
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\noindent\strong{concept tag: ``potential resolved''}\\[3em]
+\begin{minipage}{10cm}
+A constructive expression such as
+$$ f \circ g $$
+is in many ways analogous to:
+$$ \{\ x\in\mathcal{S}\ |\ P(x)\ \}\ \subseteq\ \mathcal{S} $$
+What the phrase \emph{potential resolved} means is that we are modelling a space of functions: $ f \circ g $ (the composition
+operator being the constructor), and we're saying that by convention this expression has the \emph{greatest common potential}
+when it comes to the space's functions (and/or induction operator).
+
+\ \\
+In analogy to the \emph{subsetting paradigm} our expression $ f \circ g $ is equivalent to the modelling space $ \mathcal{S} $,
+where at that point if we want to access/model a specific function within that space we from this point on are only allowed
+to apply filters. To subset $ \mathcal{S} $ we apply filters $ P(x) $. To refine and resolve $ f \circ g $ we apply filters
+$ Q(f, g) $.
+
+\ \\
+If we were to instead declare $ h \circ i(j, k) $ as our potential resolved concept, we'd be working with a different function
+space.
+\end{minipage}
+
+\newpage
+
+\noindent\strong{concept tag: ``potential-resolved''}\\[3em]
+\begin{minipage}{10cm}
+The other interesting philosophical note about declaring a concept such as
+$$ f \circ g $$
+potential-resolved is its relationships to logical quantifications:
+$$ \forall\ ,\ \exists $$
+
+For example if you were to take this weak specification ($ f \circ g $) and resolve
+it to a single function, such would equate with \emph{existential} quantification.
+Taking this line of reasoning further, if you were to refine to \emph{all}
+possible resolutions this then equates with \emph{universal} quantification.
+
+\ \\
+And yet\ldots
+
+\ \\
+By declaring the weak spec $ f \circ g $ as potential-resolved, it also \emph{potentially}
+represents those same variations of function resolutions. In this case, the interpretation
+becomes more along the lines of \emph{any} instead of \emph{all}.
+
+\ \\
+Classical mathematical logic tends to let ``any'' and ``all'' be equivalent. This is why
+I say concept theory is philosophically distinct.
+\end{minipage}
+
+\newpage
+
+\noindent {\Large\bfseries Extending the language of Concept Theory:}
+
+\ \\
+$$ \begin{array}{lcllll}
+\mbox{concept:} 	& = & \{\ \mbox{model: } A\tab[0.2cm] |\tab[0.2cm] \mbox{filter: } B\ \}		\\[1.5em]
+\mbox{e.g.}		&   & \{\ \ \bv\ =\ a_1\bv[e]_1+\ldots+a_n\bv[e]_n \qquad a_k\in\mathcal{F},\quad
+				\bv[e]_k\in\mathcal{V} \tab[0.2cm] |\tab[0.2cm] P(\bv)\ \ \}
+\end{array} $$
+\ \\
+
+Here I pay homage to Set Theory and its notation for \emph{subsetting}:
+$$ \{\ x\in\mathcal{S}\ |\ P(x)\ \} $$
+but I also deviate from tradition so as to delineate certain connotations: It is common practice to use sets to
+\emph{model} given spaces, to which a commonly observed pattern becomes the orthogonalization of \emph{constructive}
+models with \emph{constrictive} ones. In the above situation, the linear combination would be the constructive component
+to this model, while the predicate subsetting would then become the constrictive component.
+
+Concept theory in contrast is a language that allows us to express ideas of ``specification''. This is to say, the language
+focuses on specifications as objects rather than sets. In particular, one can then have ideas such as:
+\begin{center}
+\strong{weak specifications,\tab[1em] resolved specifications,\\specification refinement,\tab[1em] specification resolution}
+\end{center}
+This much I have presented on many occasions for anyone following this research, it's not new. What I present now is concept
+theory's ability to express not just set theoretic ideas, but these modelling/design ideas as well. Notably, what is called
+a constructive model can be more accurately defined as a
+\begin{center}
+\strong{potential-resolved specification}\tab[1em] or a\tab[1em] \strong{model-resolved specification}.
+\end{center}
+
+This is a major philosophical difference from the classical set-theoretic interpretation. For example in Set Theory
+a \emph{linear combination} assumes philosophically that \emph{all} such combinations are computed/admitted/achieved.
+Concept Theory on the other hand takes more of a constructivist perspective where the linear combination as concept
+is nothing more than a weak specification. At the same time, by declaring it a potential-resolved spec, we are saying
+it as an expression (and maybe from an information theoretic lens) holds all the potential it is going to. It is imbued
+with the intention that from here on out we only refine and resolve to actual vectors within the span of such a linear
+combination (to use more traditional math terminology). Its potential has been resolved.
+
+Finally, as for this update, the last new term I'd like to introduce is this idea of a
+\begin{center}
+\strong{consensus-resolved specification}.
+\end{center}
+I have observed on many occasions both in math and computing that certain definitions are given as unresolved, or rather
+weak specifications. They are considered sufficient, because although they leave room for greater specificity they also
+have enough information constraints to push the given plots and narratives forward in terms of the theory they represent.
+For example in math we only need to observe the definition of any algebra such as a group, ring, field, vector space,
+to find such a consensus spec. In computing one well known example is the
+$$ \texttt{map}\ f\ \mbox{list} $$
+operator which maps a list to another list by applying a function. This is a weak specification because not only is the
+list object of the \texttt{map} operator unresolved, so is part of its subroutine, or subfunction (so to speak). One could
+take this reasoning further into more theoretical computing and say the induction operators of Type Theory are then
+consensus-resolved specifications as well.
+
+This is to say, the point of this variety of specification then is to describe specs that are held as standard
+by the conventions of the community---representing the shared language of the community.
+
+\newpage
+
+In concept theory we start with concepts:
+$$ \bfmbox{concept:} \quad = \quad \{\ \bfmbox{model: } A\ |\ \bfmbox{filter: } B\ \} $$
+$ A, B $ are finite sets, in particular the \emph{modelling} set is defined to contain {\bfseries paths} which
+themselves are made up of {\bfseries steps}. The \emph{filtering} set is defined to contain {\bfseries predicates}.
+So here's the thing, since concept theory privileges \emph{bootstrapping}, we want to define these and as many
+other ideas as we can internally to the language.
+
+As another part of the methodology then, it is common practice to define a ``type'' or ``kind'' of concept manually
+for a few single values, then automatically or recursively for the rest. For example the first three steps
+are defined as follows:
+$$ \begin{array}{lcllll}
+0 & := & \{\ \bfmbox{model: } \emptyset & | & \bfmbox{filter: } \emptyset & \}	\\
+1 & := & \{\ \bfmbox{model: } \{0\} & | & \bfmbox{filter: } \emptyset & \}	\\
+2 & := & \{\ \bfmbox{model: } \{0,1\} & | & \bfmbox{filter: } \emptyset & \}	\\
+\end{array} $$
+With $ 0,1 $ we now have boolean values, and with steps $ 0,1,2 $ we can now define boolean monoids: binary logical
+operators. This in turn would give us the basic logical \emph{implication} operator ($ \Rightarrow $), which we can
+then use to define our first function: the successor function. Finally, we can then define the remaining (first round
+of) steps which correspond to the natural numbers.
+
+From here, we can define more general paths because we can also locally define \emph{projection functions} and thus
+\emph{pairs}.  I have already worked out a computational narrative in building \emph{applicable objects, copairs,
+if-then-else operator, lists} (and their recursive operators), \emph{colists} (switch statements). All of this can
+be done rigorously all the while privileging bootstrapping.
+
+The one clear tradeoff to privileging bootstrapping as a value is when one prefers consistently defined types (such
+as functions): Once the scalable (universal) definition is given, we would need to show the previously defined
+manual instances also satisfy the universal definitions.
+
+\ \\[0.5cm]
+
+The intention of this essay is to demonstrate a universal property of mathematical functions
+that parallels the ``subsetting'' paradigm from Set Theory:
+$$ \{\,x\in A\ |\ P(x)\,\} $$
+Here we can view the set $ A $ as a \emph{model}, and the predicate $ P(x) $ as a \emph{filter}. The idea being
+presented then is that a function can be similarly decomposed into a model component followed by a filter component.
+
+For example a function such as:
+\begin{comment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p10 = segment(p00, "SL", 1, 20);
+ pair p11 = segment(p00, "SR", 1, 40);
+ pair p12 = segment(p00, "SR", 1, 60);
+ pair p13 = segment(p00, "SR", 1, 70);
+ 
+ pair p20 = segment(p12, "SL", 1, 20);
+ pair p21 = segment(p12, "SR", 1, 50);
+ 
+ //
+ 
+ draw(p00--p10);
+ draw(p00--p11);
+ draw(p00--p12);
+ draw(p00--p13);
+ 
+ draw(p12--p20);
+ draw(p12--p21);
+ 
+ //
+ 
+ label("$y_f=f(x_1,g(w),x_3)$:", (0,0.75), N);
+ 
+ safeLabel("$f$", p00, 0.25, 0.25);
+ 
+ safeLabel("$y_f$", p10, 0.25, 0.25);
+ safeLabel("$x_1$", p11, 0.25, 0.25);
+ safeLabel("$g$", p12, 0.25, 0.25);
+ safeLabel("$x_3$", p13, 0.25, 0.25);
+ 
+ safeLabel("$x_2$", p20, 0.25, 0.25);
+ safeLabel("$w$", p21, 0.25, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{comment}
+can be defined conceptually as follows:
+
+$$ \begin{array}{rlrl}
+ \mbox{function \bfseries model:}	&			&  \qquad\qquad \mbox{function \bfseries filter:}	\\
+ & \left\{\begin{array}{rcl}
+   p_0	& :=		& /						\\
+   p_1	& :=		& /0						\\
+   p_2	& :=		& /1						\\
+   p_3	& :=		& /2						\\
+   p_4	& :=		& /2/0						\\
+   p_5	& :=		& /2/1						\\
+   p_6	& :=		& /3						\\
+   \end{array}\right\} && \left\{\begin{array}{rcl}
+   p_0	& =		& f						\\
+   p_1	& =		& y_f						\\
+   p_2	& =		& x_1						\\
+   p_3	& =		& g						\\
+   p_4	& =		& x_2						\\
+   p_5	& =		& w						\\
+   p_6	& =		& x_3						\\
+   \end{array}\right\}
+\end{array} $$
+The philosophical consequence of defining a function this way is that it is a \emph{relational} object.
+
+
+Let $ X $ be a non-empty set of \emph{paths}. A \emph{type} $ \mathcal{T} $ is defined as follows:
+$$ \mathcal{T} \subseteq \mathbb{P}(X) $$
+where $ \mathbb{P}(\cdot) $ is the \emph{powerset} of $ X $.
+In particular, for any $ \mathcal{I}\in\mathcal{T} $, $ \mathcal{I} $ is called an \emph{instance}
+of the given type, and any subset $ \mathcal{S}\subseteq\mathcal{T} $ is a \emph{subtype}.
+
+The advantage of this way of defining types---possessing an internal structure---is their respective paths allow us to define
+a \emph{filter algebra} by means of a path grammar, which allows us to express subtypes and instances as \emph{concepts}.
+In practice, many concepts correspond to subtypes, but as it's possible $ \mathbb{P}(X)\backslash\mathcal{T}\neq\emptyset $,
+concepts are a more general idea than a type.
+
+\begin{align*}
+\mbox{\bf byte type}		& \defequals (0+1)^8 \defequals \{\, \mu^m\sigma^n \quadbar 1\le m\le 8,\ 1\le n\le 2 \,\}		\\
+\mbox{\bf byte instance}	& \defequals \mathcal{I} \subseteq (0+1)^8 \quadcomma
+					     \mu^m\sigma^k\,,\ \mu^m\sigma^\ell \in \mathcal{I} \then k = \ell
+\end{align*}
+
+{\bf Algorithm} for defining (designing) concepts:
+
+\begin{enumerate}
+\item Given a concrete universal grammar, specify the type as a space of paths. For a byte,
+      we construct $ (0+1)^8 $ which is the eight term \emph{product} of the two term \emph{disjoint union} of objects $ 0, 1 $.
+
+      Here $ \mu $ is the product operator with $ \mu^m $ its $ m $th operand; $ \sigma $ the disjoint union operator
+      with $ \sigma^n $ its $ n $th operand. In particular $ \mu^m\sigma^n $ denotes a given path within the space $ (0+1)^8 $.
+\item Given a type, we specify its instances by constructing a predicate \emph{filter} which generates a family of subsets
+      of the space. Each subset of paths within the family is an instance.
+\end{enumerate}
+
+Consequences of this approach to {\bf type theory}:
+
+\begin{enumerate}
+\item Concept theory requires a concrete universal grammar for constructing spaces of paths. Fortunately much research
+      in type theory, category theory, homotopy type theory, and analytic combinatorics has already been done to that end.
+\item A concept generalizes the idea of a type as well as an instance. A concept is the dual of a filter---growing the filter
+      shrinks the concept. A concept representing a unique type instance is said to have its identity resolved. Filters are
+      specified by predicate logic, where the predicates are themselves concretely specified by the grammar used in constructing
+      the space of paths.
+\item Unresolved concepts are isomorphic to mutable data structures.
+\item By using paths as the medium of exchange in our design, we imply every concept \emph{as} data structure already has an
+      implicit natural coordinate system---a universal medium for navigating every subconcept as well as every path resolution
+      within the concept as type.
+\end{enumerate}
+
+Narrative:
+
+$$ \begin{array}{rclll}
+\mbox{\bf bit type}		& \defequals & \ 0+1
+				& \defequals & \{\, \sigma^n \quadbar 1\le n\le 2 \,\}							\\
+\mbox{\bf bit instance}		& \defequals & \mathcal{B} \subseteq (0+1)
+				& \quadcomma & \sigma^{n_1}\,,\ \sigma^{n_2} \in \mathcal{B} \then n_1 = n_2				\\
+																	\\
+\mbox{\bf word type}		& \defequals & (0+1)^N
+				& \defequals & \{\, \mu^m\sigma^n \quadbar 1\le m\le N,\ 1\le n\le 2 \,\}				\\
+\mbox{\bf word instance}	& \defequals & \mathcal{W} \subseteq (0+1)^N
+				& \quadcomma & \mu^m\sigma^{n_1}\,,\ \mu^m\sigma^{n_2} \in \mathcal{W} \then n_1 = n_2			\\
+																	\\
+\mbox{\bf address type}		& \defequals & (0+1)^{NM}
+				& \defequals & \{\, \mu^\ell\mu^m\sigma^n \quadbar 1\le \ell\le M,\ 1\le m\le N,\ 1\le n\le 2 \,\}	\\
+\mbox{\bf address instance}	& \defequals & \mathcal{A} \subseteq (0+1)^{NM}
+				& \quadcomma & \mu^\ell\mu^m\sigma^{n_1}\,,\ \mu^\ell\mu^m\sigma^{n_2} \in \mathcal{A} \then n_1 = n_2	\\
+																	\\
+\mbox{\bf tree type}		& \defequals & L(0+1)^{NM}
+				& \defequals & \{\, \sigma^k\mu^\ell\mu^m\sigma^n \quadbar
+					       1\le k\le L, 1\le \ell\le M,\ 1\le m\le N,\ 1\le n\le 2 \,\}				\\
+\mbox{\bf tree instance}	& \defequals & \mathcal{T} \subseteq L(0+1)^{NM}
+				& \quadcomma & \sigma^k\mu^\ell\mu^m\sigma^{n_1}\,,\ \sigma^k\mu^\ell\mu^m\sigma^{n_2}
+					       \in \mathcal{T} \then n_1 = n_2								\\
+\end{array} $$
+
+\end{document}

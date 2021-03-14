@@ -1,0 +1,141 @@
+% Copyright 2014 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1cm,right=1cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{asymptote}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\pagestyle{empty}
+\begin{document}
+
+\begin{asydef}
+import graph;
+unitsize(1cm);
+
+//My choice of "semi" and "auto " do not imply "semi-auto".
+
+//base components:
+
+	path semi0=(1,4){N}..{S}(-1,4);
+	path semi45=rotate(45)*semi0;
+	path semi120=rotate(120)*semi0;
+	path semi135=rotate(135)*semi0;
+	path semi180=rotate(180)*semi0;
+	path semi240=rotate(240)*semi0;
+
+	path auto3=semi120{NE}..{E}(0,-1){E}..{SE}semi240;
+	path auto4=semi45{SE}..{S}(-1,0){S}..{SW}semi135;
+
+//bi-cognite:
+	picture bicog;
+	draw(bicog, semi0--semi180--cycle);
+
+//curved bi-cognite:
+	picture curbicog;
+	draw(curbicog, auto3{NW}..{SW}cycle);
+
+//tri-cognite:
+	path auto120=rotate(120)*auto3;
+	path auto240=rotate(240)*auto3;
+
+	picture tricog;
+	draw(tricog, auto3);
+	draw(tricog, auto120);
+	draw(tricog, auto240);
+
+//quad-cognite:
+	path auto90=rotate(90)*auto4;
+	path auto180=rotate(180)*auto4;
+	path auto270=rotate(270)*auto4;
+
+	picture quadcog;
+	draw(quadcog, auto4);
+	draw(quadcog, auto90);
+	draw(quadcog, auto180);
+	draw(quadcog, auto270);
+
+\end{asydef}
+
+\begin{center}
+\bfseries\Large Cognate Theory \\ \normalsize Daniel Nikpayuk \\ December 8, 2014
+\end{center}
+
+\noindent\hspace*{0cm}\begin{asy}
+//draw:
+
+picture cogpic;
+add(cogpic, tricog);
+add(cogpic, shift(-6.6,-5.6)*rotate(145)*scale(3/4)*bicog);
+add(cogpic, shift(-5.4,1.4)*rotate(3)*scale(3/4)*bicog);
+add(cogpic, shift(5.35,2.85)*rotate(-60)*curbicog);
+add(cogpic, shift(-2.525, 8.95)*rotate(-1.5)*quadcog);
+
+picture pic;
+add(pic, rotate(90)*scale(1/2)*cogpic);
+
+real sc=1/2;
+real fs=sc*18pt;
+label(pic, "0", (0,0), fontsize(fs));
+label(pic, "1", (-1.4,2.5), fontsize(fs));
+label(pic, "2", (-0.7,-2.7), fontsize(fs));
+label(pic, "3", (-4.455,-1.23), fontsize(fs));
+label(pic, "4", (2.845,-3.35), fontsize(fs));
+
+add(scale(sc)*pic);
+
+\end{asy}
+\noindent\hspace*{2cm}\begin{tabular}{r|rrrrrrr}
+0 & \{1\} & , & \{1, 3\} & , & \{2, 4\} & & \\
+1 & \{0\} & , & \{0, 3\} & & & & \\
+2 & \{0, 4\} & , & \{3\} & & & & \\
+3 & \{0, 1\}  & , & $ \emptyset\,\ $ & , & $ \emptyset\,\ $ & , & \{2\} \\
+4 & \{0, 2\} & , & $ \emptyset\,\ $ & & & & \\
+\end{tabular}\\[0.5cm]
+
+The general idea here is to replace the existing \emph{graph theory} with improved definitions:\\[0.1cm]
+
+It can be argued the choice of representation towards the semantics of graph theory grew out various Western
+cultures that privilege/d an \emph{object over relationship} model. I'm not arguing the merits of ``individualism''
+as many great contributions have been made essentializing its value as an ideology---I do argue it is
+\emph{one way among many} and it is thus worth considering the contributions of other worldviews. As culture shapes
+definitions even within something as ``pure'' as mathematics one may notice within graph theory a privileging of objects
+(vertices) and only by assuming their existence first do we then construct relationships (edges). An example of the
+problematic nature of this approach is in considering a ``3-way relationship'':
+
+Is it fair to use graph theory to say a 3-way relationship is a graph between 3 objects?  (i.e.~it consists of a collection
+of 2-way relationships between 3 objects) What of \emph{emergence}? Is a relationship not more than the sum of its parts?
+Given the existing axioms and definitions of graph theory these sorts of considerations are an after-thought. I should
+again emphasize that I do not present this theory as a matter of ``fairness'' rather as a need to point out potentially
+poor design of definition; especially given the need to better understand relational structures in this ever complex world.
+To be {\bfseries bold}, I don't believe the language of graph theory is up to the challenge.
+
+A \emph{cognate} is a relationship that is priviliged first. This is to say it is assumed to exist first and only
+then can objects be represented as the \emph{gaps} between these cognates. Part of choice of terminology---aside from
+a cognate being a type of relationship---is the word `cognate' is similar to `cognite' (cognition) and when looking
+at the brain one has things like \emph{synaptic clefts} which aren't objects in-and-of-themselves yet graph theory
+would represent them as such. And this idea of a `gap' isn't new to math either as the more elegant of the two constructions
+(the other being Cauchy sequences) of the real line uses \emph{dedekind cuts}: The unique absence of a number is its very
+definition---such an absence observed as a gap in the rational line.
+
+Now if one were to represent a \emph{cognation} as a structuring of cognates using set theory it would be as a mapping from
+the cognate set to various sequences of subsets of those cognates (with a few additional restrictions). For example $ c_0 $
+(cognate $ 0 $ in the above figure) has 3 \emph{orientations} (relational orientations), the first of which is with $ c_1 $;
+the second with $ c_1 $ and $ c_3 $, etc.
+
+That's the intuitive understanding anyway. As such it would be easy enough to migrate the existing definitions and theorems of graph
+theory over to this cognate theory. What's more: one can actually properly represent things like ``multi-graphs'' and ``directed-graphs''
+all within a single definition. This elegance is in opposition to current graph theory where one must use similar but different
+definitions to represent such similar but different structures. Finally, this broader definition allows for simpler representations
+of more interesting directional relationships like if at a given \emph{junction} between cognates there was a one-directional
+flow between some cognates but not others. Such a thing isn't even easily perceived of within the frames of graph theory.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+\end{document}
+

@@ -1,0 +1,392 @@
+% Copyright 2014 Daniel Nikpayuk
+\documentclass[twoside]{amsart}
+\usepackage[letterpaper,left=1cm,right=1cm,top=1.5cm,bottom=2cm]{geometry}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\newcommand{\bu}[1][u]{\ensuremath{\mathbf #1}}
+
+\title{An interesting class of multiple index sums}
+\author{Daniel Nikpayuk}
+\date{December 8, 2014}
+\begin{document}
+\maketitle
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+\section{Overview}
+
+The sums in this article are a generalization of the ones occuring
+in the book \emph{Concrete Mathematics} \cite{gkp} of the form:
+
+$$ \sum_{0\le k\le n}f(k) $$
+
+As far as this article is concerned, I have cannibalized portions of an older larger one (of mine)
+into what's currently before you; I give only a quick tour of the main ideas and results.
+
+As far as the generalization of sums is concerned, it is worth noting there are many
+classes of multiple index sums whose forms quite readily retain many of the original
+manipulation laws.  Thus the one I'm interested in preserving in this article is:
+
+\begin{eqnarray*}
+\sum_{0\le j\le k\le n}f(j,k)
+ & = & \sum_{(0\le j\le n)}\sum_{(j\le k\le n)}f(j,k) \\  
+ & = & \sum_{(0\le k\le n)}\sum_{(0\le j\le k)}f(j,k)       
+\end{eqnarray*}
+
+which is called the \emph{double sum} or \emph{summand switch law}.
+
+\section{Definitions and Terminology}
+
+It will be easiest to go straight to the multiple index sums I have in mind:
+
+$$ \sum_{0\le u_1\le u_2\le u_3\le\ldots\le u_{k-1}\le u_k\le n}f(u_1, u_2, u_3,\ldots, u_{k-1}, u_k) $$
+
+As you can see, it is not too pretty to look at, write, copy, or work with by hand.  To shortform the various indices,
+I will use $ k $-tuples.  In particular I use vector style notation $ \bu $:
+
+$$ \sum_{(0\le\bu\le n)}^k\!\!\!\!\! f(\bu)  $$
+
+Thus
+$$ \bu:=(u_1, u_2,\ldots, u_{k-1}, u_k)  $$
+
+Here I use `$ := $' to mean ``by definition equals''.
+Also, I take for granted that the coordinates are integers $ \mathbb{Z} $ that are non-decreasing in order.
+We write the number $ k $ on top of the Sigma $ \Sigma $ to indicate the length of $ \bu $.
+If you wish to refer to a particular coordinate, say $ u_5 $ for example, you simply write
+$ \bu_{|5|} $.  If you wish to refer the $ j^{\mbox{\scriptsize{th}}} $ coordinate, you simply write:
+
+$$  \bu_{|j|}  $$
+
+There is one warning I feel I should mention; be careful in avoiding circular definitions:
+$$  \bu:\ne(\bu_{|1|},\ldots,\bu_{|k|})  $$
+
+Regarding the notation for the sum above, there is still the issue of order $ \le $.  I will get to that after
+I define a \emph{concatenation} operation on the $ k $-tuples of various lengths $ k $.  This is a new operation
+that requires new notation.  The symbol I've decided to use is `$  \uplus  $', the process in question then is
+to take some $  k  $-tuple, and some $  \ell  $-tuple vectors, and join them to produce a $  (k+\ell)  $-tuple vector:
+
+If $  \bu =(\bu_{|1|},\ldots ,\bu_{|k|})  $, and $  \bu[v] =(\bu[v]_{|1|},\ldots ,\bu[v]_{|\ell|})  $,
+then define 
+
+$$  \bu\uplus\bu[v]:=(\bu_{|1|},\ldots ,\bu_{|k|},\bu[v]_{|1|}, \ldots ,\bu[v]_{|\ell|})  $$
+
+Not that it's actually relevant, but if you're interested, this operation \emph{is} associative,
+clearly \emph{not} commutative, and most interestingly \emph{has} the following distributive law:
+$$  (\bu+\bu[v])\uplus(\bu[w]+\bu[x])=\bu\uplus\bu[w]+\bu[v]\uplus\bu[x]  $$
+the usefulness of which, is yet to be found.
+
+As for the ordering property $ 0\le\bu\le n $, since $ \bu $ is non-decreasing, it is never a problem to say $ 0\le\bu $
+so long as $ 0\le\bu_{|1|} $.  A symmetrical intuition applies to $ \bu\le n $.  What works out to be most
+useful though is that if $ \bu $ is some $ k $-tuple, and $ \bu[v] $ is some $ \ell $-tuple, we can say
+that $ \bu\le\bu[v] $ holds as long as the last coordinate of $ \bu $ is less than or equal to the first coordinate
+of $ \bu[v] $, which is to say $ \bu_{|k|}\le\bu[v]_{|1|} $.  For example:
+$$  (-15,1,3,7,10)\le (30,31)  $$  
+
+Now if one explores this ordering relation in more detail one discovers the following:
+\begin{eqnarray*}
+(\bu\le\bu[v])\quad\mbox{and}\quad(0\le\bu\uplus\bu[v]\le n)
+ & \iff & (0\le\bu\le n)\quad\mbox{and}\quad(\bu\le\bu[v]\le n)                  \\
+ & \iff & (0\le\bu[v]\le n)\quad\mbox{and}\quad(0\le\bu\le\bu[v])
+\end{eqnarray*} 
+
+This leads to the generalization of the much important summand switch laws:
+
+\begin{eqnarray*}
+\sum_{(0\le\bu\uplus\bu[v]\le n)}^{j,k}                                       
+       \!\!\!\!\!\!\!\!\! f(\bu\uplus\bu[v])                                 
+ & = & \sum_{(0\le\bu\le n)}^j                                           
+       \sum_{(\bu\le\bu[v]\le n)}^k\!\!\!\!\!\! f(\bu\uplus\bu[v])     \\  
+ & = & \sum_{(0\le\bu[v]\le n)}^k                                          
+       \sum_{(0\le\bu\le\bu[v])}^j\!\!\!\!\!\! f(\bu\uplus\bu[v])       
+\end{eqnarray*}
+
+Notice on top of the Sigma $ \Sigma $ the pair $ j, k $ to keep track of the lengths of $ \bu, \bu[v] $ respectively.
+I will take it for granted here, but if you explore these sums in more detail, you'll discover they parallel the ones
+again in \cite{gkp}, regarding manipulation laws.
+
+\section{Applications}
+
+The reason I've spent time exploring these sums at all is that they are intimately related to recursive equations,
+also known as discrete initial value problems I believe.  These sums are able to provide discrete closed forms
+if you're interested in them, in particular:
+
+\begin{eqnarray*}
+\sum_{(0\le\bu\le n)}^k\!\!\!\!\!
+	(\bu_{|1|}+1)(\bu_{|2|}+1)\ldots(\bu_{|k|}+1)
+ & = & \left\{\!\!\!\begin{array}{c} k+n+1 \\ n+1 \end{array}\!\!\!\right\} \\
+\sum_{(0\le\bu\le n)}^k\!\!\!\!\!
+	(\bu_{|1|}+1)(\bu_{|2|}+2)\ldots(\bu_{|k|}+k)
+ & = & \left[\!\!\!\begin{array}{c} k+n+1 \\ n+1 \end{array}\!\!\!\right]   
+\end{eqnarray*}
+
+First of all, the notation:
+$  \left\{\!\!\!\begin{array}{c} k \\ n \end{array}\!\!\!\right\}  $, as
+used in \cite{gkp} denotes the Stirling Numbers of the Second Kind, whose
+combinatorial interpretation is that of the number of ways to partition a
+$  k  $-set into $  n  $ non-empty disjoint subsets.  As well, the notation:
+$  \left[\!\!\!\begin{array}{c} k \\ n \end{array}\!\!\!\right]  $, also
+imported from \cite{gkp}, denotes the Stirling Numbers of the First Kind,
+whose combinatorial interpretation is that of the number of permutations of
+size $  k  $ (meaning the ones acting on a set of $  k  $ objects), containing 
+exactly $  n  $ cycles in their standard unique cycle decomposition.
+
+\newpage
+
+Truthfully though, everything starts with this one:
+$$ \sum_{(0\le\bu\le n)}^k\!\!\!\!\! 1={k+n\choose n} $$
+whose combinatorial proof is simple; it's actually just ``choice with repetition'': The sum on the
+left counts the number of ways to choose $ k $ objects with repetition from a collection of $ n+1 $
+objects ($ 0 $ through $ n $). Thus there are $ (n+1)-1 $ ``dividers'' or ``flags'' to position amongst
+(or choose from) $ k+(n+1)-1 $ multiset positions, leading to $ {k+n\choose n} $ which is the count on
+the right side.
+
+A secondary proof is equally instructive, informative, and worth remembering as a trick: Map the
+property of this sum $ (0\le\bu\le n) $ with the following permutation:
+$ p(\bu)=(\bu_{|1|}+1, \bu_{|2|}+2, \ldots, \bu_{|k|}+k) $, which if you notice, converts our
+non-decreasing sequence of integers to a strictly increasing one\footnote{informally: $ (0 < \bu < n+k+1) $}
+which if you notice actually translates out the need for ``with repetition'' leaving us with regular ``choice'':
+$$ {n+k\choose k}\quad\mbox{equivalently}\quad {k+n\choose n}\qed $$
+
+As always, combinatorial proofs are invaluable, but algebraic ones in this case are actually more appropriate:
+
+We start with a proof-convenient form of what I believe is termed Pascal's rule:
+
+$$ {k+n\choose n}={k-1+n\choose n}+{k+n-1\choose n-1} $$
+
+and unfold it recursively (using the rightmost as the recusive term):
+
+\begin{eqnarray*}
+{k+n\choose n} & = & {k-1+n\choose n}+{k-1+n-1\choose n-1}+{k+n-2\choose n-2} \\
+ & = & {k-1+n\choose n}+{k-1+n-1\choose n-1}+{k-1+n-2\choose n-2}+{k+n-3\choose n-3} \\
+ & = & {k-1+n\choose n}+{k-1+n-1\choose n-1}+{k-1+n-2\choose n-2}+\ldots
+\end{eqnarray*}
+
+Eventually the last term runs out, and with a small adjustment to said last term one ends up with:
+$$ {k+n\choose n}=\sum_{0\le u\le n}{k-1+n-u\choose n-u} $$
+whose form we adjust as:
+$$ {k+n\choose n}=\sum_{0\le u\le n}{k-1+u\choose u} $$
+
+This is where things change from the ordinary and the recursive nature of this style of indexing of sums is expressed;
+the next step is the same as before, we unfold:
+
+\begin{eqnarray*}
+{k+n\choose n} & = & \sum_{(0\le u\le n)}{k-1+u\choose u} \\
+ & = & \sum_{(0\le u\le n)}\sum_{(0\le v\le u)}{k-2+v\choose v} \\
+ & = & \sum_{(0\le\bu_{|2|}\le n)}^1\sum_{(0\le\bu_{|1|}\le\bu_{|2|})}^1{k-2+\bu_{|1|}\choose \bu_{|1|}} \\
+ & = & \sum_{(0\le\bu\le n)}^2{k-2+\bu_{|1|}\choose \bu_{|1|}} \\
+ &   & \\
+ & = & \ldots \\
+ &   & \\
+ & = & \sum_{(0\le\bu\le n)}^k{k-k+\bu_{|1|}\choose \bu_{|1|}} \\
+ & = & \sum_{(0\le\bu\le n)}^k 1 \\
+\end{eqnarray*}
+
+The proof of the Stirling Numbers is the same.
+
+\subsection{a table of results}
+
+I have accumulated a table of a few of the simpler sums of this kind, of which I have also derived
+algebraically.
+
+% make an actual table environment you lazy ass.
+
+\begin{eqnarray}
+\sum_{(0\le\bu\le n)}^k\!\!\!\!\! \bu_{|s|}
+ & = & s{k+n\choose k+1}                                                    \\
+\sum_{(0\le\bu\le n)}^k\!\!\!\!\! 1\cdot\bu  
+ & = & \frac{kn}{2} {k+n\choose k}                                          \\ 
+\sum_{(0\le\bu\le n)}^k\!\!\!\!\! t^{\bu_{|1|}} 
+ & = & \sum_{0\le j\le n}{k+n\choose k+j}(t-1)^j                            \\
+\sum_{(0\le\bu\le n)}^k\!\!\!\!\! t^{\bu_{|k|}} 
+ & = & \sum_{0\le j\le n}{k+n\choose k+j}t^{n-j}(t-1)^j                     \\
+\sum_{(0\le\bu\le n)}^k\!\!\!\!\! t^{1\cdot\bu}           
+ & = & \prod_{1\le j\le k}\frac{1-t^{n+j}}{1-t^{j\ \ \ }}                   
+\end{eqnarray}  
+
+Here the $ 1\cdot\bu $ is the dot product meaning $ 1\cdot\bu=\bu_{|1|}+\bu_{|2|}+\ldots+\bu_{|k|} $.
+
+\subsection{a table of stronger results}
+
+\begin{eqnarray}
+\sum_{(0\le\bu\le n)}^k\!\!\!\!\! \bu_{|s+1|}^m 
+ & = & \sum_{1\le j\le m}j!\left\{\!\!\!\begin{array}{c} m \\ j 
+       \end{array}\!\!\!\right\}{s+j\choose j}{k+n\choose k+j}              \\
+\sum_{(0\le\bu\le n)}^k\!\!\!\!\! (\bu_{|1|}^m+\ldots +\bu_{|k|}^m)
+ & = & \sum_{1\le j\le m}j!\left\{\!\!\!\begin{array}{c} m \\ j 
+       \end{array}\!\!\!\right\}{k+j\choose 1+j}{k+n\choose k+j}            \\
+\sum_{(0\le\bu\le n)}^k\!\!\!\!\! t^{\bu_{|s+1|}}
+ & = & \sum_{0\le j\le n}{s+j\choose j}{k+n\choose k+j}(t-1)^j                
+\end{eqnarray} 
+
+\subsection{partial proofs}
+
+I have included some partial proofs of some of these results.  I start with (1):
+
+\begin{eqnarray*}
+{k+1+n\choose k+1} & = & \sum_{(0\le\bu[w]\le n)}^{k+1}\!\!\!\!\! 1    \\
+ & = & \sum_{(0\le\bu[v]\uplus\bu\le n)}^{1,k}\!\!\!\!\!\!\!\! 1       \\
+ & = & \sum_{(0\le\bu\le n)}^{k}                                       
+       \sum_{(0\le\bu[v]\le\bu)}^1\!\!\!\!\! 1                         \\
+ & = & \sum_{(0\le\bu\le n)}^{k}\!\!\!\!\!(\bu_{|1|}+1)                \\
+ & = & \sum_{(0\le\bu\le n)}^k\!\!\!\!\! \bu_{|1|}
+                               +\sum_{(0\le\bu\le n)}^k\!\!\!\!\! 1    \\      
+\end{eqnarray*} 
+
+$$  \Longrightarrow\sum_{(0\le\bu\le n)}^{k}\!\!\!\!\! \bu_{|1|}
+     ={k+1+n\choose k+1}-{k+n\choose k}={k+n\choose k+1}\qed  $$
+
+A frequent strategy is the one used in \cite{gkp} where one partitions a particular sum using its index property.
+As example I would partition a two index sum with index property:
+
+$$ 0\le j\le k\le n $$
+
+by seperating it into sums with $ j > 0 $ and $ j=0 $:
+
+$$ 0\le j\le k\le n\quad\Longleftrightarrow\quad 0 < j\le k\le n\quad\mbox{ or }\quad 0=j\le k\le n $$
+
+Generalizing this---and skipping a few housekeeping steps---we have:
+
+\begin{eqnarray*}
+\sum_{(0\le\bu\le n)}^{k+1}\!\!\!\!\! \bu_{|s|}
+ & = & \sum_{(0\le\bu\le n)}^{k}\!\!\!\!\! \bu_{|s-1|}+\!\!\!\!\!\!\!\!\!\!
+       \sum_{\ \ \ \ (0\le\bu\le n-1)}^{k+1}
+            \!\!\!\!\!\!\!\!\!\!\!\! (\bu_{|s|}+1)                          \\
+ & = & \sum_{(0\le\bu\le n)}^{k}\!\!\!\!\! \bu_{|s-1|}+{k+n\choose k+1}
+        +\!\!\!\!\!\!\!\!\!\!\!\sum_{\ \ \ \ (0\le\bu\le n-1)}^{k+1}
+         \!\!\!\!\!\!\!\!\!\!\!\! \bu_{|s|}                                 
+\end{eqnarray*}
+
+Again we apply this same trick, but to the right side of the inequality:
+
+\begin{eqnarray*}
+\sum_{(0\le\bu\le n)}^{k+1}\!\!\!\!\! \bu_{|s|}
+ & = & \sum_{(0\le\bu\le n)}^{k}\!\!\!\!\! \bu_{|s|}
+       +\!\!\!\!\!\!\!\!\!\sum_{\ \ \ \ (0\le\bu\le n-1)}^{k+1}
+       \!\!\!\!\!\!\!\!\!\!\!\! \bu_{|s|}                
+\end{eqnarray*} 
+
+We now combine the two resulting in a recursive equation:
+
+$$  \Longrightarrow\sum_{(0\le\bu\le n)}^{k}\!\!\!\!\! \bu_{|s|}
+     ={k+n\choose k+1}+\sum_{(0\le\bu\le n)}^{k}\!\!\!\!\! \bu_{|s-1|}  $$
+
+Finally we unfold and simplify:
+
+$$  \Longrightarrow\sum_{(0\le\bu\le n)}^{k}\!\!\!\!\! \bu_{|s|}
+     =s{k+n\choose k+1}\qed  $$
+
+Next is $  (2)  $, an extension of the inversion property is needed:
+
+$$ 0\le\bu\le n\quad\Longleftrightarrow\quad 0\le n-\hat{\bu}\le n $$
+
+where the $ \hat{\bu} $ is the result from sequentially inverting $ \bu $.
+
+\newpage
+
+Upon verifying this sequential inversion as a permutation, as well as the logic of symmetry,
+a generalization of Gauss' classic proof of the arithmetic series demonstrates as follows:
+
+\begin{eqnarray*}
+\sum_{(0\le\bu\le n)}^k\!\!\!\!\! 1\cdot\bu  
+ & = & \sum_{(0\le n-\hat{\bu}\le n)}^k\!\!\!\!\! 1\cdot(n-\hat{\bu})      \\ 
+ & = & \sum_{(0\le\bu\le n)}^k\!\!\!\! 1\cdot(n-\hat{\bu})  \\
+ & = & \sum_{(0\le\bu\le n)}^k\!\!\!\!\! (1\cdot n-1\cdot\hat{\bu})  \\
+ & = & \sum_{(0\le\bu\le n)}^k\!\!\!\!\! 1\cdot n
+       \ -\sum_{(0\le\bu\le n)}^k\!\!\!\!\! 1\cdot\hat{\bu}            \\
+ & = & kn{k+n\choose k}-\sum_{(0\le\bu\le n)}^k\!\!\!\!\! 1\cdot\bu        \\
+\end{eqnarray*} 
+$$  \Longrightarrow\sum_{(0\le\bu\le n)}^k\!\!\!\!\! 1\cdot\bu
+    =\frac{kn}{2}{k+n\choose k}\qed  $$
+
+And finally $  (5)  $, but I should explain an interpretation of some notation I use here.
+If $ 1\cdot\bu $ is a dot product of two $ k $-tuples, one being $ 1 $ (with all it's entries as $ 1 $)
+and the other being $ \bu $, then $ 1\cdot 1 $ would be $ 1+1+\ldots+1+1 $ where there are $ k $ terms
+in this sum, hence $ 1\cdot 1=k $ in this instance.
+
+We first partition the sum using the left side of the index property and simplify:
+
+\begin{eqnarray*}
+\sum_{(0\le\bu\le n+1)}^k\!\!\!\!\! t^{1\cdot\bu}           
+ & = & \sum_{(0\le\bu\le n+1)}^{k-1}\!\!\!\!\! t^{1\cdot(0\uplus\bu)}
+       +\sum_{(0\le\bu\le n)}^k\!\!\!\!\! t^{1\cdot(\bu+1)}                \\
+ & = & \sum_{(0\le\bu\le n+1)}^{k-1}\!\!\!\!\! t^{0+1\cdot\bu}               
+       +\sum_{(0\le\bu\le n)}^k\!\!\!\!\! t^{1\cdot\bu+1\cdot1}            \\
+ & = & \sum_{(0\le\bu\le n+1)}^{k-1}\!\!\!\!\! t^{1\cdot\bu}              
+       +t^k\sum_{(0\le\bu\le n)}^k\!\!\!\!\! t^{1\cdot\bu}                 \\
+\end{eqnarray*} 
+
+We secondly and similarily partition the sum using the right side of the index property and simplify:
+
+\begin{eqnarray*}
+\sum_{(0\le\bu\le n+1)}^k\!\!\!\!\! t^{1\cdot\bu}           
+ & = & \sum_{(0\le\bu\le n+1)}^{k-1}\!\!\!\!\! t^{1\cdot[\bu\uplus (n+1)]}
+       +\sum_{(0\le\bu\le n)}^k\!\!\!\!\! t^{1\cdot\bu}                    \\
+ & = & \sum_{(0\le\bu\le n+1)}^{k-1}\!\!\!\!\! t^{1\cdot\bu+(n+1)}         
+       +\sum_{(0\le\bu\le n)}^k\!\!\!\!\! t^{1\cdot\bu}                    \\
+ & = & t^{n+1}\sum_{(0\le\bu\le n+1)}^{k-1}\!\!\!\!\! t^{1\cdot\bu}        
+       +\sum_{(0\le\bu\le n)}^k\!\!\!\!\! t^{1\cdot\bu}                    \\
+\end{eqnarray*} 
+
+Now I combine the two:
+
+\begin{eqnarray*}
+\Longrightarrow \sum_{(0\le\bu\le n+1)}^{k-1}\!\!\!\!\! t^{1\cdot\bu}
++t^k\sum_{(0\le\bu\le n)}^k\!\!\!\!\! t^{1\cdot\bu}
+ & = & t^{n+1}\sum_{(0\le\bu\le n+1)}^{k-1}\!\!\!\!\! t^{1\cdot\bu}       
+       +\sum_{(0\le\bu\le n)}^k\!\!\!\!\! t^{1\cdot\bu}                    \\
+\Longrightarrow \sum_{(0\le\bu\le n)}^k\!\!\!\!\! t^{1\cdot\bu}
+ & = & \frac{1-t^{n+1}}{1-t^k}
+       \sum_{(0\le\bu\le n+1)}^{k-1}\!\!\!\!\! t^{1\cdot\bu}
+\end{eqnarray*} 
+
+This is a generalization of the common proof to the geometric series:
+
+$$  \Longrightarrow\sum_{(0\le\bu\le n)}^k\!\!\!\!\! t^{1\cdot\bu}           
+    =\prod_{1\le j\le k}\frac{1-t^{n+j}}{1-t^{j\ \ \ }}\qed  $$
+
+\section{Conclusion}
+
+Regarding this basic introduction to the main results of this research, I hope you found it somewhat interesting.
+
+A final note: I recognize I did not show a lot of the rigour required in regular math work---not to mention some
+of the underlying assumptions and tricks. With respect, my guess is that those who would be interested in such
+complicated index sums in the first place would generally be able to derive any of the missing pieces of this article
+themselves.
+
+In the off-case that someone new is interested but yet unable to follow the whole of the logic, feel
+free to contact me and we can further discuss.
+
+Pijariiqpunga.
+
+\section{Problems}
+
+1) Prove:
+
+$$  \sum_{1\le j\le n}j^m{s+j\choose j}{n+k-s-j\choose k-s}
+    =\sum_{1\le j\le m}j!
+    \left\{\!\!\!\begin{array}{c} m \\ j \end{array}\!\!\!\right\}
+    {s+j\choose j}{k+1+n\choose k+1+j}  $$
+
+2) Prove:
+
+\begin{eqnarray*}
+\sum_{0\le j\le n}{s+j\choose j}{n+k-j\choose k}t^j
+ & = & \sum_{0\le j\le n}{s+j\choose j}{k+s+1+n\choose k+s+1+j}(t-1)^j    \\
+ & = & \sum_{0\le j\le n}\left(\sum_{j\le\ell\le n}{\ell\choose j}
+       {s+\ell\choose\ell}{k+s+1+n\choose k+s+1+\ell}(-1)^{\ell-j}\right)t^j
+\end{eqnarray*}       
+
+\begin{thebibliography}{99}
+\bibitem{gkp} R.L. Graham, D.E. Knuth, O. Patashnik.  Concrete
+         Mathematics.  Addison-Wesley Publishing (1994).
+\end{thebibliography}
+
+\end{document} 

@@ -1,0 +1,94 @@
+% Copyright 2019 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=0in,right=0in,top=0.4in,bottom=0in]{geometry}
+\usepackage{asymptote}
+
+\begin{asydef}
+// this comment prevents a compilation bug.
+
+real tan_pi_over_six = tan(pi/6);
+
+void draw_hex(picture pic = currentpicture, int num, pen color = black)
+{
+	real      x = 11 / (3num - 1);
+	real  width = num*(3x)-x;
+
+	real      y = x * tan_pi_over_six;
+	real height = num*(3y)-y;
+
+	real  angle = aTan(11/8.5)-aTan(height/width);
+
+	path   rise = (0,0)--(x,y);
+	path   step = (0,0)--(x,-y)--(2x,0);
+	path   comb = (0,0)--shift(0,-2y)*step;
+	path  cover = (0,0)--(x,-y)--(x,-3y);
+
+	picture initial;
+
+	draw(initial, rise, color);
+
+	for (int col = 0; col < num-1; ++col) draw(initial, shift(x+col*2x, y)*step, color);
+
+	for (int row = 0; row < num; ++row)
+	{
+		for (int col = 0; col < num; ++col)
+		{
+			draw(initial, shift(row*x+col*2x, row*(-3y))*comb, color);
+		}
+
+		draw(initial, shift((row-1)*x+num*2x, row*(-3y)+y)*cover, color);
+	}
+
+	pic.add(rotate(-angle)*initial);
+}
+
+\end{asydef}
+
+\pagestyle{empty}
+\begin{document}
+
+\noindent\begin{center}
+\begin{asy}
+import fontsize;
+unitsize(1inch);
+
+draw_hex(11);
+
+label("\bfseries Hex", (1.25,-9), fontsize(48pt));
+label("\bfseries 11$\times$11", (1.25,-9.5), fontsize(24pt));
+
+\end{asy}
+\end{center}
+
+\newpage
+
+\noindent\begin{center}
+\begin{asy}
+import fontsize;
+unitsize(1inch);
+
+draw_hex(13);
+
+label("\bfseries Hex", (1.25,-9), fontsize(48pt));
+label("\bfseries 13$\times$13", (1.25,-9.5), fontsize(24pt));
+
+\end{asy}
+\end{center}
+
+\newpage
+
+\noindent\begin{center}
+\begin{asy}
+import fontsize;
+unitsize(1inch);
+
+draw_hex(19);
+
+label("\bfseries Hex", (1.25,-9), fontsize(48pt));
+label("\bfseries 19$\times$19", (1.25,-9.5), fontsize(24pt));
+
+\end{asy}
+\end{center}
+
+\end{document}
+

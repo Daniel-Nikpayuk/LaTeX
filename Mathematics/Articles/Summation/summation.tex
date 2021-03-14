@@ -1,0 +1,410 @@
+% Copyright 2014 Daniel Nikpayuk
+\documentclass[twoside]{article}
+  \setlength{\oddsidemargin}{0in}\setlength{\evensidemargin}{0in}
+  \setlength{\topmargin}{0in}
+  \setlength{\headheight}{0in}\setlength{\headsep}{0in}
+  \setlength{\textwidth}{6.5in}\setlength{\textheight}{9in}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\title{Summation}
+\author{Daniel Nikpayuk}
+\date{December 8, 2014}
+\begin{document}
+\maketitle
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+Summation for the many who are not well acquainted with it, as 
+old friends are with each other, do not much enjoy the sight of 
+the, as some might say, horrendous notation given to it.  I'm 
+talking about the notorious \emph{sigma} notation $  \Sigma  $, 
+which is meant \mbox{to---if} learned and used 
+\mbox{correctly---make} handling ugly sums a walk in the park.
+
+Such people often invoke the ``path of least resistence'' 
+arguement by which they say there is no need to introduce new 
+notation maintaining the existing ellipsis notation, i.e. 
+$  a_1+a_2+\ldots +a_n  $, works just fine since it is less 
+mechanical, easier to manipulate, and therefore faster to use.  
+The point being: if it's not broke, and it gets the job done,
+why fix it?
+
+It is not the author's intention to turn this observation into 
+a debate.  Instead, the intention of this article is to make 
+refinements in understanding the notation and why it exists 
+(other than as a shortform of the horizontally longer ellipsis 
+representation), as well as demonstrating the power it holds 
+(most notably with finding closed forms for multiple sums).
+
+\section{Sigma notation}
+
+We will be working with what is called the generalized sigma
+notation.  It turns out that there are two varieties which
+are worth introducing since they will both help a great deal in
+manipulating sums.  The first provides us with a
+set-theoretic perspective, and the second handles the notation 
+with the idea of properties. 
+
+So to begin, the following notation: 
+$$  \sum_{k\in I}a_k  $$ is simply an abbreviation for the sum 
+of all terms $  a_k  $ such that $  k  $ is an \emph{integer} 
+that belongs $  \in  $ to the set $  I  $, where $  I  $ is 
+called the \emph{index set} and is a finite subset of the 
+integers $  \mathbb{Z}  $.  Just to clarify, the $  \Sigma  $ part of 
+the sigma notation is called the \emph{summand}.
+
+When forming the index set, one may simply collect integers
+together, even if it's for no apparent reason.  But
+one can also collect the necessary integers together in a
+systematic way by means of some known property $  P(k)  $.
+In that case, as in the book ``Concrete Mathematics''
+for which this article is inspired (and is otherwise referenced
+as the bracketed index \cite{gkp}), we write:
+$$  \sum_{P(k)}a_k   $$ and add terms $  a_k  $ to our sum 
+whenever $  k  $ is an integer satisfying the given property 
+$  P(k)  $.  The mindful reader at this point might ask what 
+happens when no integers satisfy the property $  P(k)  $?  
+Well, since we aren't adding anything to the sum, we will 
+again borrow from \cite{gkp} and define such a structure to 
+be \emph{zero}.  The same thing happens when we sum terms over 
+an empty index set, so we should name this peculiarity the 
+\emph{empty sum}.
+
+For concreteness, the following example is provided.  Let 
+$  a_k=1  $ and $  I=\{ -2,-1,0,1,2,3\}  $, then
+$$  \sum_{k\in I}1=1+1+1+1+1+1=\sum_{-2\le k\le 3}\!\!\!\! 1  $$
+
+We now take this idea a bit further to introduce double sums.  
+These types of sums are actually pretty simple, they arise 
+when we consider the possibility of the term of a series
+$  \sum_{j\in H}b_j  $ being equal to a sum itself.  With this 
+comes a new consideration though, the term $  b_j  $ as a sum
+will have its own term $  a_{j,k}  $ and its own index set 
+$  I  $, both of which depend on $  k  $, but \emph{can} also 
+depend on $  j  $.
+$$  \sum_{j\in H}\sum_{k\in I_j}\!a_{j,k}
+\mbox{\ \ \ or\ \ \ }\sum_{Q(j)}\sum_{P(j,k)}\!\! a_{j,k}  $$
+
+Noting one more thing before we move on, I will actually use 
+the better known delimited form of the sigma notation in this 
+article, ie. 
+$$  \sum_{k=m}^na_k=a_m+a_{m+1}+a_{m+2}+\ldots +a_{n-1}+a_n  $$
+but only to \emph{display} equations in 
+their finished form.
+
+\subsection{Manipulation}
+
+The goal of our notation now that we have it, is to be
+able to manipulate the complicated structure of summation
+in a concise and easy way.  With this in mind, let's see
+what we can do.   
+
+We begin actually with double sums.  The essential thing to 
+realize here, is that a double sum is a sum of sums, which 
+in the end is just another sum (say that ten times fast).  
+Once this is thought out, one would expect that there is a 
+reasonable \emph{single summand} representation of certain 
+(infact many) double sums.  This of course is true.  
+
+We approach this idea, of a single summand representation of 
+a double sum, by extending the original definitions, by which 
+we extend the term $  a_j  $ to $  a_{j,k}  $ and the index set 
+$  I  $ of \emph{integers} to an index set $  I  $ of 
+\emph{ordered pairs of integers} (or a property $  P(k)  $ to a 
+property $  P(j,k)  $).  Here, an example of this alternate 
+approach would be of some help.  How about letting 
+$  a_{j,k}=j+k  $ and
+$$  I=\{ (0,0),(0,1),(0,2),(1,1),(1,2),(2,2)\}  $$
+so then 
+$$  \sum_{(j,k)\in I}\!\! (j+k)=\sum_{0\le j\le k\le 2}\!\!\!\!\! (j+k)  $$
+$$  =(0+0)+(0+1)+(0+2)+(1+1)+(1+2)+(2+2)  $$
+See!  easy as $  \pi  $.   
+
+With this extension in hand, we are led to: 
+
+\begin{eqnarray*}
+\sum_{(m\le j\le k\le n)}\!\!\!\!\!\!\!\!\! a_{j,k}                         
+ & = & \sum_{(m\le k\le n)}\sum_{(m\le j\le k)}\!\!\!\!\! a_{j,k} \\
+ & = & \sum_{(m\le j\le n)}\sum_{(j\le k\le n)}\!\!\!\! a_{j,k}
+\end{eqnarray*} for some integer constants $  m  $ and $  n  $.   
+This handy little 3-way equation is called the \emph{summand 
+switch law}.  There are infact broader summand switch laws, 
+but for our applications, the one presented here is sufficient. 
+
+The truth of this law isn't exactly ``obvious,'' so it helps if
+you look at it this way: since all three formulae are sums of the 
+terms $  a_{j,k}  $, we only have to show that whenever 
+$  a_{j,k}  $ belongs to any of the above sums for particular 
+values $  j,k  $ they also belong to the two others (the same 
+number of times of course). 
+
+We can actually ``streamline'' this proof, not by showing that 
+for each sum containing any given term the other two sums 
+contain that given term, but by showing that the properties 
+cummulated within each sum, for each sum (that need to be 
+satisfied in order for the term to belong), are equivalent.  
+Let's see, how do we do this?\ldots Ah, that's easy!
+It is first worthwhile to note that in general 
+$$  (a\le b\le c)  $$ is shortform for
+$$  (a\le b)\mbox{ \emph{and} } (b\le c)  $$
+With this we observe that
+$$  (m\le k\le n)\mbox{ \emph{and} } (m\le j\le k)  $$ 
+is true if and only if
+$$  (m\le j)\mbox{ \emph{and} } (j\le k)\mbox{ \emph{and} } (k\le n)  $$ 
+is true, or equivalently 
+$$  (m\le j\le k\le n)  $$ which working backwards is the same as
+$$  (m\le j\le n)\mbox{ \emph{and} } (j\le k\le n)  $$
+A symmetric arguement may be given in the case of the properties
+being false to show their complete, and total logical equivalence.  
+
+Applying this now proven law to our above example we see that
+
+\begin{eqnarray*}
+ &   & \sum_{0\le j\le k\le 2}\!\!\!\!\! (j+k)                  \\
+ & = & \sum_{(0\le k\le 2)}\sum_{(0\le j\le k)}\!\!\!\! (j+k)   \\ 
+ & = & [\ (0+0)\ ]\ +\ [\ (0+1)+(1+1)\ ]                        \\
+ &   & +\ [\ (0+2)+(1+2)+(2+2)\ ]                               \\
+ & = & [\ (0+0)+(0+1)+(0+2)\ ]                                  \\
+ &   & +\ [\ (1+1)+(1+2)\ ]\ +\ [\ (2+2)\ ]                     \\ 
+ & = & \sum_{(0\le j\le 2)}\sum_{(j\le k\le 2)}\!\!\!\! (j+k)             
+\end{eqnarray*} 
+
+Moving on with our manipulation laws, it turns out that there are 
+three major ones to know when looking at single summand sums.  
+The first two are straight-forward, so I won't spend time with any 
+explanations, they work out to be:
+
+\begin{eqnarray}
+\sum_{k\in I}(a_k+b_k) & = & \sum_{k\in I}a_k+\sum_{k\in I}b_k \\
+\sum_{k\in I}ca_k & = & c\sum_{k\in I}a_k 
+\end{eqnarray} Both of these equations have names, $  (1)  $ is 
+called the \emph{associative law}, and $  (2)  $ is called the 
+\emph{distributive law}.  The use of the phrase ``single summand 
+sums'' (above) should be noted since it implies that the sums in 
+these equations may infact be double sums in disguise.  This works 
+as long as we consider the possibility of the index variable 
+$  k  $ being shortform for $  k=(k_1,k_2)  $.  The truth of these 
+extended laws may be verified with the set theoretic arguements 
+applied to the index set.
+
+Hmmm\ldots what could it possibly mean if I said there were
+three laws and only included two as being straight-forward?
+Yes! that's right, the third law, called the 
+\emph{commutative law}, will need some clarification.  
+It takes the form:
+
+\begin{eqnarray}
+\sum_{k\in I}a_k & = & \sum_{p(k)\in I}\!\!\! a_{p(k)}
+\end{eqnarray}Wait a minute though, isn't this just
+substituting one variable for another?  Nope! consider:
+$$  \sum_{0\le k\le 5}\!\!\! a_k\stackrel{?}{=}
+\sum_{0\le k^2\le 5}\!\!\!\! a_{k^2}  $$
+the former (on the left) equals $$  a_0+a_1+a_2+a_3+a_4+a_5  $$
+while the latter (on the right) is equal to $$  a_{4}+a_{1}+a_0+a_1+a_4  $$
+The point is that not just any substitution will do,
+there needs to be a one-to-one correspondence, i.e. for
+every integer (or pair of integers) $  k_1  $ belonging to 
+the index set of summation, there is \emph{exactly} one 
+integer (or pair) $  k_2  $ such that $  k_1=p(k_2)  $, 
+otherwise you could add the same term more than once or 
+not at all.  A good example of a ``proper'' substitution, 
+is setting $  p(k)=n-k  $ for the sum
+$$  \sum_{0\le k\le n}\!\!\! a_k  $$ 
+since for each $  k_1\in I  $ (the index set)
+there exists only one $  k_2  $ such that $  k_1=n-k_2  $,
+or equivalently, there is only one corresponding
+$  n-k_2\in I  $. Substituting this in, we have
+$$  \sum_{0\le k_1\le n}\!\!\!\! a_{k_1}
+ =\sum_{0\le n-k_2\le n}\!\!\!\!\!\!\! a_{n-k_2}  $$
+So to restate the obvious, the term $  a_{n-k_2}  $ is 
+added to the sum if and only if 
+$$  (0\le n-k_2\le n)\mbox{ is true, }  $$ 
+now looking more closely at this particular property 
+$$  (0\le n-k_2\le n)  $$ we see that
+$$  (0\le n-k_2\le n)\Longleftrightarrow (0\le k_2\le n)  $$
+which follows from again using the fact that
+$$  (0\le n-k_2\le n)  $$ is shortform for
+$$  (0\le n-k_2)\mbox{ \emph{and} }(n-k_2\le n)  $$
+but also
+$$  (0\le n-k_2)\Longleftrightarrow (k_2\le n)  $$
+$$  (n-k_2\le n)\Longleftrightarrow (0\le k_2)  $$ 
+What all of this then means is that
+$$  \sum_{0\le k_1\le n}\!\!\!\! a_{k_1}
+=\sum_{0\le k_2\le n}\!\!\!\! a_{n-k_2}  $$ or equivalently:
+$$  \sum_{0\le k\le n}\!\!\! a_{k}
+=\sum_{0\le k\le n}\!\!\! a_{n-k}  $$
+
+The important thing to remember in this chain of reasoning is 
+the \emph{method of derivation} rather than the specific result 
+itself, because with it you can derive many other specific 
+commutative laws, for example setting \mbox{$  p(k)=k+c  $} will 
+always work, as well as using the extensions 
+\mbox{$  p(j,k)=(j+c,k+c)  $} or \mbox{$  p(j,k)=(n-j,n-k)  $} 
+(for some integer constants $  c  $ and $  n  $).  Having this 
+said, I will from now on entirely skip any other similar 
+derivation when proving an equation.
+
+\section{Practice}
+
+We are finally ready to demonstrate the value of our now
+furnished sigma notation.  It should be noted that the two
+famous series
+$$  \sum_{1\le k\le n}\!\!\! k=\frac{n(n+1)}{2}\mbox{\ \ \ and\ \ }  
+\sum_{0\le k\le n}\!\!\! x^k=\frac{1-x^{n+1}}{1-x^{}\ \ \ \ }  $$
+are taken for granted since proofs can be supplied very
+easily from very many sources.
+
+Let's start off nice and simple with
+$$  \sum_{0\le j\le k\le n}\!\!\!\!\! 1  $$ 
+
+\begin{eqnarray*}
+ & = & \sum_{(0\le k\le n)}\sum_{(0\le j\le k)}\!\!\! 1              \\
+ & = & \sum_{(0\le k\le n)}\!\!\!\! (k+1)                            \\
+ & = & \sum_{(0\le k\le n)}\!\!\!\! k+\sum_{(0\le k\le n)}\!\!\!\! 1 \\
+ & = & \frac{n(n+1)}{2}+(n+1)                      \\
+ & = & \frac{(n+1)(n+2)}{2} 
+\end{eqnarray*}
+
+As our second example, let us find a closed form for
+$$  \sum_{0\le j\le k\le n}\!\!\!\!\! (j+k)  $$
+We could solve this old friend of ours\footnote{As far as 
+articles are concerned.} one sum at a time (as in the 
+previous example), but there is a more clever method.    
+
+We start with the permutation on $  \mathbb{Z}^2  $
+$$  p(j,k)=(n-j,n-k)  $$ which after implementing the 
+extended commutative law gives us
+
+\begin{eqnarray*}
+ &   & \sum_{0\le n-j\le n-k\le n}\!\!\!\!\!\!\!\!\!\!\! [(n-j)+(n-k)]  \\
+ & = & \sum_{0\le k\le j\le n}\!\!\!\!\! [2n-(j+k)]                     \\
+ & = & 2n\!\!\!\!\!\!\sum_{0\le k\le j\le n}\!\!\!\!\!\! 1
+-\sum_{0\le k\le j\le n}\!\!\!\!\! (j+k) 
+\end{eqnarray*} From here we observe, for the purpose of 
+substitution, that
+
+\begin{eqnarray*}
+\sum_{0\le k\le j\le n}\!\!\!\!\! (j+k) 
+ & = & \sum_{0\le k\le j\le n}\!\!\!\!\! (k+j) \\
+ & = & \sum_{0\le j\le k\le n}\!\!\!\!\! (j+k)
+\end{eqnarray*} leading us (with a little bit of old-fashioned
+ algebra) to
+
+\begin{eqnarray*}
+\sum_{0\le j\le k\le n}\!\!\!\!\! (j+k) 
+ & = & n\!\!\!\!\!\!\sum_{0\le k\le j\le n}\!\!\!\!\! 1 \\
+ & = & \frac{n(n+1)(n+2)}{2}
+\end{eqnarray*} Interestingly, this solution may be applied 
+towards the well known series $  \sum_{k=1}^nk^2  $:
+
+\begin{eqnarray*}
+ &   & \frac{n(n+1)(n+2)}{2}                                           \\
+ & = & \sum_{0\le j\le k\le n}\!\!\!\!\! (j+k)                         \\
+ & = & \sum_{(0\le k\le n)}\sum_{(0\le j\le k)}\!\!\!\! (j+k)          \\
+ & = & \sum_{(0\le k\le n)}\sum_{(0\le j\le k)}\!\!\!\! j               
++\sum_{(0\le k\le n)}\sum_{(0\le j\le k)}\!\!\!\! k                    \\
+ & = & \sum_{(0\le k\le n)}\!\!\!\!\!\frac{k(k+1)}{2}                   
++\sum_{(0\le k\le n)}\!\!\!\!\! k(k+1)                                 \\
+ & = & \frac{3}{2}\sum_{(0\le k\le n)}\!\!\!\! (k^2+k)                 \\
+ & = & \frac{3}{2}\sum_{(0\le k\le n)}\!\!\!\!\! k^2+\frac{3n(n+1)}{4}
+\end{eqnarray*} 
+$$  \Longrightarrow \sum_{k=1}^nk^2=\frac{n(n+1)(2n+1)}{6}  $$
+
+For our next example, let's try something a little  
+different: 
+$$  S_n=\sum_{0\le k\le n}\!\! (k+1)x^k  $$
+A good start is to relegate and replace this series with its alter ego:
+$$  \sum_{0\le j\le k\le n}\!\!\!\!\! x^k  $$ this claim holding of
+course because 
+$$  S_n=\sum_{(0\le k\le n)}\sum_{(0\le j\le k)}\!\!\!\! x^k  $$
+
+Venturing towards something new, we will partition this sum into 
+two sums in two ways (why you ask?\mbox{\ldots be patient)}.  
+We do this by partitioning the terms of the sum, effectively 
+dividing the sum into two.  The first division occurs when we use 
+the fact that the index variable $  k  $ of the general term 
+$  x^k  $ will either be $  k=n  $ or $  k<n  $:
+
+\begin{eqnarray*}
+\sum_{0\le j\le k\le n}\!\!\!\!\! x^k             
+ & = & \sum_{0\le j\le k=n}\!\!\!\!\! x^n        
+ +\sum_{0\le j\le k<n}\!\!\!\!\! x^k            \\
+ & = & x^n\!\!\!\sum_{0\le j\le n}\!\!\! 1             
+ +\sum_{0\le j\le k\le n-1}\!\!\!\!\!\!\!\! x^k \\
+\end{eqnarray*} the second way to partition the terms is to realize 
+that the index variable $  j  $ will either be $  0=j  $ or $  0<j  $ 
+so that 
+
+\begin{eqnarray*}
+\sum_{0\le j\le k\le n}\!\!\!\!\! x^k      
+ & = & \sum_{0=j\le k\le n}\!\!\!\!\! x^k   
+ +\sum_{0<j\le k\le n}\!\!\!\!\! x^k      \\
+ & = & \sum_{0\le k\le n}\!\!\! x^k        
+ +\sum_{1\le j\le k\le n}\!\!\!\!\! x^k    
+\end{eqnarray*} We then convert
+$$  \sum_{1\le j\le k\le n}\!\!\!\!\! x^k
+\mbox{\ \ \ to\ \ \ }\sum_{0\le j\le k\le n-1}\!\!\!\!\!\!\!\! x^k  $$ 
+with $$  p(j,k)=(j+1,k+1)  $$ which is a permutation on $  \mathbb{Z}^2  $.
+This is carried out as follows:
+
+\begin{eqnarray*}
+\sum_{1\le j\le k\le n}\!\!\!\!\! x^k 
+ & = & \sum_{1\le j+1\le k+1\le n}\!\!\!\!\!\!\!\!\!\!\! x^{k+1}        \\
+ & = & x\!\!\!\!\!\!\!\!\!\sum_{0\le j\le k\le n-1}\!\!\!\!\!\!\!\! x^k
+\end{eqnarray*} which after substituting back in and equating
+the two derived sides, leaves us with
+$$  x^n\sum_{j=0}^n1+S_{n-1}=\sum_{k=0}^nx^k+xS_{n-1}  $$
+reducing to
+$$  \sum_{k=0}^n(k+1)x^k=\frac{1-x^{n+2}}{(1-x)^2}
+-\frac{(n+2)x^{n+1}}{1-x^{}}  $$
+
+As our last example, we have:
+$$  T_n=\sum_{0\le j\le k\le n}\!\!\!\!\! x^{j+k}  $$
+which will tell us as to whether or not our  adventurous 
+partitioning method of the last example was just luck or if it has 
+some worth.  Repeating the process provides us with the equation
+$$  x^n\sum_{j=0}^nx^j+T_{n-1}=\sum_{k=0}^nx^k+x^2T_{n-1}  $$
+so it appears this method is of use after all.
+$$  \sum_{0\le j\le k\le n}\!\!\!\!\! x^{j+k}
+=\frac{1-x^{n+1}}{1-x^{}\ \ \ \ }\cdot\frac{1-x^{n+2}}{1-x^2\ \ \ }  $$
+
+\newpage
+
+\section{Challenge Problems}
+Find closed forms for the following:
+
+\begin{enumerate}
+\item $$  \sum_{k=-3}^n[(k+4)^2+(k-2)+3]  $$
+\item $$  \sum_{k=2}^n(x+1)^{k+1}  $$
+\item $$  \underbrace{\sqrt{2\sqrt{2\sqrt{2\sqrt{\ldots\sqrt{2}}}}}}
+_{n^{\#}\mbox{ of times}}  $$
+\item $$  \sum_{k=1}^nkx^k  $$
+\item $$  \sum_{k=1}^nk^3  $$
+      hint: Commute with $  p(k)=n-k  $, and expand the term.
+\item $$  \sum_{0\le j,k\le n}\!\!\!\! 1  $$
+      hint: $  (0\le j,k\le n)  $
+
+      $  \Longleftrightarrow (0\le j\le n) $ 
+      \emph{and} $  (0\le k\le n)  $ 
+\item $$  \sum_{0\le j\le k\le\ell\le n}\!\!\!\!\!\!\!\! x^{j+k+\ell}  $$
+      hint: Use the partitioning method.
+\item If $  H_n  $ is notation such that
+$$  H_n=\sum_{k=1}^n\frac{1}{k}  $$ then prove the following: 
+$$  \sum_{n=1}^mH_n=(m+1)H_m-m  $$
+      hint: Apply the summand switch law.
+\end{enumerate}
+
+\begin{thebibliography}{99}
+\bibitem{gkp} R.L. Graham, D.E. Knuth, O. Patashnik.  Concrete 
+         Mathematics.  Addison-Wesley Publishing (1994).
+\end{thebibliography}
+
+\end{document}
+

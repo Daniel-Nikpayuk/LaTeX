@@ -1,0 +1,1379 @@
+% Copyright 2015 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1cm,right=1cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{bm}
+
+\newcommand{\st}{$ ^{\mbox{\scriptsize st}} $ }
+\newcommand{\nd}{$ ^{\mbox{\scriptsize nd}} $ }
+\newcommand{\rd}{$ ^{\mbox{\scriptsize rd}} $ }
+
+\renewcommand{\th}{$ ^{\mbox{\scriptsize th}} $ }
+%\th command exists, it gives the old english symbol used for `theta' IPA (voiceless)
+
+\renewcommand{\leq}{\ensuremath{\quad\le\qquad}}
+
+\newcommand{\seq}[1][u]{\ensuremath{<\!#1\!>}}
+\newcommand{\bseq}[1][u]{\ensuremath{<\!\!\bm{#1}\!\!>}}
+\newcommand{\underseq}[2][u]{\ensuremath{\underset{#2}{<\!#1\!>}}}
+\newcommand{\bunderseq}[2][u]{\ensuremath{\underset{#2}{<\!\!\bm{#1}\!\!>}}}
+
+\newcommand{\radix}[2][u]{\ensuremath{\underset{#2}{(#1)}}}
+\newcommand{\radixp}[3][u]{\ensuremath{\underset{#2}{(#1)^{#3}}}}
+\newcommand{\bradix}[2][u]{\ensuremath{\underset{#2}{(\bm{#1})}}}
+\newcommand{\bradixp}[3][u]{\ensuremath{\underset{#2}{(\bm{#1})^{#3}}}}
+
+\newcommand{\numer}[3][w]{\ensuremath{(\bm{#1})_{#2\le k\le #3}}}
+\newcommand{\denom}[3][y]{\ensuremath{(\bm{#1})_{#2\le k <  #3}}}
+
+\newcommand{\ldiv}[1]{\ensuremath{\raisebox{0.045em}{)}\hspace{-0.3275em}\overline{\ #1}}}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+
+\newenvironment{proof}[1][Proof]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries Definition (#1):}]}{\end{trivlist}}
+
+\newcommand{\qed}{\nobreak \ifvmode \relax \else
+      \ifdim\lastskip<1.5em \hskip-\lastskip
+      \hskip1.5em plus0em minus0.5em \fi \nobreak
+      \vrule height0.5em width0.5em depth0.25em\fi}
+
+\pagestyle{empty}
+\begin{document}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+We have a few subtleties to consider actually. To begin, only midway did we add the assumption that
+$ \denom{i}{\ell}\le\numer{i}{\ell} $, but looking more closely it's possible in this case the leading digit of $ \bm(w) $ is zero.
+In our intuitive example this wouldn't happen because our divisor was $ 99 $, as large as possible under the constraint of two digits.
+If it had been smaller, say $ 12 $, then the first two digits of our dividend $ 20 $ would have been large enough that we wouldn't
+have needed the extra step of adding the next digit $ 200 $. In this case you can think of our partial dividend not as $ 20 $ but
+instead as $ 020 $. Same value, but three digits now. If you go over the steps in this derivation you will discover it does not
+contradict our result.
+
+This resolves the first subtlety in that \emph{our derived bound works for the seperate conditional case within our algorithm} as well.
+The second subtlety is it is now time to make compromises on our bound. To be fair, the above bound is still incomplete as we intended
+to derive a bound where both the lower and upper were entirely independent of the numerator and denominator values in the middle of
+this ordered relation. It is not yet independent because we have the $ \bseq[y]_{\ell-1} $ value embedded within, and so it is here
+we make our compromise: We will add the following assumption
+$$ \left\lfloor\frac{b}{2}\right\rfloor\leq\bunderseq[y]{\ell-1} $$
+but if we intend to use this to further our bound derivation, we need this to be in the form of a chain. Fortunately, we already
+know firstly $ \bseq[y]_{\ell-1} < b $. Secondly, given our ``floor function'' lemma from before, we then have
+$$ \frac{b-1}{2}\leq\bunderseq[y]{\ell-1}\leq b-1 $$
+this bound we also need in the form of a multiplicative inverse
+$$ \frac{1}{b-1}\leq\frac{1}{\bseq[y]_{\ell-1}}\leq\frac{2}{b-1} $$
+
+We have what we need to begin. Starting with the lower bound:
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}-\frac{b^\ell-2}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}+\frac{1}{b^\ell-1}-1 $$
+which first simplifies to
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j+b^\ell-3}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+we divide and consensus:
+$$ \frac{1}{b-1}\leq\frac{1}{\bseq[y]_{\ell-1}}\leq\frac{2}{b-1} $$
+becomes
+$$ \frac{b^j+b^\ell-3}{(b-1)b^{\ell-1}}
+	\leq\frac{b^j+b^\ell-3}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{2(b^j+b^\ell-3)}{(b-1)b^{\ell-1}} $$
+which in turn becomes
+$$ -\frac{2(b^j+b^\ell-3)}{(b-1)b^{\ell-1}}
+	\leq-\frac{b^j+b^\ell-3}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq-\frac{b^j+b^\ell-3}{(b-1)b^{\ell-1}} $$
+
+$$ \frac{b^j-1}{(b-1)b^{\ell-1}}
+	\leq\frac{b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{2(b^j-1)}{(b-1)b^{\ell-1}} $$
+which in turn becomes
+$$ -\frac{2(b^j-1)}{(b-1)b^{\ell-1}}
+	\leq-\frac{b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq-\frac{b^j-1}{(b-1)b^{\ell-1}} $$
+
+
+Moving on:
+$$ \frac{b-1}{2}\leq\bunderseq[y]{\ell-1}\leq b-1 $$
+becomes
+$$ \frac{(b-1)b^{\ell-1}}{2(b^\ell-1)^2}
+	\leq\frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\frac{(b-1)b^{\ell-1}}{(b^\ell-1)^2} $$
+and so adding both of these together:
+$$ \frac{(b-1)b^{\ell-1}}{2(b^\ell-1)^2}-\frac{2(b^j+b^\ell-3)}{(b-1)b^{\ell-1}}
+	\leq\frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j+b^\ell-3}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{(b-1)b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j+b^\ell-3}{(b-1)b^{\ell-1}} $$
+
+$$ \frac{(b-1)b^{\ell-1}}{2(b^\ell-1)^2}-\frac{2(b^j-1)}{(b-1)b^{\ell-1}}+\frac{1}{b^\ell-1}-1
+	\leq\frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j+b^\ell-3}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{(b-1)b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j+b^\ell-3}{(b-1)b^{\ell-1}} $$
+
+The upper bound is a tiny bit simpler:
+$$ \frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+first noting
+$$ \frac{1}{(b-1)^2}\leq\frac{1}{\bseq[y]_{\ell-1}^2}\leq\frac{4}{(b-1)^2} $$
+since
+$$ \frac{1}{b-1}\leq\frac{1}{\bseq[y]_{\ell-1}}\leq\frac{2}{b-1} $$
+and so
+$$ \frac{(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}
+	\leq\frac{4(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}} $$
+along with
+$$ \frac{(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1
+	\leq\frac{4(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+Finally, we have our refined---if not ugly--bound:
+$$ \frac{2}{b^\ell-1}+\frac{(b-1)b^{\ell-1}}{2(b^\ell-1)^2}-\frac{2b^j}{(b-1)b^{\ell-1}}-1
+	\leq\left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor
+		-\left\lfloor\frac{\numer{i}{\ell}}{\denom{i}{\ell}}\right\rfloor
+	\leq\frac{4(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+for the experienced inequality manipulator, you should also be able to verify this bound can be further simplified as:
+$$ -1\ \le\ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor
+		-\left\lfloor\frac{\numer{i}{\ell}}{\denom{i}{\ell}}\right\rfloor
+	\ \le\ 1 $$
+keep in mind as we are assuming our divisor has two or more digits we are using the additional assumption that $ j\le\ell+2 $.
+
+In the special case of $ i=0 $ the above simplifies further to our quotient of interest,
+$$ -1\ \le\ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor-q\ \le\ 1 $$
+which of course can be rearranged to put the center of attention on said quotient:
+$$ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor-1
+	\le\ \! q\ \le\ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor+1 $$
+
+To reiterate: This bound allows us to narrow down in advance our calculation of the quotient for arbitrary precision digit divisors
+(two or more digits) to one of three possible cases. At that point, it's guess and check, but a constant bound is far better than
+logarithmic or even linear.
+
+And yet, we can still do just a little bit better.
+
+
+Admittedly we are only interested in the lower end of this particular bound
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}-\frac{b^\ell-2}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{\numer{j}{\ell}+1}{\denom{j}{\ell}}-1-\frac{\numer{i}{\ell}}{\denom{i}{\ell}} $$
+as we have yet to derive the upper bound separately. In fact this is how such inequality manipulations work: maintain the chain
+until the final moment where you usually only need the upper or lower bound but not both.  You have to maintain the chain because
+you will likely be performing additive and multiplicative inversions, and complete information is needed for such manipulations.
+
+We are now interested in the upper half of our original bound:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}} $$
+for which we have the identity:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\quad=\qquad\bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)
+	+\frac{\numer{j}{\ell}-\numer{i}{\ell}-1}{\denom{i}{\ell}}+1 $$
+
+Actually, for the curious, I'd like to make a {\bfseries side note} here. As it is, one can also derive the alternate identity:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\quad=\qquad\frac{\denom{i}{\ell}\numer{j}{\ell}+\denom{i}{\ell}\denom{j}{\ell}-\denom{j}{\ell}[\numer{i}{\ell}+1]}
+		{\denom{i}{\ell}\denom{j}{\ell}} $$
+which privileges multiplication as the \emph{root} operator rather than addition. I've pointed out in the \emph{inequality.pdf}
+article that multiplicative forms can provide improved bounds over additive forms of an identity, the problem here is some of the
+bounds derived in the process of creating a chain here don't satisfy the assumptions needed for the rules of inequality manipulation.
+Otherwise I would have likely used this identity instead.
+
+Getting back to it: We now focus on the left side similar to the previous derivation:
+$$ \bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right) $$
+Luckily for us, from our previous derivations we already know that
+$$ \frac{1}{(b^\ell-1)^2}
+	\leq\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}
+	\leq\frac{b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}} $$
+and
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}\le\bradix[w]{j\le k\le\ell}\le b^{\ell+1}-1 $$
+so we can skip the work and get straight to the result:
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}\qquad (l'') $$
+
+As for our right-hand side:
+$$ \frac{\numer{j}{\ell}-\numer{i}{\ell}-1}{\denom{i}{\ell}} $$
+it is also similar to the previous derivations. If we replace the index of $ (4) $ we immediately have:
+$$ \frac{1}{b^\ell-1}\leq\frac{1}{\denom{i}{\ell}}\leq\frac{1}{\bseq[y]_{\ell-1}b^{\ell-1}}\qquad (8) $$
+and with $ (3) $ from even earlier
+$$ 1\le\bradix[w]{i\le k \le\ell}+1-\bradix[w]{j\le k\le\ell}\le b^j $$
+we can multiply this by $ (8) $ to obtain
+$$ \frac{1}{b^\ell-1}\leq\frac{\numer{i}{\ell}+1-\numer{j}{\ell}}{\denom{i}{\ell}}\leq\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+which when itself is additively inverted results in the second bound of our above identity:
+$$ -\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{\numer{j}{\ell}-\numer{i}{\ell}-1}{\denom{i}{\ell}}
+	\leq-\frac{1}{b^\ell-1}\qquad (r'') $$
+which when adding $ (l'') $ and $ (r'') $ as well as adding $ 1 $ more, we obtain:
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}}+1
+	\leq\frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+where of course we are only really interested in the upper half:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+We now have enough, and by using the transitive law we have possibly weaker but more independent bounds on our original relation:
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}-\frac{b^\ell-2}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor
+		-\left\lfloor\frac{\numer{i}{\ell}}{\denom{i}{\ell}}\right\rfloor
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+
+$$ \frac{1}{b^\ell-1}
+	\leq\frac{1}{\denom{i}{\ell}}
+	\leq\frac{1}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+$$ \frac{1}{b^\ell-1}-1
+	\leq\frac{1}{\denom{j}{\ell}}-1
+	\leq\frac{1}{\bseq[y]_{\ell-1}b^{\ell-1}}-1 $$
+
+Finally adding $ (l') $ and $ (m') $ and $ (r') $ together we obtain the first serious bound for our approximation:
+
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}-\frac{b^\ell-2}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{\numer{j}{\ell}+1}{\denom{j}{\ell}}-1-\frac{\numer{i}{\ell}}{\denom{i}{\ell}}
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{\bseq[y]_{\ell-1}b^{\ell-1}-1}{b^\ell-1} $$
+
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}+\frac{1}{b^\ell-1}-1
+	\leq\frac{\numer{j}{\ell}+1}{\denom{j}{\ell}}-1-\frac{\numer{i}{\ell}}{\denom{i}{\ell}}
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}+\frac{1}{\bseq[y]_{\ell-1}b^{\ell-1}}-1 $$
+
+
+which is equivalent to
+$$ \qquad\frac{1-\denom{j}{\ell}}{\denom{j}{\ell}} $$
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}-1
+	\le\bradix[y]{j\le k < \ell}-1
+	\le b^\ell-2 $$
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}-1}{b^\ell-1}
+	\leq\frac{\denom{j}{\ell}-1}{\denom{j}{\ell}}
+	\leq\frac{b^\ell-2}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+when inverted
+$$ -\frac{b^\ell-2}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{1-\denom{j}{\ell}}{\denom{j}{\ell}}
+	\leq-\frac{\bseq[y]_{\ell-1}b^{\ell-1}-1}{b^\ell-1}\qquad (r') $$
+
+
+
+
+
+$$ 0\leq\bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{i}{\ell}}-\frac{1}{\denom{j}{\ell}}\right) $$
+and finally it's pretty obvious
+$$ -1 \quad <\qquad \frac{1}{\denom{i}{\ell}}-1 $$
+so if we add them altogether we already can deduce
+$$ 0\leq\frac{\numer{i}{\ell}-\numer{j}{\ell}}{\denom{i}{\ell}}
+	+\bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{i}{\ell}}-\frac{1}{\denom{j}{\ell}}\right)
+	+\frac{1}{\denom{i}{\ell}}-1 $$
+
+
+
+
+
+
+Changing our focus now toward the middle of our original identity:
+$$ \bradix[w]{i\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right) $$
+we first simplify fractional part:
+$$ \frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}=\frac{\denom{i}{j}}{\denom{j}{\ell}\denom{i}{\ell}} $$
+Recalling the previous derivation $ (4) $, if we create a copy replacing the index $ j $ with $ i $ and multiply, we obtain:
+multiplying $ (6) $ and $ (7) $ together we derive the next bound in our sequence:
+$$ \frac{1}{(b^\ell-1)^2}
+	\leq\frac{\denom{i}{j}}{\denom{j}{\ell}\denom{i}{\ell}}
+	\leq\frac{b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}} $$
+multiplying this and the former together we derive our right bound
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\bradix[w]{i\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}\qquad (m') $$
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+$$ \begin{array}{rcl}
+\bradix[y]{j\le k < \ell}[\bradix[w]{i\le k\le\ell}+1]
+	-\bradix[y]{i\le k < \ell}\bradix[y]{j\le k < \ell}
+	-\bradix[y]{i\le k < \ell}\bradix[w]{j\le k\le\ell}
+ & = & \bradix[y]{j\le k < \ell}\bradix[w]{i\le k\le\ell}+\bradix[y]{j\le k < \ell}
+	-\bradix[y]{i\le k < \ell}\bradix[y]{j\le k < \ell}
+	-\bradix[y]{i\le k < \ell}\bradix[w]{j\le k\le\ell} \\ \\
+ & = & \bradix[y]{j\le k < \ell}\bradix[w]{i\le k\le\ell}
+	-\bradix[y]{j\le k < \ell}\bradix[w]{j\le k\le\ell}+\bradix[y]{j\le k < \ell}\bradix[w]{j\le k\le\ell}
+	+\bradix[y]{j\le k < \ell}[1-\bradix[y]{i\le k < \ell}]
+	-\bradix[y]{i\le k < \ell}\bradix[w]{j\le k\le\ell} \\ \\
+ & = & \bradix[y]{j\le k < \ell}\bradix[w]{i\le k\le\ell}
+	-\bradix[y]{j\le k < \ell}\bradix[w]{j\le k\le\ell}
+	+\bradix[y]{j\le k < \ell}[1-\bradix[y]{i\le k < \ell}]
+	+\bradix[y]{j\le k < \ell}\bradix[w]{j\le k\le\ell}-\bradix[y]{i\le k < \ell}\bradix[w]{j\le k\le\ell} \\ \\
+ & = & \bradix[y]{j\le k < \ell}[\bradix[w]{i\le k\le\ell}-\bradix[w]{j\le k\le\ell}]
+	+\bradix[y]{j\le k < \ell}[1-\bradix[y]{i\le k < \ell}]
+	+\bradix[w]{j\le k\le\ell}[\bradix[y]{j\le k < \ell}-\bradix[y]{i\le k < \ell}] \\ \\
+\end{array} $$
+
+$$ (ab+c)b^{\ell-1}\le\bradix[y]{i\le k < \ell}\le b^\ell-1 $$
+$$ (ab+c)b^{\ell-1}\le\bradix[y]{j\le k < \ell}\le b^\ell-1 $$
+
+$$ 1\le\bradix[w]{i\le k\le\ell}-\bradix[w]{j\le k\le\ell}\le b^j-1 $$
+$$ 1\le\bradix[y]{i\le k < \ell}-\bradix[y]{j\le k < \ell}\le b^j-1 $$
+
+$$ (ab+c)b^{\ell-1}
+	\leq\bradix[y]{j\le k < \ell}\left(\bradix[w]{i\le k\le\ell}-\bradix[w]{j\le k\le\ell}\right)
+	\leq (b^\ell-1)(b^j-1) $$
+
+$$ \frac{1}{(b^\ell-1)^2}
+	\leq\frac{1}{\denom{i}{\ell}\denom{j}{\ell}}
+	\leq\frac{1}{(ab^\ell+cb^{\ell-1})^2} $$
+
+$$ \frac{(ab+c)b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\frac{\bradix[y]{j\le k < \ell}\left(\bradix[w]{i\le k\le\ell}-\bradix[w]{j\le k\le\ell}\right)}{\denom{i}{\ell}\denom{j}{\ell}}
+	\leq\frac{(b^\ell-1)(b^j-1)}{(ab^\ell+cb^{\ell-1})^2} $$
+
+$$ (ab+c)b^{\ell-1}-1
+	\leq\bradix[y]{i\le k < \ell}-1
+	\leq b^\ell-2 $$
+
+$$ \left((ab+c)b^{\ell-1}-1\right)\left((ab+c)b^{\ell-1}\right)
+	\leq\bradix[y]{j\le k < \ell}\left(\bradix[y]{i\le k < \ell}-1\right)
+	\leq (b^\ell-1)(b^\ell-2) $$
+
+$$ \frac{1}{(b^\ell-1)^2}
+	\leq\frac{1}{\denom{i}{\ell}\denom{j}{\ell}}
+	\leq\frac{1}{(ab^\ell+cb^{\ell-1})^2} $$
+
+$$ \frac{\left((ab+c)b^{\ell-1}-1\right)\left((ab+c)b^{\ell-1}\right)}{(b^\ell-1)^2}
+	\leq\frac{\bradix[y]{j\le k < \ell}\left(\bradix[y]{i\le k < \ell}-1\right)}{\denom{i}{\ell}\denom{j}{\ell}}
+	\leq\frac{(b^\ell-1)(b^\ell-2)}{(ab^\ell+cb^{\ell-1})^2} $$
+
+$$ -\frac{(b^\ell-1)(b^\ell-2)}{(ab^\ell+cb^{\ell-1})^2}
+	\leq\frac{\bradix[y]{j\le k < \ell}\left(1-\bradix[y]{i\le k < \ell}\right)}{\denom{i}{\ell}\denom{j}{\ell}}
+	\leq-\frac{\left((ab+c)b^{\ell-1}-1\right)\left((ab+c)b^{\ell-1}\right)}{(b^\ell-1)^2} $$
+
+$$ 1\le\bradix[y]{i\le k < \ell}-\bradix[y]{j\le k < \ell}\le b^j-1 $$
+$$ ab^\ell+cb^{\ell-1}\le\bradix[w]{j\le k\le\ell}\le b^{\ell+1}-1 $$
+
+$$ ab^\ell+cb^{\ell-1}
+	\leq\bradix[w]{j\le k\le\ell}\left(\bradix[y]{i\le k < \ell}-\bradix[y]{j\le k < \ell}\right)
+	\leq (b^{\ell+1}-1)(b^j-1) $$
+
+$$ \frac{1}{(b^\ell-1)^2}
+	\leq\frac{1}{\denom{i}{\ell}\denom{j}{\ell}}
+	\leq\frac{1}{(ab^\ell+cb^{\ell-1})^2} $$
+
+$$ \frac{ab^\ell+cb^{\ell-1}}{(b^\ell-1)^2}
+	\leq\frac{\bradix[w]{j\le k\le\ell}\left(\bradix[y]{i\le k < \ell}-\bradix[y]{j\le k < \ell}\right)}{\denom{i}{\ell}\denom{j}{\ell}}
+	\leq\frac{(b^{\ell+1}-1)(b^j-1)}{(ab^\ell+cb^{\ell-1})^2} $$
+
+$$ -\frac{(b^{\ell+1}-1)(b^j-1)}{(ab^\ell+cb^{\ell-1})^2}
+	\leq\frac{\bradix[w]{j\le k\le\ell}\left(\bradix[y]{j\le k < \ell}-\bradix[y]{i\le k < \ell}\right)}{\denom{i}{\ell}\denom{j}{\ell}}
+	\leq-\frac{ab^\ell+cb^{\ell-1}}{(b^\ell-1)^2} $$
+
+$$ \frac{(ab+c)b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\frac{\bradix[y]{j\le k < \ell}\left(\bradix[w]{i\le k\le\ell}-\bradix[w]{j\le k\le\ell}\right)}{\denom{i}{\ell}\denom{j}{\ell}}
+	\leq\frac{(b^\ell-1)(b^j-1)}{(ab^\ell+cb^{\ell-1})^2} $$
+
+$$ -\frac{(b^\ell-1)(b^\ell-2)}{(ab^\ell+cb^{\ell-1})^2}
+	\leq\frac{\bradix[y]{j\le k < \ell}\left(1-\bradix[y]{i\le k < \ell}\right)}{\denom{i}{\ell}\denom{j}{\ell}}
+	\leq-\frac{\left((ab+c)b^{\ell-1}-1\right)\left((ab+c)b^{\ell-1}\right)}{(b^\ell-1)^2} $$
+
+$$ -\frac{(b^{\ell+1}-1)(b^j-1)}{(ab^\ell+cb^{\ell-1})^2}
+	\leq\frac{\bradix[w]{j\le k\le\ell}\left(\bradix[y]{j\le k < \ell}-\bradix[y]{i\le k < \ell}\right)}{\denom{i}{\ell}\denom{j}{\ell}}
+	\leq-\frac{ab^\ell+cb^{\ell-1}}{(b^\ell-1)^2} $$
+
+$$ \frac{(ab+c)b^{\ell-1}}{(b^\ell-1)^2}
+		-\frac{(b^\ell-1)(b^\ell-2)}{(ab^\ell+cb^{\ell-1})^2}
+		-\frac{(b^{\ell+1}-1)(b^j-1)}{(ab^\ell+cb^{\ell-1})^2}
+	\leq\frac{\denom{j}{\ell}[\numer{i}{\ell}+1]
+		-\denom{i}{\ell}\denom{j}{\ell}
+		-\denom{i}{\ell}\numer{j}{\ell}}
+		{\denom{i}{\ell}\denom{j}{\ell}} $$
+
+$$ \frac{(ab+c)b^{\ell-1}}{(b^\ell-1)^2}
+		-\frac{(b^\ell-1)(b^\ell-2)+(b^{\ell+1}-1)(b^j-1)}{(ab^\ell+cb^{\ell-1})^2}
+	\leq\frac{\denom{j}{\ell}[\numer{i}{\ell}+1]
+		-\denom{i}{\ell}\denom{j}{\ell}
+		-\denom{i}{\ell}\numer{j}{\ell}}
+		{\denom{i}{\ell}\denom{j}{\ell}} $$
+
+$$ \frac{(ab+c)b^{\ell-1}}{(b^\ell-1)^2}
+		-\frac{2b^{2\ell}-b^{\ell+1}-3b^\ell-b^{\ell-1}+3}{(ab^\ell+cb^{\ell-1})^2}
+	\leq\frac{\denom{j}{\ell}[\numer{i}{\ell}+1]
+		-\denom{i}{\ell}\denom{j}{\ell}
+		-\denom{i}{\ell}\numer{j}{\ell}}
+		{\denom{i}{\ell}\denom{j}{\ell}} $$
+
+
+
+
+
+As for the next term, we know
+$$ \frac{1}{b^\ell-1}
+	\leq\frac{1}{\denom{h}{\ell}}
+	\leq\frac{1}{ab^\ell+cb^{\ell-1}} $$
+which when additively inverted leaves us with
+$$ -\frac{1}{ab^\ell+cb^{\ell-1}}
+	\leq-\frac{1}{\denom{h}{\ell}}
+	\leq-\frac{1}{b^\ell-1} $$
+and by substituting the proper indices and adding results in
+$$ \frac{1}{b^\ell-1}-\frac{1}{ab^\ell+cb^{\ell-1}}
+	\leq\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}
+	\leq\frac{1}{ab^\ell+cb^{\ell-1}}-\frac{1}{b^\ell-1} $$
+which is in the wrong order, but allows us to use \emph{multiplicatively}. This claim of course needs proving:
+
+\newpage
+
+\begin{lemma}
+Let $ a,c $ be such that
+$$ 1\le ab+c\le b-1 $$
+we then have
+$$ -1\leq\frac{1}{b^\ell-1}-\frac{1}{ab^\ell+cb^{\ell-1}} $$
+\end{lemma}
+
+\begin{proof}
+Starting with
+$$ 1\le ab+c\le b-1 $$
+we derive
+$$ b^{\ell-1}\le ab^\ell+cb^{\ell-1}\le b^\ell-b^{\ell-1} $$
+we safely assume
+$$ 1\le b^{\ell-1}\le ab^\ell+cb^{\ell-1}\le b^\ell-b^{\ell-1} $$
+and so
+$$ 1-\frac{1}{b^\ell}\leq 1\leq b^{\ell-1}\leq ab^\ell+cb^{\ell-1}\leq b^\ell-b^{\ell-1} $$
+simplifying
+$$ 1-\frac{1}{b^\ell}\leq ab^\ell+cb^{\ell-1} $$
+equivalently
+$$ \frac{b^\ell-1}{b^\ell}\leq ab^\ell+cb^{\ell-1} $$
+this implies
+$$ \frac{1}{ab^\ell+cb^{\ell-1}}\leq \frac{b^\ell}{b^\ell-1} $$
+as well
+$$ \frac{1}{ab^\ell+cb^{\ell-1}}\leq 1+\frac{1}{b^\ell-1} $$
+finally
+$$ -1\leq \frac{1}{b^\ell-1}-\frac{1}{ab^\ell+cb^{\ell-1}}\qed $$
+\end{proof}
+
+As a consequence of this lemma, in order to multiply, we need to shift right by one which admittedly complicates things a little:
+$$ \frac{1}{b^\ell-1}-\frac{1}{ab^\ell+cb^{\ell-1}}+1
+	\leq\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}+1
+	\leq\frac{1}{ab^\ell+cb^{\ell-1}}-\frac{1}{b^\ell-1}+1 $$
+recalling
+$$ ab^\ell+cb^{\ell-1}\le\bradix[w]{j\le k\le\ell}\le b^{\ell+1}-1 $$
+and multiplying the upper ends
+$$ \bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}+1\right)
+	\leq\left(b^{\ell+1}-1\right)\left(\frac{1}{ab^\ell+cb^{\ell-1}}-\frac{1}{b^\ell-1}+1\right) $$
+which when additively inverted almost gets us there
+$$ \left(b^{\ell+1}-1\right)\left(\frac{1}{b^\ell-1}-\frac{1}{ab^\ell+cb^{\ell-1}}-1\right)
+	\leq\bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{i}{\ell}}-\frac{1}{\denom{j}{\ell}}-1\right) $$
+one step further
+$$ \left(b^{\ell+1}-1\right)\left(\frac{1}{b^\ell-1}-\frac{1}{ab^\ell+cb^{\ell-1}}-1\right)+\bradix[w]{j\le k\le\ell}
+	\leq\bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{i}{\ell}}-\frac{1}{\denom{j}{\ell}}\right) $$
+and finally
+$$ \frac{b^{\ell+1}-1}{b^\ell-1}-\frac{b^{\ell+1}-1}{ab^\ell+cb^{\ell-1}}-b^{\ell+1}+ab^\ell+cb^{\ell-1}+1
+	\leq\bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{i}{\ell}}-\frac{1}{\denom{j}{\ell}}\right) $$
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+in it, I do point out how equality identities don't necessarily preserve inequality bounds. This is to say,
+you can reshape an error bound with nothing else than an identity substitution, such as the following:
+$$ \frac{\numer{j}{\ell}+1}{\denom{j}{\ell}}-1-\frac{\numer{i}{\ell}}{\denom{i}{\ell}}
+	\quad=\qquad\frac{\numer{j}{\ell}-\numer{i}{\ell}}{\denom{j}{\ell}}
+	+\bradix[w]{i\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)
+	+\frac{1}{\denom{j}{\ell}}-1 $$
+the advantage of breaking it up like this is being able to primarily focus separately on the numerators:
+$$ \qquad\frac{\numer{j}{\ell}-\numer{i}{\ell}}{\denom{j}{\ell}}\qquad (l) $$
+or the denominators
+$$ \bradix[w]{i\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)\qquad (m) $$
+or leftovers
+$$ \qquad\frac{1}{\denom{j}{\ell}}-1\qquad (r) $$
+
+We start with the numerators, with the following straightforward inequality:
+$$ 0\le\bradix[w]{i\le k\le\ell}-\bradix[w]{j\le k\le\ell}\le b^j-1 $$
+we will also be needing the basic inequality:
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}\le\bradix[y]{j\le k < \ell}\le b^\ell-1 $$
+which works because we know our denominator cannot equal zero: $ \denom{j}{\ell}\neq 0 $, and in
+particular, we also know by assumption that our leading digit is also non-zero: $ \bseq[y]_{\ell-1}\neq 0 $.
+We multiplicatively invert to obtain:
+$$ \frac{1}{b^\ell-1}\leq\frac{1}{\denom{j}{\ell}}\leq\frac{1}{\bseq[y]_{\ell-1}b^{\ell-1}}\qquad (4) $$
+
+Going back to $ (3) $, we multiply by $ (4) $ to extend our bound as follows:
+$$ 0\leq\frac{\numer{i}{\ell}-\numer{j}{\ell}}{\denom{j}{\ell}}
+	\leq\frac{b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+additively inverting this
+$$ -\frac{b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{\numer{j}{\ell}-\numer{i}{\ell}}{\denom{j}{\ell}}
+	\leq 0\qquad (l') $$
+
+Changing our focus now toward the middle of our original identity:
+$$ \bradix[w]{i\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right) $$
+we first simplify fractional part:
+$$ \frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}=\frac{\denom{i}{j}}{\denom{j}{\ell}\denom{i}{\ell}} $$
+Recalling the previous derivation $ (4) $, if we create a copy replacing the index $ j $ with $ i $ and multiply, we obtain:
+$$ \frac{1}{(b^\ell-1)^2}\leq\frac{1}{\denom{j}{\ell}\denom{i}{\ell}}\leq\frac{1}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}\qquad (6) $$
+Furthermore we can safely assume $ \denom{i}{\ell}\neq\denom{j}{\ell} $ since we intentionally seek an
+imperfect approximation---it makes no sense for equality to exist---which leaves us with
+$$ 0 < \bradix[y]{i\le k < \ell}-\bradix[y]{j\le k < \ell}
+	\quad\Longrightarrow\quad 1\le\bradix[y]{i\le k < j}\le b^j\qquad (7) $$
+multiplying $ (6) $ and $ (7) $ together we derive the next bound in our sequence:
+$$ \frac{1}{(b^\ell-1)^2}
+	\leq\frac{\denom{i}{j}}{\denom{j}{\ell}\denom{i}{\ell}}
+	\leq\frac{b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}} $$
+By assumption we know that $ \denom{i}{\ell}\le\numer{i}{\ell} $ and so we have
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}\le\bradix[w]{i\le k\le\ell}\le b^{\ell+1}-1 $$
+multiplying this and the former together we derive our right bound
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\bradix[w]{i\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}\qquad (m') $$
+
+Lastly we look at the right side of this original identity:
+$$ \qquad\frac{1}{\denom{j}{\ell}}-1 $$
+which is equivalent to
+$$ \qquad\frac{1-\denom{j}{\ell}}{\denom{j}{\ell}} $$
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}-1
+	\le\bradix[y]{j\le k < \ell}-1
+	\le b^\ell-2 $$
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}-1}{b^\ell-1}
+	\leq\frac{\denom{j}{\ell}-1}{\denom{j}{\ell}}
+	\leq\frac{b^\ell-2}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+when inverted
+$$ -\frac{b^\ell-2}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{1-\denom{j}{\ell}}{\denom{j}{\ell}}
+	\leq-\frac{\bseq[y]_{\ell-1}b^{\ell-1}-1}{b^\ell-1}\qquad (r') $$
+
+$$ \frac{1}{b^\ell-1}
+	\leq\frac{1}{\denom{j}{\ell}}
+	\leq\frac{1}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+$$ \frac{1}{b^\ell-1}-1
+	\leq\frac{1}{\denom{j}{\ell}}-1
+	\leq\frac{1}{\bseq[y]_{\ell-1}b^{\ell-1}}-1 $$
+
+Finally adding $ (l') $ and $ (m') $ and $ (r') $ together we obtain the first serious bound for our approximation:
+
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}-\frac{b^\ell-2}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{\numer{j}{\ell}+1}{\denom{j}{\ell}}-1-\frac{\numer{i}{\ell}}{\denom{i}{\ell}}
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{\bseq[y]_{\ell-1}b^{\ell-1}-1}{b^\ell-1} $$
+
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}+\frac{1}{b^\ell-1}-1
+	\leq\frac{\numer{j}{\ell}+1}{\denom{j}{\ell}}-1-\frac{\numer{i}{\ell}}{\denom{i}{\ell}}
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}+\frac{1}{\bseq[y]_{\ell-1}b^{\ell-1}}-1 $$
+
+which admittedly is a lot to take in when looking at it. Please take a moment to go over the steps thoroughly and convince yourself
+of this derivation before we move forward\footnote{If you see a problem in the proof up to this point or even further along,
+I would be more than happy to know. Thank you.}.
+
+Admittedly we are only interested in the lower end of this particular bound
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}-\frac{b^\ell-2}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{\numer{j}{\ell}+1}{\denom{j}{\ell}}-1-\frac{\numer{i}{\ell}}{\denom{i}{\ell}} $$
+as we have yet to derive the upper bound separately. In fact this is how such inequality manipulations work: maintain the chain
+until the final moment where you usually only need the upper or lower bound but not both.  You have to maintain the chain because
+you will likely be performing additive and multiplicative inversions, and complete information is needed for such manipulations.
+
+We are now interested in the upper half of our original bound:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}} $$
+for which we have the identity:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\quad=\qquad\bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)
+	+\frac{\numer{j}{\ell}-\numer{i}{\ell}-1}{\denom{i}{\ell}}+1 $$
+
+Actually, for the curious, I'd like to make a {\bfseries side note} here. As it is, one can also derive the alternate identity:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\quad=\qquad\frac{\denom{i}{\ell}\numer{j}{\ell}+\denom{i}{\ell}\denom{j}{\ell}-\denom{j}{\ell}[\numer{i}{\ell}+1]}
+		{\denom{i}{\ell}\denom{j}{\ell}} $$
+which privileges multiplication as the \emph{root} operator rather than addition. I've pointed out in the \emph{inequality.pdf}
+article that multiplicative forms can provide improved bounds over additive forms of an identity, the problem here is some of the
+bounds derived in the process of creating a chain here don't satisfy the assumptions needed for the rules of inequality manipulation.
+Otherwise I would have likely used this identity instead.
+
+Getting back to it: We now focus on the left side similar to the previous derivation:
+$$ \bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right) $$
+Luckily for us, from our previous derivations we already know that
+$$ \frac{1}{(b^\ell-1)^2}
+	\leq\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}
+	\leq\frac{b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}} $$
+and
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}\le\bradix[w]{j\le k\le\ell}\le b^{\ell+1}-1 $$
+so we can skip the work and get straight to the result:
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}\qquad (l'') $$
+
+As for our right-hand side:
+$$ \frac{\numer{j}{\ell}-\numer{i}{\ell}-1}{\denom{i}{\ell}} $$
+it is also similar to the previous derivations. If we replace the index of $ (4) $ we immediately have:
+$$ \frac{1}{b^\ell-1}\leq\frac{1}{\denom{i}{\ell}}\leq\frac{1}{\bseq[y]_{\ell-1}b^{\ell-1}}\qquad (8) $$
+and with $ (3) $ from even earlier
+$$ 1\le\bradix[w]{i\le k \le\ell}+1-\bradix[w]{j\le k\le\ell}\le b^j $$
+we can multiply this by $ (8) $ to obtain
+$$ \frac{1}{b^\ell-1}\leq\frac{\numer{i}{\ell}+1-\numer{j}{\ell}}{\denom{i}{\ell}}\leq\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+which when itself is additively inverted results in the second bound of our above identity:
+$$ -\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{\numer{j}{\ell}-\numer{i}{\ell}-1}{\denom{i}{\ell}}
+	\leq-\frac{1}{b^\ell-1}\qquad (r'') $$
+which when adding $ (l'') $ and $ (r'') $ as well as adding $ 1 $ more, we obtain:
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}}+1
+	\leq\frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+where of course we are only really interested in the upper half:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+We now have enough, and by using the transitive law we have possibly weaker but more independent bounds on our original relation:
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}-\frac{b^\ell-2}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor
+		-\left\lfloor\frac{\numer{i}{\ell}}{\denom{i}{\ell}}\right\rfloor
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+\subsection*{refinements}
+
+We have a few subtleties to consider actually. To begin, only midway did we add the assumption that
+$ \denom{i}{\ell}\le\numer{i}{\ell} $, but looking more closely it's possible in this case the leading digit of $ \bm(w) $ is zero.
+In our intuitive example this wouldn't happen because our divisor was $ 99 $, as large as possible under the constraint of two digits.
+If it had been smaller, say $ 12 $, then the first two digits of our dividend $ 20 $ would have been large enough that we wouldn't
+have needed the extra step of adding the next digit $ 200 $. In this case you can think of our partial dividend not as $ 20 $ but
+instead as $ 020 $. Same value, but three digits now. If you go over the steps in this derivation you will discover it does not
+contradict our result.
+
+This resolves the first subtlety in that \emph{our derived bound works for the seperate conditional case within our algorithm} as well.
+The second subtlety is it is now time to make compromises on our bound. To be fair, the above bound is still incomplete as we intended
+to derive a bound where both the lower and upper were entirely independent of the numerator and denominator values in the middle of
+this ordered relation. It is not yet independent because we have the $ \bseq[y]_{\ell-1} $ value embedded within, and so it is here
+we make our compromise: We will add the following assumption
+$$ \left\lfloor\frac{b}{2}\right\rfloor\leq\bunderseq[y]{\ell-1} $$
+but if we intend to use this to further our bound derivation, we need this to be in the form of a chain. Fortunately, we already
+know firstly $ \bseq[y]_{\ell-1} < b $. Secondly, given our ``floor function'' lemma from before, we then have
+$$ \frac{b-1}{2}\leq\bunderseq[y]{\ell-1}\leq b-1 $$
+this bound we also need in the form of a multiplicative inverse
+$$ \frac{1}{b-1}\leq\frac{1}{\bseq[y]_{\ell-1}}\leq\frac{2}{b-1} $$
+
+We have what we need to begin. Starting with the lower bound:
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}-\frac{b^\ell-2}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}+\frac{1}{b^\ell-1}-1 $$
+which first simplifies to
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j+b^\ell-3}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+we divide and consensus:
+$$ \frac{1}{b-1}\leq\frac{1}{\bseq[y]_{\ell-1}}\leq\frac{2}{b-1} $$
+becomes
+$$ \frac{b^j+b^\ell-3}{(b-1)b^{\ell-1}}
+	\leq\frac{b^j+b^\ell-3}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{2(b^j+b^\ell-3)}{(b-1)b^{\ell-1}} $$
+which in turn becomes
+$$ -\frac{2(b^j+b^\ell-3)}{(b-1)b^{\ell-1}}
+	\leq-\frac{b^j+b^\ell-3}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq-\frac{b^j+b^\ell-3}{(b-1)b^{\ell-1}} $$
+
+$$ \frac{b^j-1}{(b-1)b^{\ell-1}}
+	\leq\frac{b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{2(b^j-1)}{(b-1)b^{\ell-1}} $$
+which in turn becomes
+$$ -\frac{2(b^j-1)}{(b-1)b^{\ell-1}}
+	\leq-\frac{b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq-\frac{b^j-1}{(b-1)b^{\ell-1}} $$
+
+
+Moving on:
+$$ \frac{b-1}{2}\leq\bunderseq[y]{\ell-1}\leq b-1 $$
+becomes
+$$ \frac{(b-1)b^{\ell-1}}{2(b^\ell-1)^2}
+	\leq\frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\frac{(b-1)b^{\ell-1}}{(b^\ell-1)^2} $$
+and so adding both of these together:
+$$ \frac{(b-1)b^{\ell-1}}{2(b^\ell-1)^2}-\frac{2(b^j+b^\ell-3)}{(b-1)b^{\ell-1}}
+	\leq\frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j+b^\ell-3}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{(b-1)b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j+b^\ell-3}{(b-1)b^{\ell-1}} $$
+
+$$ \frac{(b-1)b^{\ell-1}}{2(b^\ell-1)^2}-\frac{2(b^j-1)}{(b-1)b^{\ell-1}}+\frac{1}{b^\ell-1}-1
+	\leq\frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j+b^\ell-3}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{(b-1)b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j+b^\ell-3}{(b-1)b^{\ell-1}} $$
+
+The upper bound is a tiny bit simpler:
+$$ \frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+first noting
+$$ \frac{1}{(b-1)^2}\leq\frac{1}{\bseq[y]_{\ell-1}^2}\leq\frac{4}{(b-1)^2} $$
+since
+$$ \frac{1}{b-1}\leq\frac{1}{\bseq[y]_{\ell-1}}\leq\frac{2}{b-1} $$
+and so
+$$ \frac{(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}
+	\leq\frac{4(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}} $$
+along with
+$$ \frac{(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1
+	\leq\frac{4(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+Finally, we have our refined---if not ugly--bound:
+$$ \frac{2}{b^\ell-1}+\frac{(b-1)b^{\ell-1}}{2(b^\ell-1)^2}-\frac{2b^j}{(b-1)b^{\ell-1}}-1
+	\leq\left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor
+		-\left\lfloor\frac{\numer{i}{\ell}}{\denom{i}{\ell}}\right\rfloor
+	\leq\frac{4(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+for the experienced inequality manipulator, you should also be able to verify this bound can be further simplified as:
+$$ -1\ \le\ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor
+		-\left\lfloor\frac{\numer{i}{\ell}}{\denom{i}{\ell}}\right\rfloor
+	\ \le\ 1 $$
+keep in mind as we are assuming our divisor has two or more digits we are using the additional assumption that $ j\le\ell+2 $.
+
+In the special case of $ i=0 $ the above simplifies further to our quotient of interest,
+$$ -1\ \le\ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor-q\ \le\ 1 $$
+which of course can be rearranged to put the center of attention on said quotient:
+$$ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor-1
+	\le\ \! q\ \le\ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor+1 $$
+
+To reiterate: This bound allows us to narrow down in advance our calculation of the quotient for arbitrary precision digit divisors
+(two or more digits) to one of three possible cases. At that point, it's guess and check, but a constant bound is far better than
+logarithmic or even linear.
+
+And yet, we can still do just a little bit better.
+
+\subsection*{cleanup}
+
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+we will be needing the basic inequality:
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}\le\bradix[y]{j\le k < \ell}\le b^\ell-1\qquad (3) $$
+we know by assumption that our leading digit is non-zero: $ \bseq[y]_{\ell-1}\neq 0 $ (and thus $ \denom{j}{\ell}\neq 0 $).
+We multiplicatively invert to obtain:
+$$ \frac{1}{b^\ell-1}\leq\frac{1}{\denom{j}{\ell}}\leq\frac{1}{\bseq[y]_{\ell-1}b^{\ell-1}}\qquad (4) $$
+and for our purposes will will also want the separate flavors:
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}\le\bradix[y]{i\le k < \ell}\le b^\ell-1 $$
+$$ \frac{1}{b^\ell-1}\leq\frac{1}{\denom{i}{\ell}}\leq\frac{1}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+looking at our numerator:
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}\le\bradix[w]{j\le k\le\ell}\le b^{\ell+1}-1 $$
+which also holds under its replaced index
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}\le\bradix[w]{i\le k\le\ell}\le b^{\ell+1}-1 $$
+we shift by one
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}+1\le\bradix[w]{j\le k\le\ell}+1\le b^{\ell+1} $$
+multiplying together we get
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}+1}{b^\ell-1}
+	\leq\frac{\numer{j}{\ell}+1}{\denom{j}{\ell}}
+	\leq\frac{b^{\ell+1}}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+similarly we can do the same with the other index:
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{b^\ell-1}
+	\leq\frac{\numer{i}{\ell}}{\denom{i}{\ell}}
+	\leq\frac{b^{\ell+1}-1}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+but in this case we need to additively invert to get the other term,
+$$ -\frac{b^{\ell+1}-1}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq-\frac{\numer{i}{\ell}}{\denom{i}{\ell}}
+	\leq-\frac{\bseq[y]_{\ell-1}b^{\ell-1}}{b^\ell-1} $$
+and if we add these together while shifting left we get our first bound
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}+1}{b^\ell-1}-\frac{b^{\ell+1}-1}{\bseq[y]_{\ell-1}b^{\ell-1}}-1
+	\leq\frac{\numer{j}{\ell}+1}{\denom{j}{\ell}}-1-\frac{\numer{i}{\ell}}{\denom{i}{\ell}}
+	\leq\frac{b^{\ell+1}}{\bseq[y]_{\ell-1}b^{\ell-1}}-\frac{\bseq[y]_{\ell-1}b^{\ell-1}}{b^\ell-1}-1 $$
+
+Please take a moment to go over the steps thoroughly and convince yourself of this derivation before we move
+forward\footnote{If you see a problem in the proof up to this point or even further along, I would be more
+than happy to know. Thank you.}.
+
+Admittedly we are only interested in the lower end of this particular bound
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}+1}{b^\ell-1}-\frac{b^{\ell+1}-1}{\bseq[y]_{\ell-1}b^{\ell-1}}-1
+	\leq\frac{\numer{j}{\ell}+1}{\denom{j}{\ell}}-1-\frac{\numer{i}{\ell}}{\denom{i}{\ell}} $$
+as we have yet to derive the upper bound separately. In fact this is how such inequality manipulations work: maintain the chain
+until the final moment where you usually only need the upper or lower bound but not both.  You have to maintain the chain because
+you will likely be performing additive and multiplicative inversions, and complete information is needed for such manipulations.
+
+We are now interested in the upper half of our original bound:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}} $$
+for which we have the identity:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\quad=\qquad\bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)
+	+\frac{\numer{j}{\ell}-\numer{i}{\ell}-1}{\denom{i}{\ell}}+1 $$
+
+Actually, for the curious, I'd like to make a {\bfseries side note} here. As it is, one can also derive the alternate identity:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\quad=\qquad\frac{\denom{i}{\ell}\numer{j}{\ell}+\denom{i}{\ell}\denom{j}{\ell}-\denom{j}{\ell}[\numer{i}{\ell}+1]}
+		{\denom{i}{\ell}\denom{j}{\ell}} $$
+which privileges multiplication as the \emph{root} operator rather than addition. I've pointed out in the \emph{inequality.pdf}
+article that multiplicative forms can provide improved bounds over additive forms of an identity, the problem here is some of the
+bounds derived in the process of creating a chain here don't satisfy the assumptions needed for the rules of inequality manipulation.
+Otherwise I would have likely used this identity instead.
+
+Getting back to it: We now focus on the left side similar to the previous derivation:
+$$ \bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right) $$
+Luckily for us, from our previous derivations we already know that
+$$ \frac{1}{(b^\ell-1)^2}
+	\leq\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}
+	\leq\frac{b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}} $$
+and
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}\le\bradix[w]{j\le k\le\ell}\le b^{\ell+1}-1 $$
+so we can skip the work and get straight to the result:
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}\qquad (l'') $$
+
+As for our right-hand side:
+$$ \frac{\numer{j}{\ell}-\numer{i}{\ell}-1}{\denom{i}{\ell}} $$
+it is also similar to the previous derivations. If we replace the index of $ (4) $ we immediately have:
+$$ \frac{1}{b^\ell-1}\leq\frac{1}{\denom{i}{\ell}}\leq\frac{1}{\bseq[y]_{\ell-1}b^{\ell-1}}\qquad (8) $$
+and with $ (3) $ from even earlier
+$$ 1\le\bradix[w]{i\le k \le\ell}+1-\bradix[w]{j\le k\le\ell}\le b^j $$
+we can multiply this by $ (8) $ to obtain
+$$ \frac{1}{b^\ell-1}\leq\frac{\numer{i}{\ell}+1-\numer{j}{\ell}}{\denom{i}{\ell}}\leq\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+which when itself is additively inverted results in the second bound of our above identity:
+$$ -\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{\numer{j}{\ell}-\numer{i}{\ell}-1}{\denom{i}{\ell}}
+	\leq-\frac{1}{b^\ell-1}\qquad (r'') $$
+which when adding $ (l'') $ and $ (r'') $ as well as adding $ 1 $ more, we obtain:
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}}+1
+	\leq\frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+where of course we are only really interested in the upper half:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+We now have enough, and by using the transitive law we have possibly weaker but more independent bounds on our original relation:
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}+1}{b^\ell-1}-\frac{b^{\ell+1}-1}{\bseq[y]_{\ell-1}b^{\ell-1}}-1
+	\leq\left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor
+		-\left\lfloor\frac{\numer{i}{\ell}}{\denom{i}{\ell}}\right\rfloor
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+\subsection*{refinements}
+
+We have a few subtleties to consider actually. To begin, only midway did we add the assumption that
+$ \denom{i}{\ell}\le\numer{i}{\ell} $, but looking more closely it's possible in this case the leading digit of $ \bm(w) $ is zero.
+In our intuitive example this wouldn't happen because our divisor was $ 99 $, as large as possible under the constraint of two digits.
+If it had been smaller, say $ 12 $, then the first two digits of our dividend $ 20 $ would have been large enough that we wouldn't
+have needed the extra step of adding the next digit $ 200 $. In this case you can think of our partial dividend not as $ 20 $ but
+instead as $ 020 $. Same value, but three digits now. If you go over the steps in this derivation you will discover it does not
+contradict our result.
+
+This resolves the first subtlety in that \emph{our derived bound works for the seperate conditional case within our algorithm} as well.
+The second subtlety is it is now time to make compromises on our bound. To be fair, the above bound is still incomplete as we intended
+to derive a bound where both the lower and upper were entirely independent of the numerator and denominator values in the middle of
+this ordered relation. It is not yet independent because we have the $ \bseq[y]_{\ell-1} $ value embedded within, and so it is here
+we make our compromise: We will add the following assumption
+$$ \left\lfloor\frac{b}{2}\right\rfloor\leq\bunderseq[y]{\ell-1} $$
+but if we intend to use this to further our bound derivation, we need this to be in the form of a chain. Fortunately, we already
+know firstly $ \bseq[y]_{\ell-1} < b $. Secondly, given our ``floor function'' lemma from before, we then have
+$$ \frac{b-1}{2}\leq\bunderseq[y]{\ell-1}\leq b-1 $$
+this bound we also need in the form of a multiplicative inverse
+$$ \frac{1}{b-1}\leq\frac{1}{\bseq[y]_{\ell-1}}\leq\frac{2}{b-1} $$
+
+We have what we need to begin. Starting with the lower bound:
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}+1}{b^\ell-1}-\frac{b^{\ell+1}-1}{\bseq[y]_{\ell-1}b^{\ell-1}}-1 $$
+we divide and get along:
+$$ \frac{b-1}{2}\leq\bunderseq[y]{\ell-1}\leq b-1 $$
+becomes
+$$ \frac{(b-1)b^{\ell-1}}{2}\leq\bunderseq[y]{\ell-1}b^{\ell-1}\leq (b-1)b^{\ell-1} $$
+which in turn becomes
+$$ \frac{(b-1)b^{\ell-1}+2}{2}\leq\bunderseq[y]{\ell-1}b^{\ell-1}+1\leq (b-1)b^{\ell-1}+1 $$
+which itself in turn becomes
+$$ \frac{(b-1)b^{\ell-1}+2}{2(b^\ell-1)}
+	\leq\frac{\bseq[y]_{\ell-1}b^{\ell-1}+1}{b^\ell-1}
+	\leq\frac{(b-1)b^{\ell-1}+1}{b^\ell-1} $$
+
+Moving on:
+$$ \frac{1}{b-1}\leq\frac{1}{\bseq[y]_{\ell-1}}\leq\frac{2}{b-1} $$
+becomes
+$$ \frac{b^{\ell+1}-1}{(b-1)b^{\ell-1}}
+	\leq\frac{b^{\ell+1}-1}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{2(b^{\ell+1}-1)}{(b-1)b^{\ell-1}} $$
+which in turn becomes
+$$ -\frac{2(b^{\ell+1}-1)}{(b-1)b^{\ell-1}}
+	\leq-\frac{b^{\ell+1}-1}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq-\frac{b^{\ell+1}-1}{(b-1)b^{\ell-1}} $$
+
+and so these together and again subtracting by one:
+$$ \frac{(b-1)b^{\ell-1}+2}{2(b^\ell-1)}-\frac{2(b^{\ell+1}-1)}{(b-1)b^{\ell-1}}-1
+	\leq\frac{\bseq[y]_{\ell-1}b^{\ell-1}+1}{b^\ell-1}-\frac{b^{\ell+1}-1}{\bseq[y]_{\ell-1}b^{\ell-1}}-1
+	\leq\frac{(b-1)b^{\ell-1}+1}{b^\ell-1}-\frac{b^{\ell+1}-1}{(b-1)b^{\ell-1}}-1 $$
+
+The upper bound is a tiny bit simpler:
+$$ \frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+first noting
+$$ \frac{1}{(b-1)^2}\leq\frac{1}{\bseq[y]_{\ell-1}^2}\leq\frac{4}{(b-1)^2} $$
+since
+$$ \frac{1}{b-1}\leq\frac{1}{\bseq[y]_{\ell-1}}\leq\frac{2}{b-1} $$
+and so
+$$ \frac{(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}
+	\leq\frac{4(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}} $$
+along with
+$$ \frac{(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1
+	\leq\frac{4(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+Finally, we have our refined---if not ugly--bound:
+$$ \frac{2}{b^\ell-1}+\frac{(b-1)b^{\ell-1}}{2(b^\ell-1)^2}-\frac{2b^j}{(b-1)b^{\ell-1}}-1
+	\leq\left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor
+		-\left\lfloor\frac{\numer{i}{\ell}}{\denom{i}{\ell}}\right\rfloor
+	\leq\frac{4(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+for the experienced inequality manipulator, you should also be able to verify this bound can be further simplified as:
+$$ -1\ \le\ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor
+		-\left\lfloor\frac{\numer{i}{\ell}}{\denom{i}{\ell}}\right\rfloor
+	\ \le\ 1 $$
+keep in mind as we are assuming our divisor has two or more digits we are using the additional assumption that $ j\le\ell+2 $.
+
+In the special case of $ i=0 $ the above simplifies further to our quotient of interest,
+$$ -1\ \le\ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor-q\ \le\ 1 $$
+which of course can be rearranged to put the center of attention on said quotient:
+$$ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor-1
+	\le\ \! q\ \le\ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor+1 $$
+
+To reiterate: This bound allows us to narrow down in advance our calculation of the quotient for arbitrary precision digit divisors
+(two or more digits) to one of three possible cases. At that point, it's guess and check, but a constant bound is far better than
+logarithmic or even linear.
+
+And yet, we can still do just a little bit better.
+
+\subsection*{cleanup}
+
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+in it, I do point out how equality identities don't necessarily preserve inequality bounds. This is to say,
+you can reshape an error bound with nothing else than an identity substitution, such as the following:
+$$ \frac{\numer{j}{\ell}+1}{\denom{j}{\ell}}-1-\frac{\numer{i}{\ell}}{\denom{i}{\ell}}
+	\quad=\qquad\frac{\numer{j}{\ell}+1-\numer{i}{\ell}}{\denom{j}{\ell}}
+	+\bradix[w]{i\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)-1 $$
+the advantage of breaking it up like this is being able to primarily focus separately on the numerators:
+$$ \qquad\frac{\numer{j}{\ell}+1-\numer{i}{\ell}}{\denom{j}{\ell}}\qquad (l) $$
+or the denominators
+$$ \bradix[w]{i\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)\qquad (r) $$
+
+We start with the numerators, with the following straightforward inequality:
+$$ 0\le\bradix[w]{i\le k\le\ell}-\bradix[w]{j\le k\le\ell}\le b^j-1 $$
+as we need a ``+1'' term in the centre, we shift it right by one:
+$$ 1\le\bradix[w]{i\le k \le\ell}+1-\bradix[w]{j\le k\le\ell}\le b^j\qquad (3) $$
+we will also be needing the basic inequality:
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}\le\bradix[y]{j\le k < \ell}\le b^\ell-1 $$
+which works because we know our denominator cannot equal zero: $ \denom{j}{\ell}\neq 0 $, and in
+particular, we also know by assumption that our leading digit is also non-zero: $ \bseq[y]_{\ell-1}\neq 0 $.
+We multiplicatively invert to obtain:
+$$ \frac{1}{b^\ell-1}\leq\frac{1}{\denom{j}{\ell}}\leq\frac{1}{\bseq[y]_{\ell-1}b^{\ell-1}}\qquad (4) $$
+and for our purposes will will also want to scale
+$$ \frac{2}{b^\ell-1}\leq\frac{2}{\denom{j}{\ell}}\leq\frac{2}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+as well as additively invert our bound
+$$ \frac{-2}{\bseq[y]_{\ell-1}b^{\ell-1}}\leq\frac{-2}{\denom{j}{\ell}}\leq\frac{-2}{b^\ell-1}\qquad (5) $$
+
+Going back to $ (3) $, we multiply by $ (4) $ to extend our bound as follows:
+$$ \frac{1}{b^\ell-1}\leq\frac{\numer{i}{\ell}-\numer{j}{\ell}+1}{\denom{j}{\ell}}\leq\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+and finally we add to this our previous derivation $ (5) $ to obtain:
+$$ \frac{1}{b^\ell-1}-\frac{2}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{\numer{i}{\ell}-\numer{j}{\ell}-1}{\denom{j}{\ell}}
+	\leq\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}}-\frac{2}{b^\ell-1} $$
+which when itself is additively inverted results in the first term of our above identity $ (l) $:
+$$ \frac{2}{b^\ell-1}-\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{\numer{j}{\ell}+1-\numer{i}{\ell}}{\denom{j}{\ell}}
+	\leq\frac{2}{\bseq[y]_{\ell-1}b^{\ell-1}}-\frac{1}{b^\ell-1}\qquad (l') $$
+
+Changing our focus now toward the right side of our original identity:
+$$ \bradix[w]{i\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)\qquad $$
+we first simplify fractional part:
+$$ \frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}=\frac{\denom{i}{j}}{\denom{j}{\ell}\denom{i}{\ell}} $$
+Recalling the previous derivation $ (4) $, if we create a copy replacing the index $ j $ with $ i $ and multiply, we obtain:
+$$ \frac{1}{(b^\ell-1)^2}\leq\frac{1}{\denom{j}{\ell}\denom{i}{\ell}}\leq\frac{1}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}\qquad (6) $$
+Furthermore we can safely assume $ \denom{i}{\ell}\neq\denom{j}{\ell} $ since we intentionally seek an
+imperfect approximation---it makes no sense for equality to exist---which leaves us with
+$$ 0 < \bradix[y]{i\le k < \ell}-\bradix[y]{j\le k < \ell}
+	\quad\Longrightarrow\quad 1\le\bradix[y]{i\le k < j}\le b^j\qquad (7) $$
+multiplying $ (6) $ and $ (7) $ together we derive the next bound in our sequence:
+$$ \frac{1}{(b^\ell-1)^2}
+	\leq\frac{\denom{i}{j}}{\denom{j}{\ell}\denom{i}{\ell}}
+	\leq\frac{b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}} $$
+By assumption we know that $ \denom{i}{\ell}\le\numer{i}{\ell} $ and so we have
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}\le\bradix[w]{i\le k\le\ell}\le b^{\ell+1}-1 $$
+multiplying this and the former together we derive our right bound
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\bradix[w]{i\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}\qquad (r') $$
+finally adding $ (l') $ and $ (r') $ together---and subtracting $ 1 $ as it was also part of the original
+identity---we obtain the first serious bound for our approximation:
+$$ \frac{2}{b^\ell-1}-\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}}+\frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-1
+	\leq\frac{\numer{j}{\ell}+1}{\denom{j}{\ell}}-1-\frac{\numer{i}{\ell}}{\denom{i}{\ell}}
+	\leq\frac{2}{\bseq[y]_{\ell-1}b^{\ell-1}}-\frac{1}{b^\ell-1}
+		+\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-1 $$
+which admittedly is a lot to take in when looking at it. Please take a moment to go over the steps thoroughly and convince yourself
+of this derivation before we move forward\footnote{If you see a problem in the proof up to this point or even further along,
+I would be more than happy to know. Thank you.}.
+
+Admittedly we are only interested in the lower end of this particular bound
+$$ \frac{2}{b^\ell-1}-\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}}+\frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-1
+	\leq\frac{\numer{j}{\ell}+1}{\denom{j}{\ell}}-1-\frac{\numer{i}{\ell}}{\denom{i}{\ell}} $$
+as we have yet to derive the upper bound separately. In fact this is how such inequality manipulations work: maintain the chain
+until the final moment where you usually only need the upper or lower bound but not both.  You have to maintain the chain because
+you will likely be performing additive and multiplicative inversions, and complete information is needed for such manipulations.
+
+We are now interested in the upper half of our original bound:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}} $$
+for which we have the identity:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\quad=\qquad\bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)
+	+\frac{\numer{j}{\ell}-\numer{i}{\ell}-1}{\denom{i}{\ell}}+1 $$
+
+Actually, for the curious, I'd like to make a {\bfseries side note} here. As it is, one can also derive the alternate identity:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\quad=\qquad\frac{\denom{i}{\ell}\numer{j}{\ell}+\denom{i}{\ell}\denom{j}{\ell}-\denom{j}{\ell}[\numer{i}{\ell}+1]}
+		{\denom{i}{\ell}\denom{j}{\ell}} $$
+which privileges multiplication as the \emph{root} operator rather than addition. I've pointed out in the \emph{inequality.pdf}
+article that multiplicative forms can provide improved bounds over additive forms of an identity, the problem here is some of the
+bounds derived in the process of creating a chain here don't satisfy the assumptions needed for the rules of inequality manipulation.
+Otherwise I would have likely used this identity instead.
+
+Getting back to it: We now focus on the left side similar to the previous derivation:
+$$ \bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right) $$
+Luckily for us, from our previous derivations we already know that
+$$ \frac{1}{(b^\ell-1)^2}
+	\leq\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}
+	\leq\frac{b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}} $$
+and
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}\le\bradix[w]{j\le k\le\ell}\le b^{\ell+1}-1 $$
+so we can skip the work and get straight to the result:
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}\qquad (l'') $$
+
+As for our right-hand side:
+$$ \frac{\numer{j}{\ell}-\numer{i}{\ell}-1}{\denom{i}{\ell}} $$
+it is also similar to the previous derivations. If we replace the index of $ (4) $ we immediately have:
+$$ \frac{1}{b^\ell-1}\leq\frac{1}{\denom{i}{\ell}}\leq\frac{1}{\bseq[y]_{\ell-1}b^{\ell-1}}\qquad (8) $$
+and with $ (3) $ from even earlier
+$$ 1\le\bradix[w]{i\le k \le\ell}+1-\bradix[w]{j\le k\le\ell}\le b^j $$
+we can multiply this by $ (8) $ to obtain
+$$ \frac{1}{b^\ell-1}\leq\frac{\numer{i}{\ell}+1-\numer{j}{\ell}}{\denom{i}{\ell}}\leq\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+which when itself is additively inverted results in the second bound of our above identity:
+$$ -\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{\numer{j}{\ell}-\numer{i}{\ell}-1}{\denom{i}{\ell}}
+	\leq-\frac{1}{b^\ell-1}\qquad (r'') $$
+which when adding $ (l'') $ and $ (r'') $ as well as adding $ 1 $ more, we obtain:
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}}+1
+	\leq\frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+where of course we are only really interested in the upper half:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+We now have enough, and by using the transitive law we have possibly weaker but more independent bounds on our original relation:
+$$ \frac{2}{b^\ell-1}-\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}}+\frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-1
+	\leq\left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor
+		-\left\lfloor\frac{\numer{i}{\ell}}{\denom{i}{\ell}}\right\rfloor
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+\subsection*{refinements}
+
+We have a few subtleties to consider actually. To begin, only midway did we add the assumption that
+$ \denom{i}{\ell}\le\numer{i}{\ell} $, but looking more closely it's possible in this case the leading digit of $ \bm(w) $ is zero.
+In our intuitive example this wouldn't happen because our divisor was $ 99 $, as large as possible under the constraint of two digits.
+If it had been smaller, say $ 12 $, then the first two digits of our dividend $ 20 $ would have been large enough that we wouldn't
+have needed the extra step of adding the next digit $ 200 $. In this case you can think of our partial dividend not as $ 20 $ but
+instead as $ 020 $. Same value, but three digits now. If you go over the steps in this derivation you will discover it does not
+contradict our result.
+
+This resolves the first subtlety in that \emph{our derived bound works for the seperate conditional case within our algorithm} as well.
+The second subtlety is it is now time to make compromises on our bound. To be fair, the above bound is still incomplete as we intended
+to derive a bound where both the lower and upper were entirely independent of the numerator and denominator values in the middle of
+this ordered relation. It is not yet independent because we have the $ \bseq[y]_{\ell-1} $ value embedded within, and so it is here
+we make our compromise: We will add the following assumption
+$$ \left\lfloor\frac{b}{2}\right\rfloor\leq\bunderseq[y]{\ell-1} $$
+but if we intend to use this to further our bound derivation, we need this to be in the form of a chain. Fortunately, we already
+know firstly $ \bseq[y]_{\ell-1} < b $. Secondly, given our ``floor function'' lemma from before, we then have
+$$ \frac{b-1}{2}\leq\bunderseq[y]{\ell-1}\leq b-1 $$
+this bound we also need in the form of a multiplicative inverse
+$$ \frac{1}{b-1}\leq\frac{1}{\bseq[y]_{\ell-1}}\leq\frac{2}{b-1} $$
+
+We have what we need to begin. Starting with the lower bound:
+$$ \frac{2}{b^\ell-1}-\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}}+\frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-1 $$
+we divide and consensus:
+$$ \frac{1}{b-1}\leq\frac{1}{\bseq[y]_{\ell-1}}\leq\frac{2}{b-1} $$
+becomes
+$$ \frac{b^j}{(b-1)b^{\ell-1}}\leq\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}}\leq\frac{2b^j}{(b-1)b^{\ell-1}} $$
+which in turn becomes
+$$ -\frac{2b^j}{(b-1)b^{\ell-1}}\leq-\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}}\leq-\frac{b^j}{(b-1)b^{\ell-1}} $$
+
+Moving on:
+$$ \frac{b-1}{2}\leq\bunderseq[y]{\ell-1}\leq b-1 $$
+becomes
+$$ \frac{(b-1)b^{\ell-1}}{2(b^\ell-1)^2}\leq\frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}\leq\frac{(b-1)b^{\ell-1}}{(b^\ell-1)^2} $$
+and so adding everything together:
+$$ \frac{2}{b^\ell-1}+\frac{(b-1)b^{\ell-1}}{2(b^\ell-1)^2}-\frac{2b^j}{(b-1)b^{\ell-1}}-1
+	\leq\frac{2}{b^\ell-1}-\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}}+\frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-1
+	\leq\frac{2}{b^\ell-1}+\frac{(b-1)b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j}{(b-1)b^{\ell-1}}-1 $$
+
+The upper bound is a tiny bit simpler:
+$$ \frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+first noting
+$$ \frac{1}{(b-1)^2}\leq\frac{1}{\bseq[y]_{\ell-1}^2}\leq\frac{4}{(b-1)^2} $$
+since
+$$ \frac{1}{b-1}\leq\frac{1}{\bseq[y]_{\ell-1}}\leq\frac{2}{b-1} $$
+and so
+$$ \frac{(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}
+	\leq\frac{4(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}} $$
+along with
+$$ \frac{(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1
+	\leq\frac{4(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+Finally, we have our refined---if not ugly--bound:
+$$ \frac{2}{b^\ell-1}+\frac{(b-1)b^{\ell-1}}{2(b^\ell-1)^2}-\frac{2b^j}{(b-1)b^{\ell-1}}-1
+	\leq\left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor
+		-\left\lfloor\frac{\numer{i}{\ell}}{\denom{i}{\ell}}\right\rfloor
+	\leq\frac{4(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+for the experienced inequality manipulator, you should also be able to verify this bound can be further simplified as:
+$$ -1\ \le\ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor
+		-\left\lfloor\frac{\numer{i}{\ell}}{\denom{i}{\ell}}\right\rfloor
+	\ \le\ 1 $$
+keep in mind as we are assuming our divisor has two or more digits we are using the additional assumption that $ j\le\ell+2 $.
+
+In the special case of $ i=0 $ the above simplifies further to our quotient of interest,
+$$ -1\ \le\ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor-q\ \le\ 1 $$
+which of course can be rearranged to put the center of attention on said quotient:
+$$ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor-1
+	\le\ \! q\ \le\ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor+1 $$
+
+To reiterate: This bound allows us to narrow down in advance our calculation of the quotient for arbitrary precision digit divisors
+(two or more digits) to one of three possible cases. At that point, it's guess and check, but a constant bound is far better than
+logarithmic or even linear.
+
+And yet, we can still do just a little bit better.
+
+\subsection*{cleanup}
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+in it, I do point out how equality identities don't necessarily preserve inequality bounds. This is to say,
+you can reshape an error bound with nothing else than an identity substitution, such as the following:
+$$ \begin{array}{rcl}
+\frac{\numer{j}{\ell}+1}{\denom{j}{\ell}}-1-\frac{\numer{i}{\ell}}{\denom{i}{\ell}}
+ & = & \frac{\numer{j}{\ell}+1}{\denom{j}{\ell}}-\frac{\numer{i}{\ell}}{\denom{i}{\ell}}-1 \\
+\\
+ & = & \frac{\numer{j}{\ell}+1}{\denom{j}{\ell}}-\frac{\numer{i}{\ell}+\denom{i}{\ell}}{\denom{i}{\ell}} \\
+\\
+ & = & \frac{\numer{j}{\ell}+1}{\denom{j}{\ell}}
+	-\frac{\numer{i}{\ell}+\denom{i}{\ell}}{\denom{j}{\ell}}
+	+\frac{\numer{i}{\ell}+\denom{i}{\ell}}{\denom{j}{\ell}}
+	-\frac{\numer{i}{\ell}+\denom{i}{\ell}}{\denom{i}{\ell}} \\
+\\
+ & = & \frac{\numer{j}{\ell}+1-[\numer{i}{\ell}+\denom{i}{\ell}]}{\denom{j}{\ell}}
+	+[\bradix[w]{i\le k\le\ell}+\bradix[y]{i\le k < \ell}]\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right) \\
+\end{array} $$
+the advantage of breaking it up like this is being able to primarily focus separately on the numerators:
+$$ \qquad\frac{\numer{j}{\ell}+1-[\numer{i}{\ell}+\denom{i}{\ell}]}{\denom{j}{\ell}}\qquad (l) $$
+or the denominators
+$$ [\bradix[w]{i\le k\le\ell}+\bradix[y]{i\le k < \ell}]\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)\qquad (r) $$
+
+We start with the numerators, with the following straightforward inequality:
+$$ 0\le\bradix[w]{i\le k\le\ell}-\bradix[w]{j\le k\le\ell}\le b^j-1 $$
+as we need a ``$ \denom{i}{\ell}+1 $'' term in the centre, we shift the whole thing right by such:
+$$ \bradix[y]{i\le k < \ell}+1
+	\le\bradix[w]{i\le k \le\ell}+\bradix[y]{i\le k < \ell}+1-\bradix[w]{j\le k\le\ell}
+	\le b^j+\bradix[y]{i\le k < \ell}\qquad (3) $$
+we will also be needing the basic inequality:
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}\le\bradix[y]{j\le k < \ell}\le b^\ell-1 $$
+which also holds in the slightly different flavor:
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}\le\bradix[y]{i\le k < \ell}\le b^\ell-1 $$
+which we can shift by one
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}+1\le\bradix[y]{i\le k < \ell}+1\le b^\ell $$
+which improves the lower bound of $ (3) $:
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}+1
+	\le\bradix[w]{i\le k \le\ell}+\bradix[y]{i\le k < \ell}+1-\bradix[w]{j\le k\le\ell}
+	\le b^j+\bradix[y]{i\le k < \ell}\qquad (3a) $$
+or we can shift by more
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}+b^j\le\bradix[y]{i\le k < \ell}+b^j\le b^\ell+b^j-1 $$
+which improves the upper bound of $ (3a) $:
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}+1
+	\le\bradix[w]{i\le k \le\ell}+\bradix[y]{i\le k < \ell}+1-\bradix[w]{j\le k\le\ell}
+	\le b^\ell+b^j-1\qquad (4) $$
+Looking back at
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}\le\bradix[y]{j\le k < \ell}\le b^\ell-1 $$
+we notice our denominator does not equal zero: $ \denom{j}{\ell}\neq 0 $, and in
+particular, we also know by assumption that our leading digit is also non-zero: $ \bseq[y]_{\ell-1}\neq 0 $.
+We multiplicatively invert to obtain:
+$$ \frac{1}{b^\ell-1}\leq\frac{1}{\denom{j}{\ell}}\leq\frac{1}{\bseq[y]_{\ell-1}b^{\ell-1}}\qquad (5) $$
+and for our purposes will will also want to scale
+$$ \frac{2}{b^\ell-1}\leq\frac{2}{\denom{j}{\ell}}\leq\frac{2}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+as well as additively invert our bound
+$$ \frac{-2}{\bseq[y]_{\ell-1}b^{\ell-1}}\leq\frac{-2}{\denom{j}{\ell}}\leq\frac{-2}{b^\ell-1}\qquad (6) $$
+
+Going back to $ (4) $, we multiply by $ (5) $ to extend our bound as follows:
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}+1}{b^\ell-1}
+	\leq\frac{\numer{i}{\ell}+\denom{i}{\ell}+1-\numer{j}{\ell}}{\denom{j}{\ell}}
+	\leq\frac{b^\ell+b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+and finally we add to this our previous derivation $ (6) $ to obtain:
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}+1}{b^\ell-1}-\frac{2}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{\numer{i}{\ell}+\denom{i}{\ell}-1-\numer{j}{\ell}}{\denom{j}{\ell}}
+	\leq\frac{b^\ell+b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}-\frac{2}{b^\ell-1}\qquad $$
+which when itself is additively inverted results in the first term of our above identity $ (l) $:
+$$ \frac{2}{b^\ell-1}-\frac{b^\ell+b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{\numer{j}{\ell}+1-[\numer{i}{\ell}+\denom{i}{\ell}]}{\denom{j}{\ell}}
+	\leq\frac{2}{\bseq[y]_{\ell-1}b^{\ell-1}}-\frac{\bseq[y]_{\ell-1}b^{\ell-1}+1}{b^\ell-1}\qquad (l') $$
+
+Changing our focus now toward the right side of our identity:
+$$ [\bradix[w]{i\le k\le\ell}+\bradix[y]{i\le k < \ell}]\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right) $$
+we first simplify fractional part:
+$$ \frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}=\frac{\denom{i}{j}}{\denom{j}{\ell}\denom{i}{\ell}} $$
+Recalling the previous derivation $ (5) $, if we create a copy replacing the index $ j $ with $ i $ and multiply, we obtain:
+$$ \frac{1}{(b^\ell-1)^2}\leq\frac{1}{\denom{j}{\ell}\denom{i}{\ell}}\leq\frac{1}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}\qquad (7) $$
+Furthermore we can safely assume $ \denom{i}{\ell}\neq\denom{j}{\ell} $ since we intentionally seek an
+imperfect approximation---it makes no sense for equality to exist---which leaves us with
+$$ 0 < \bradix[y]{i\le k < \ell}-\bradix[y]{j\le k < \ell}
+	\quad\Longrightarrow\quad 1\le\bradix[y]{i\le k < j}\le b^j\qquad (8) $$
+multiplying $ (7) $ and $ (8) $ together we derive the next bound in our sequence:
+$$ \frac{1}{(b^\ell-1)^2}
+	\leq\frac{\denom{i}{j}}{\denom{j}{\ell}\denom{i}{\ell}}
+	\leq\frac{b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}} $$
+By assumption we know that $ \denom{i}{\ell}\le\numer{i}{\ell} $ and so we have
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}\le\bradix[w]{i\le k\le\ell}\le b^{\ell+1}-1 $$
+and again remembering
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}\le\bradix[y]{i\le k < \ell}\le b^\ell-1 $$
+we can add to get
+$$ 2\bunderseq[y]{\ell-1}b^{\ell-1}
+	\le\bradix[w]{i\le k\le\ell}+\bradix[y]{i\le k < \ell}
+	\le b^{\ell+1}+b^\ell-2 $$
+multiplying this and the former together we derive our right bound
+$$ \frac{2\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}
+	\leq[\bradix[w]{i\le k\le\ell}+\bradix[y]{i\le k < \ell}]\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)
+	\leq\frac{(b^{\ell+1}+b^\ell-2)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}\qquad (r') $$
+finally adding $ (l') $ and $ (r') $ together we obtain the first serious bound for our approximation:
+$$ \frac{2}{b^\ell-1}-\frac{b^\ell+b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}+\frac{2\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\frac{\numer{j}{\ell}+1}{\denom{j}{\ell}}-1-\frac{\numer{i}{\ell}}{\denom{i}{\ell}} $$
+$$ \leq\frac{2}{\bseq[y]_{\ell-1}b^{\ell-1}}-\frac{\bseq[y]_{\ell-1}b^{\ell-1}+1}{b^\ell-1}
+	+\frac{(b^{\ell+1}+b^\ell-2)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}} $$
+which admittedly is a lot to take in when looking at it. Please take a moment to go over the steps thoroughly and convince yourself
+of this derivation before we move forward\footnote{If you see a problem in the proof up to this point or even further along,
+I would be more than happy to know. Thank you.}.
+
+Admittedly we are only interested in the lower end of this particular bound
+$$ \frac{2}{b^\ell-1}-\frac{b^\ell+b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}+\frac{2\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\frac{\numer{j}{\ell}+1}{\denom{j}{\ell}}-1-\frac{\numer{i}{\ell}}{\denom{i}{\ell}} $$
+as we have yet to derive the upper bound separately. In fact this is how such inequality manipulations work:
+maintain the chain until the final moment where you usually only need the upper or lower bound but not both
+before moving onto a next step.  You have to maintain the chain because you will likely be performing additive
+and multiplicative inversions, and complete information is needed for such manipulations.
+
+We are now interested in the upper half of our original bound:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}} $$
+for which we have the identity:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\quad=\qquad\bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)
+	+\frac{\numer{j}{\ell}-\numer{i}{\ell}-1}{\denom{i}{\ell}}+1 $$
+
+Actually, for the curious, I'd like to make a {\bfseries side note} here. As it is, one can also derive the alternate identity:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\quad=\qquad\frac{\denom{i}{\ell}\numer{j}{\ell}+\denom{i}{\ell}\denom{j}{\ell}-\denom{j}{\ell}[\numer{i}{\ell}+1]}
+		{\denom{i}{\ell}\denom{j}{\ell}} $$
+which privileges multiplication as the \emph{root} operator rather than addition. I've pointed out in the \emph{inequality.pdf}
+article that multiplicative forms can provide improved bounds over additive forms of an identity, the problem here is some of the
+bounds derived in the process of creating a chain here don't satisfy the assumptions needed for the rules of inequality manipulation.
+Otherwise I would have likely used this identity instead.
+
+Getting back to it: We now focus on the left side similar to the previous derivation:
+$$ \bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right) $$
+Luckily for us, from our previous derivations we already know that
+$$ \frac{1}{(b^\ell-1)^2}
+	\leq\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}
+	\leq\frac{b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}} $$
+and
+$$ \bunderseq[y]{\ell-1}b^{\ell-1}\le\bradix[w]{j\le k\le\ell}\le b^{\ell+1}-1 $$
+so we can skip the work and get straight to the result:
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\bradix[w]{j\le k\le\ell}\left(\frac{1}{\denom{j}{\ell}}-\frac{1}{\denom{i}{\ell}}\right)
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}\qquad (l'') $$
+
+As for our right-hand side:
+$$ \frac{\numer{j}{\ell}-\numer{i}{\ell}-1}{\denom{i}{\ell}} $$
+it is also similar to the previous derivations. If we replace the index of $ (4) $ we immediately have:
+$$ \frac{1}{b^\ell-1}\leq\frac{1}{\denom{i}{\ell}}\leq\frac{1}{\bseq[y]_{\ell-1}b^{\ell-1}}\qquad (8) $$
+and with $ (3) $ from even earlier
+$$ 1\le\bradix[w]{i\le k \le\ell}+1-\bradix[w]{j\le k\le\ell}\le b^j $$
+we can multiply this by $ (8) $ to obtain
+$$ \frac{1}{b^\ell-1}\leq\frac{\numer{i}{\ell}+1-\numer{j}{\ell}}{\denom{i}{\ell}}\leq\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}} $$
+which when itself is additively inverted results in the second bound of our above identity:
+$$ -\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{\numer{j}{\ell}-\numer{i}{\ell}-1}{\denom{i}{\ell}}
+	\leq-\frac{1}{b^\ell-1}\qquad (r'') $$
+which when adding $ (l'') $ and $ (r'') $ as well as adding $ 1 $ more, we obtain:
+$$ \frac{\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}-\frac{b^j}{\bseq[y]_{\ell-1}b^{\ell-1}}+1
+	\leq\frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+where of course we are only really interested in the upper half:
+$$ \frac{\numer{j}{\ell}}{\denom{j}{\ell}}+1-\frac{\numer{i}{\ell}+1}{\denom{i}{\ell}}
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+We now have enough, and by using the transitive law we have possibly weaker but more independent bounds on our original relation:
+$$ \frac{2}{b^\ell-1}-\frac{b^\ell+b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}+\frac{2\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor
+		-\left\lfloor\frac{\numer{i}{\ell}}{\denom{i}{\ell}}\right\rfloor
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+\subsection*{refinements}
+
+We have a few subtleties to consider actually. To begin, only midway did we add the assumption that
+$ \denom{i}{\ell}\le\numer{i}{\ell} $, but looking more closely it's possible in this case the leading digit of $ \bm(w) $ is zero.
+In our intuitive example this wouldn't happen because our divisor was $ 99 $, as large as possible under the constraint of two digits.
+If it had been smaller, say $ 12 $, then the first two digits of our dividend $ 20 $ would have been large enough that we wouldn't
+have needed the extra step of adding the next digit $ 200 $. In this case you can think of our partial dividend not as $ 20 $ but
+instead as $ 020 $. Same value, but three digits now. If you go over the steps in this derivation you will discover it does not
+contradict our result.
+
+This resolves the first subtlety in that \emph{our derived bound works for the seperate conditional case within our algorithm} as well.
+The second subtlety is it is now time to make compromises on our bound. To be fair, the above bound is still incomplete as we intended
+to derive a bound where both the lower and upper were entirely independent of the numerator and denominator values in the middle of
+this ordered relation. It is not yet independent because we have the $ \bseq[y]_{\ell-1} $ value embedded within, and so it is here
+we make our compromise: We will add the following assumption
+$$ \left\lfloor\frac{b}{2}\right\rfloor\leq\bunderseq[y]{\ell-1} $$
+but if we intend to use this to further our bound derivation, we need this to be in the form of a chain. Fortunately, we already
+know firstly $ \bseq[y]_{\ell-1} < b $. Secondly, given our ``floor function'' lemma from before, we then have
+$$ \frac{b-1}{2}\leq\bunderseq[y]{\ell-1}\leq b-1 $$
+this bound we also need in the form of a multiplicative inverse
+$$ \frac{1}{b-1}\leq\frac{1}{\bseq[y]_{\ell-1}}\leq\frac{2}{b-1} $$
+
+We have what we need to begin. Starting with the lower bound:
+$$ \frac{2}{b^\ell-1}-\frac{b^\ell+b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}+\frac{2\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2} $$
+we divide and consensus:
+$$ \frac{1}{b-1}\leq\frac{1}{\bseq[y]_{\ell-1}}\leq\frac{2}{b-1} $$
+becomes
+$$ \frac{b^\ell+b^j-1}{(b-1)b^{\ell-1}}
+	\leq\frac{b^\ell+b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq\frac{2(b^\ell+b^j-1)}{(b-1)b^{\ell-1}} $$
+which in turn becomes
+$$ -\frac{2(b^\ell+b^j-1)}{(b-1)b^{\ell-1}}
+	\leq-\frac{b^\ell+b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}
+	\leq-\frac{b^\ell+b^j-1}{(b-1)b^{\ell-1}} $$
+
+Moving on:
+$$ \frac{b-1}{2}\leq\bunderseq[y]{\ell-1}\leq b-1 $$
+becomes
+$$ \frac{(b-1)b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\frac{2\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\frac{2(b-1)b^{\ell-1}}{(b^\ell-1)^2} $$
+and so adding everything together:
+$$ \frac{2}{b^\ell-1}-\frac{2(b^\ell+b^j-1)}{(b-1)b^{\ell-1}}+\frac{(b-1)b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\frac{2}{b^\ell-1}-\frac{b^\ell+b^j-1}{\bseq[y]_{\ell-1}b^{\ell-1}}+\frac{2\bseq[y]_{\ell-1}b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\frac{2}{b^\ell-1}-\frac{b^\ell+b^j-1}{(b-1)b^{\ell-1}}+\frac{2(b-1)b^{\ell-1}}{(b^\ell-1)^2} $$
+
+The upper bound is a tiny bit simpler:
+$$ \frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+first noting
+$$ \frac{1}{(b-1)^2}\leq\frac{1}{\bseq[y]_{\ell-1}^2}\leq\frac{4}{(b-1)^2} $$
+since
+$$ \frac{1}{b-1}\leq\frac{1}{\bseq[y]_{\ell-1}}\leq\frac{2}{b-1} $$
+and so
+$$ \frac{(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}
+	\leq\frac{4(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}} $$
+along with
+$$ \frac{(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1
+	\leq\frac{(b^{\ell+1}-1)b^j}{\bseq[y]_{\ell-1}^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1
+	\leq\frac{4(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+Finally, we have our refined---if not ugly--bound:
+$$ \frac{2}{b^\ell-1}-\frac{2b^\ell+b^j-1}{(b-1)b^{\ell-1}}+\frac{(b-1)b^{\ell-1}}{(b^\ell-1)^2}
+	\leq\left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor
+		-\left\lfloor\frac{\numer{i}{\ell}}{\denom{i}{\ell}}\right\rfloor
+	\leq\frac{4(b^{\ell+1}-1)b^j}{(b-1)^2b^{2\ell-2}}-\frac{1}{b^\ell-1}+1 $$
+
+for the experienced inequality manipulator, you should also be able to verify this bound can be further simplified as:
+$$ -1\ \le\ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor
+		-\left\lfloor\frac{\numer{i}{\ell}}{\denom{i}{\ell}}\right\rfloor
+	\ \le\ 1 $$
+keep in mind as we are assuming our divisor has two or more digits we are using the additional assumption that $ j\le\ell+2 $.
+
+In the special case of $ i=0 $ the above simplifies further to our quotient of interest,
+$$ -1\ \le\ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor-q\ \le\ 1 $$
+which of course can be rearranged to put the center of attention on said quotient:
+$$ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor-1
+	\le\ \! q\ \le\ \left\lfloor\frac{\numer{j}{\ell}}{\denom{j}{\ell}}\right\rfloor+1 $$
+
+To reiterate: This bound allows us to narrow down in advance our calculation of the quotient for arbitrary precision digit divisors
+(two or more digits) to one of three possible cases. At that point, it's guess and check, but a constant bound is far better than
+logarithmic or even linear.
+
+And yet, we can still do just a little bit better.
+
+\subsection*{cleanup}
+
+\end{document}
+

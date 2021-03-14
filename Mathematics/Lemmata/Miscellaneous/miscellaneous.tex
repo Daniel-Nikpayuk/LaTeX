@@ -1,0 +1,204 @@
+% Copyright 2016, 2020-2021 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1cm,right=1cm,top=1.5cm,bottom=1.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\pagestyle{empty}
+\begin{document}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+General identities researched and discovered when I was young. Probably all of them are known,
+that was the usual trend I found, and I doubt I'll have any use for them these days,
+but these are the forms I cut my \emph{brute-force-formula-manipulating teeth} on, so to speak.
+Fun.  No proofs are given. If nothing else they are formal identities.
+
+\begin{enumerate}
+
+\item
+$$ (fg)^{(n)}=\sum_{0\le k\le n}{n \choose k}f^{(n-k)}g^k $$
+
+\item
+$$ (f\circ g)^{(n)}\mbox{ - index algorithm }(2,1,1) $$
+
+\item
+$$ (fg\ldots yz)' = f'g\ldots yz + fg'\ldots yz + \ldots + fg\ldots y'z + fg\ldots yz' $$
+
+\item
+$$ mn = \sum_{k=1}^{m+n}k-\left(\sum_{k=1}^m k+\sum_{k=1}^n k\right) $$
+
+\item
+$$ \int_{0^+}^1\frac{t^n}{(t^t)^w}dt
+	= \sum_{k\ge 0}\frac{w^k}{(n+k+1)^{k+1}}
+	= \frac{1}{n+1}+\frac{w}{(n+2)^2}+\frac{w^2}{(n+3)^3}+\ldots $$
+
+\item
+$$ F'(x) = f(x) \quad\Longrightarrow\quad \int f^{-1}(x)dx = xf^{-1}(x)-F(f^{-1}(x)) $$
+
+\item
+$$ (n+1)! = \sum_{k=1}^n k!k $$
+
+\item
+$$ \frac{d}{dx}f^{-1}(x) = \frac{1}{f'(f^{-1}(x))} $$
+
+\item
+$$ \frac{1+\sqrt{4x+1}}{2} = \sqrt{x+\sqrt{x+\sqrt{x+\sqrt{\ldots}}}} $$
+
+\item
+$$ \frac{1+\sqrt{4x-3}}{2} = \sqrt{x+\sqrt{x-\sqrt{x+\sqrt{\ldots}}}} $$
+
+\item
+$$ \ln x = \lim_{n\to 0}\frac{1}{n}\left[1-\left(\frac{1}{x}\right)^n\right] $$
+
+\item
+$$ 1 = \sum_{k=0}^n(-1)^k{n \choose k}{2n-k \choose n} $$
+
+\item
+$$ S = 1 + 2(1) + 3(1+2(1)) + 4(1+2(1)+3(1+2(1))) + \ldots \quad\Longrightarrow\quad 2S_n=n! $$
+
+\item
+$$ \left(x+1\right)\left(x-\frac{1}{3}\right)\left(x+\frac{1}{2}\right)\left(x+3\right)
+	= x^4 + \frac{25}{6}x^3  + \frac{7}{2}x^2 - \frac{1}{6}x - \frac{1}{2} \quad\sim\quad
+\begin{array}{r|ccccc}
+1		& 1 \\
+ \\
+-\frac{1}{3}	& 1 & 1 \\
+ \\
+\frac{1}{2}	& 1 & \frac{2}{3} 	& -\frac{1}{3} \\
+ \\
+3		& 1 & \frac{7}{6} 	& 0			& -\frac{1}{6} \\
+ \\
+		& 1 & \frac{25}{6} 	& \frac{7}{2}		& -\frac{1}{6}		& -\frac{1}{2}
+\end{array} $$
+
+\item
+$$ \int_a^bf(x)dx = f(c)(b-a) \quad\Longrightarrow\quad \int_{0^+}^1x^xdx = c^c = 1-\frac{1}{2^2}+\frac{1}{3^3}-\frac{1}{4^4}+\ldots $$
+
+\item
+$$ \sqrt{a^2+4b} = a + \frac{2b}{a + \frac{b}{a + \frac{b}{a + \ldots}}} $$
+
+\item
+$$ \int_a^\infty\frac{dt}{(t^t)^w} \quad\le\quad \frac{1}{(a^a)^w}\cdot\frac{1}{w\ln a},\quad a > 1,\quad (\mbox{converges }a\to\infty) $$
+
+\item
+$$ f = e^{ax},\ g = e^{bx} \quad\Longrightarrow\quad (a+b)^n = \sum_{k=0}^n{n \choose k}a^{n-k}b^k $$
+
+\item
+$$ \frac{\partial h}{\partial x}h(x,w) = e^{wp(x)}
+	\quad\Longleftrightarrow\quad \int[\,p(x)]^ndx = \left(\frac{d}{dw}\right)^{(n)}h(x, w\to 0) $$
+
+\item
+$$ a_n = b_n + c_na_{n-d} \quad\Longrightarrow\quad
+	a_n = b_n + \sum_{\ell=1}^m\left(\prod_{p=0}^{\ell-1}c_{n-dp}\right)b_{n-d\ell}
+	+ \left(\prod_{p=0}^mc_{n-dp}\right)a_{n-d(m+1)} $$
+
+\item
+$$ f^{(n)}(x) \quad\exists\Longrightarrow\quad \left(\frac{d}{dx}\right)^{(n)}f(e^x)
+	= \sum_{k=1}^n\left\{\!\!\!\begin{array}{c} n \\ k\end{array}\!\!\!\right\}f^{(k-1)}(e^x)e^{kx} $$
+
+\item
+$$ R(n,n-m) = \sum_{k=m}^na_kR(k-1, k-m),\quad R(n,n) = 1 $$
+$$ \quad\Longrightarrow\quad R(n,n-m) = R(n-1, n-m-1) + a_nR(n-1, n-m) $$
+$$ \quad\Longrightarrow\quad (x+a_1)(x+a_2)(\ldots)(x+a_n) = R(n, n)x^n + R(n, n-1)x^{n-1} + \ldots + R(n,1)x + R(n,0) $$
+
+\item
+$$ F'(x) = f(x) \wedge f^{-1}(a) = b \quad\Longrightarrow\quad F(x) = xf(x)-ab-F(b)-\int_a^{f(x)}f^{-1}(t)dt $$
+
+\item
+$$ a = 1+xa \quad\Longrightarrow\quad \frac{x^{n+1}-1}{x-1} = 1+x+x^2+\ldots+x^{n-1}+x^n $$
+
+\item
+$$ 1 < a \quad\Longrightarrow\quad \int_1^\infty\frac{dt}{t^t} \quad\le\quad \int_1^a\frac{dt}{t^t} + \frac{1}{a^a\ln a} $$
+
+\item
+$$ 1-\frac{1}{2^2}+\frac{1}{3^3}-\frac{1}{4^4}+\ldots \sim 0.783430510709 $$
+
+\item
+$$ 1+\frac{1}{2^2}+\frac{1}{3^3}+\frac{1}{4^4}+\ldots \sim 1.29128599704 $$
+
+\item
+$$ a_n := \int x^ne^{x^2}dx \quad\Longrightarrow\quad a_n = \frac{1}{2}x^{n-1}e^{x^2}-\frac{n-1}{2}a_{n-2} $$
+
+\item
+$$ \left(\frac{d}{dx}\right)^{(n)}\sin x = \sin(x+\pi n) $$
+
+\item
+$$ \int_{0^+}^1f(\ln\left(\frac{1}{t^t}\right)^w)dt
+	= \sum_{m\ge 0}\frac{f^{(m)}(0)}{(m+1)^{m+1}}w^m
+	= -\int_{0^+}^1\ln t\ f(\ln\left(\frac{1}{t^t}\right)^w)dt $$
+
+\item
+$$ \sum_{n\ge 0} \frac{f^{(n)}(0)}{n^n} z^n = f(0) + z\int_0^1f'(-zt\ln t)dt $$
+
+\item
+$$ \int_{0^+}^1\frac{t^m(\ln t)^n}{(t^t)^w}dt
+	= (-1)^n n!\sum_{k\ge 0}{n+k\choose n}\frac{w^k}{(m+k+1)^{n+k+1}} $$
+
+\item
+$$ f(e^x) = 1+\sum_{k\ge 1}f^{(k-1)}(1)\sum_{m\ge k}
+	\left\{\!\!\!\begin{array}{c} m \\ k\end{array}\!\!\!\right\}\frac{x^m}{m!} $$
+
+\item
+$$ \int t^m(\ln t)^ndt = \frac{(-1)^n n! t^{m+1}}{(m+1)^{n+1}}\sum_{0\le j\le n}\frac{[-(m+1)\ln t]^j}{j!} $$
+
+\item
+$$ \int_{0^+}^1\frac{dt}{1+wt\ln t} = \sum_{m\ge 0}\frac{m!}{(m+1)^{m+1}}w^m,\quad |w| < e $$
+
+\item
+$$ \rho_n^x := \sum_{m\ge 2}\frac{m^x}{m!}(\ln m)^n $$
+$$ \rho_0^n = e\sum_{k=1}^n\left\{\!\!\!\begin{array}{c} n \\ k\end{array}\!\!\!\right\}-1 $$
+$$ \rho_0^{n+1}-\rho_0^n = \sum_{k=1}^nk\left\{\!\!\!\begin{array}{c} n \\ k\end{array}\!\!\!\right\} $$
+$$ \left(\frac{d}{dx}\right)^{(m)}\rho_n^x = \rho_{n+m}^x $$
+$$ \rho_n^x = \sum_{k\ge 0}\rho_{n+k}^w\frac{(x-w)^k}{k!} $$
+$$ \rho_0^n-\rho_0^m = \sum_{k\ge 1}\rho_k^m\frac{(n-m)^k}{k!} $$
+$$ \rho_0^{n-1}+\rho_1^n-\rho_0^n = \sum_{k\ge 0}\rho_{k+1}^{n-1}\frac{k}{(k+1)!} $$
+
+\newpage
+
+\item
+$$ \cos\frac{\pi}{5} = \frac{1+\sqrt{5}}{4} $$\\[3em]
+
+\item
+$$ \cos\frac{\pi}{7} = \frac{1}{6}\left[ 1+2\sqrt{7}\cos\frac{\theta}{3} \right],
+	\quad \cos\theta = \frac{-1}{2\sqrt{7}},
+	\quad \sin\theta = \frac{3\sqrt{3}}{2\sqrt{7}},
+	\quad \theta\sim 1.76092193 $$\\[3em]
+
+\item
+$$ \cos\frac{\pi}{7} = x \quad\Longrightarrow\quad 0=8x^3-4x^2-4x+1 $$
+
+\item Given the well known cubic equation (not mine):\\[1ex]
+$$ \hspace{-8.75cm} ax^3+bx^2+cx+d = 0 $$\\[-2ex]
+$$ \Longrightarrow\quad x\ =\
+	\sqrt[3]{
+	\left(\frac{-b^3}{27a^3}+\frac{bc}{6a^2}-\frac{d}{2a}\right)
++		\sqrt{\left(\frac{-b^3}{27a^3}+\frac{bc}{6a^2}-\frac{d}{2a}\right)^2
++			\left(\frac{c}{3a}-\frac{b^2}{9a^2}\right)^3}}
+$$ \\
+$$ \hspace{2.25cm}
++\ \ 	\sqrt[3]{
+	\left(\frac{-b^3}{27a^3}+\frac{bc}{6a^2}-\frac{d}{2a}\right)
+-		\sqrt{\left(\frac{-b^3}{27a^3}+\frac{bc}{6a^2}-\frac{d}{2a}\right)^2
++			\left(\frac{c}{3a}-\frac{b^2}{9a^2}\right)^3}}
+-	\frac{b}{3a}
+$$ \\[2ex]
+we then have:
+$$ \hspace{-3.25cm}\Longrightarrow\quad \cos\frac{\pi}{7}\ =\
+	\frac{1}{6}
++	\frac{1}{6}\sqrt[3]{\frac{21}{2}}
+	\left(\sqrt[3]{-\frac{1}{3}+\sqrt{3}i}
++	\sqrt[3]{-\frac{1}{3}-\sqrt{3}i}\right)
+$$
+
+\end{enumerate}
+
+\end{document}
+

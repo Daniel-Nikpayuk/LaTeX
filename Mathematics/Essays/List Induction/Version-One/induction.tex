@@ -1,0 +1,1730 @@
+% Copyright 2020 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=2.5cm,right=2.5cm,top=2cm,bottom=2.5cm]{geometry}
+\usepackage{asymptote}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{verbatim}
+\usepackage{xcolor}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% latex symbols:
+
+\newcommand{\vn}{\ensuremath{\varnothing}}
+
+\newcommand{\RA}{\Rightarrow}
+\newcommand{\lra}{\longrightarrow}
+\newcommand{\then}{\ensuremath{\quad\Longrightarrow\quad}}
+\newcommand{\qmapsto}{\ensuremath{\quad \mapsto \quad}}
+\newcommand{\mapsfrom}{\mathrel{\reflectbox{\ensuremath{\mapsto}}}}
+
+\newcommand{\defeq}{\ensuremath{\ :=\ }}
+\newcommand{\qeq}{\ensuremath{\quad =\quad}}
+\newcommand{\qqeq}{\ensuremath{\qquad =\qquad}}
+\newcommand{\qdefeq}{\ensuremath{\quad :=\quad}}
+\newcommand{\qqdefeq}{\ensuremath{\qquad :=\qquad}}
+
+% latex markup:
+
+\newcommand{\strong}[1]{{\bfseries #1}}
+\newcommand{\bfmbox}[1]{\mbox{\bfseries #1}}
+
+% latex spacing:
+
+\newcommand{\twoquad}{\ensuremath{\quad\quad}}
+\newcommand{\threequad}{\ensuremath{\quad\quad\quad}}
+\newcommand{\fourquad}{\ensuremath{\quad\quad\quad\quad}}
+
+\newcommand{\twoqquad}{\ensuremath{\qquad\qquad}}
+\newcommand{\threeqquad}{\ensuremath{\qquad\qquad\qquad}}
+\newcommand{\fourqquad}{\ensuremath{\qquad\qquad\qquad\qquad}}
+
+% essay symbols:
+
+\newcommand{\s}{\mbox{s}}
+
+\newcommand{\bv}[1][v]{\mathbf{#1}}
+
+\newcommand{\readleft}{\ensuremath{\,_{_\leftarrow}\,}}
+\newcommand{\readright}{\ensuremath{\,_{_\rightarrow}\,}}
+
+\newcommand{\trle}{\ensuremath{\scriptscriptstyle \triangleleft}}
+\newcommand{\trri}{\ensuremath{\scriptscriptstyle \triangleright}}
+
+\newcommand{\doublechar}[2]{#2\hspace{#1}#2}
+\newcommand{\shiftedchar}[3]{\hspace{#1}\raisebox{#2}{#3}}
+\newcommand{\shiftedrule}[5]{\hspace{#1}\raisebox{#2}{\textcolor{#3}{\rule{#4}{#5}}}}
+\newcommand{\after}[1]{\hspace{#1}}
+
+\newcommand{\ldp}{\ensuremath{
+\doublechar{-0.5ex}{(}
+\shiftedchar{-0.35ex}{1.00ex}{$\scriptscriptstyle \bar{ }$}
+\shiftedchar{-0ex}{-1.25ex}{$\scriptscriptstyle \bar{ }$}
+\after{0.55ex}
+}}
+
+\newcommand{\rdp}{\ensuremath{
+\doublechar{-0.5ex}{)}
+\shiftedchar{-1.00ex}{1.00ex}{$\scriptscriptstyle \bar{ }$}
+\shiftedchar{-0ex}{-1.25ex}{$\scriptscriptstyle \bar{ }$}
+\after{0.95ex}
+}}
+
+\newcommand{\grayt}[1]{\ensuremath{\textcolor{darkgray}{#1}}}
+\newcommand{\grply}{\textcolor{darkgray}{,\ \apply(}}
+\newcommand{\grbnd}{\textcolor{darkgray}{,\ \bind(}}
+\newcommand{\grcns}{\textcolor{darkgray}{,\ \cons(}}
+
+\newcommand{\drop}{\mbox{drop}}
+\newcommand{\keep}{\mbox{keep}}
+
+\newcommand{\as}{\mbox{as}}
+
+\newcommand{\test}[1][\_]{\mbox{test#1}}
+
+\newcommand{\vi}[1][\_]{\mbox{$value$#1input}}
+\newcommand{\vo}[1][\_]{\mbox{$value$#1output}}
+\newcommand{\ai}[1][\_]{\mbox{$act$#1input}}
+\newcommand{\ao}[1][\_]{\mbox{$act$#1output}}
+\newcommand{\cli}[1][\_]{\mbox{$combine$#1left#1input}}
+\newcommand{\cri}[1][\_]{\mbox{$combine$#1right#1input}}
+\newcommand{\co}[1][\_]{\mbox{$combine$#1output}}
+\newcommand{\nei}[1][\_]{\mbox{$next$#1input}}
+\newcommand{\no}[1][\_]{\mbox{$next$#1output}}
+\newcommand{\coli}[1][\_]{\mbox{cons#1left#1input}}
+\newcommand{\cori}[1][\_]{\mbox{cons#1right#1input}}
+\newcommand{\coo}[1][\_]{\mbox{cons#1output}}
+
+\newcommand{\locr}[1][\_]{local#1resultant}
+\newcommand{\locp}[1][\_]{local#1precedent}
+
+% essay formatting:
+
+\newcommand{\mss}[1]{\ensuremath{\mbox{\scriptsize #1}}}
+\newcommand{\bms}[1]{\ensuremath{_{\mbox{\bfseries\tiny #1}}}}
+\newcommand{\bnms}[2]{\ensuremath{\bms{#1,}{_{#2}}}}
+
+\newcommand{\tab}[1][1.125cm]{\hspace{#1}}
+
+\newcommand{\col}[1][0ex]{& \hspace{#1}}
+\newcommand{\scol}{\col[0.15cm]}
+\newcommand{\lcol}{\col[0.45cm]}
+
+\newcommand{\msbox}[1]{\ensuremath{_{\mbox{\scriptsize #1}}}}
+\newcommand{\cbox}[1]{\mbox{// #1}}
+
+\newcommand{\tco}[1]{\textcolor{orange}{#1}}
+\newcommand{\tcb}[1]{\textcolor{blue}{#1}}
+\newcommand{\tcg}[1]{\textcolor{gray}{#1}}
+
+% essay functions:
+
+\newcommand{\lp}{\mbox{loop}}
+\newcommand{\tlp}{\texttt{\mbox{loop}}}
+
+\newcommand{\apply}{\mbox{apply}}
+\newcommand{\delay}{\mbox{delay}}
+\newcommand{\force}{\mbox{force}}
+\newcommand{\transit}{\mbox{transit}}
+
+\newcommand{\cont}{\mbox{cont}}
+
+\newcommand{\id}{\mbox{id}}
+\newcommand{\cons}{\mbox{cons}}
+\newcommand{\car}{\mbox{car}}
+\newcommand{\cdr}{\mbox{cdr}}
+\newcommand{\eq}{\mbox{eq?}}
+\newcommand{\dec}{\mbox{dec}}
+\newcommand{\isNull}{\mbox{isNull?}}
+\newcommand{\isZero}{\mbox{isZero?}}
+\newcommand{\length}{\mbox{length}}
+\newcommand{\push}{\mbox{push}}
+\newcommand{\rev}{\mbox{reverse}}
+\newcommand{\concat}{\mbox{concat}}
+\newcommand{\reverse}{\mbox{reverse}}
+
+\newcommand{\isProd}{\mbox{isProduction?}}
+\newcommand{\isTerm}{\mbox{isTerminal?}}
+\newcommand{\isVar}{\mbox{isVariable?}}
+
+\newcommand{\isNotProd}{\mbox{isNotProduction?}}
+\newcommand{\isNotNull}{\mbox{isNotNull?}}
+
+\newcommand{\lambdacp}[1][y]{\ensuremath{\ \tcg{\lambda#1.}cont\tcg{(#1,} -_c\tcg{)},\ }}
+
+% essay operators:
+
+\newcommand{\define}{\mbox{define}}
+\newcommand{\induct}[1]{\bfmbox{induct}\mss{\,#1\,}}
+
+\newcommand{\compose}{\mbox{compose}}
+\newcommand{\precompose}[1]{\ensuremath{\mbox{precompose}_{#1}}}
+\newcommand{\postcompose}[1]{\ensuremath{\mbox{postcompose}_{#1}}}
+
+\newcommand{\ndopose}{\mbox{endopose}}
+\newcommand{\prendopose}[1]{\ensuremath{\mbox{preendopose}_{#1}}}
+\newcommand{\postndopose}[1]{\ensuremath{\mbox{postendopose}_{#1}}}
+
+\newcommand{\hold}{\mbox{hold}}
+\newcommand{\cohold}{\mbox{cohold}}
+\newcommand{\pend}{\mbox{pend}}
+\newcommand{\dihold}{\mbox{dihold}}
+\newcommand{\copend}{\mbox{copend}}
+\newcommand{\stem}{\mbox{stem}}
+\newcommand{\costem}{\mbox{costem}}
+\newcommand{\distem}{\mbox{distem}}
+
+\newcommand{\bind}{\mbox{bind}}
+\newcommand{\Hbind}{\ensuremath{>\hspace{-1ex}>\!=}}
+\newcommand{\Hrbind}{\ensuremath{=\!<\hspace{-1ex}<}}
+\newcommand{\Hfish}{\ensuremath{>\!=\!>}}
+\newcommand{\Hrfish}{\ensuremath{<\!=\!<}}
+
+\newcommand{\underpose}[2]{\ensuremath{\underset{\mbox{\tiny #2}}{\{\mbox{#1}\}}}}
+\newcommand{\doubleunderpose}[4]{\ensuremath{\underset{\mbox{\tiny #2}}{\{\mbox{#1}}\,||\,\underset{\mbox{\tiny #4}}{\mbox{#3}\}}}}
+
+\newcommand{\varstempose}[4]{\ensuremath{\textcolor{#1}{#2\underpose{#3}{#4}}}}
+\newcommand{\spose}[2][darkgray]{\varstempose{#1}{\star}{closing}{#2}}
+\newcommand{\cpose}[2][darkgray]{\varstempose{#1}{\star}{opening}{#2}}
+\newcommand{\dpose}[2][darkgray]{\varstempose{#1}{\star}{open}{#2}}
+
+\newcommand{\reppose}[2]{\bfmbox{repeat}\ \ #1\ \ #2}
+
+\newcommand{\tpose}[2]{\raisebox{#1}{\ensuremath{\star}}\{\texttt{#2}\}}
+\newcommand{\deftpose}[1]{\tpose{0.1ex}{#1}}
+
+\newcommand{\alias}{\mbox{alias}}
+\newcommand{\assign}{\mbox{assign}}
+
+\newcommand{\start}{\mbox{start}}
+
+\newcommand{\angscp}[1]{\langle #1\rangle}
+\newcommand{\angscphyp}[2]{\angscp{#1\mbox{-}#2}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{asydef}
+// this comment prevents a compilation bug.
+
+real direction(bool value)
+{
+	return value ? 1 : -1;
+}
+
+pair offset(pair current, string align, real x = 0.03)
+{
+	pair shifter =	(align == "E") ? (x, 0) :
+			(align == "N") ? (0, x) :
+			(align == "W") ? (-x, 0) :
+			(align == "S") ? (0, -x) : (0,0);
+
+	return shift(shifter)*current;
+}
+
+pair segment(pair current = (0,0), string align, real projection, real angle = 0)
+{
+	align = (align == "E") ? "EU" :
+		(align == "N") ? "NL" :
+		(align == "W") ? "WD" :
+		(align == "S") ? "SR" : align;
+
+	real base          = direction(substr(align, 0, 1) == "E" || substr(align, 0, 1) == "N");
+	real adjacent      = direction(substr(align, 1, 1) == "R" || substr(align, 1, 1) == "U") * Tan(angle);
+	pair initialVertex = (substr(align, 0, 1) == "E" || substr(align, 0, 1) == "W") ? (base, adjacent) : (adjacent, base);
+	pair scaledVertex  = scale(projection) * initialVertex;
+	pair shiftedVertex = shift(current)    * scaledVertex;
+
+	return shiftedVertex;
+}
+
+//
+
+void drawpath(path p)
+{
+	draw(p);
+
+	for (int k=0; k < size(p); ++k)
+	{
+		dot(point(p, k));
+	}
+}
+
+void safeLabel(picture pic = currentpicture, Label L, pair position, real width, real height,
+	align align = NoAlign, pen textpen = currentpen, pen borderpen = currentpen,
+	pen fillpen = white, filltype filltype = NoFill, string bordertype = "round")
+{
+	if (bordertype == "round")
+	{
+		pair w = position + (-width, 0);
+		pair e = position + ( width, 0);
+		pair n = position + (0, height);
+		pair s = position + (0,-height);
+
+		filldraw(pic, w{up}::n{right}::e{down}::s{left}::cycle, fillpen, borderpen);
+	}
+	else if (bordertype == "box")
+	{
+		pair sw = position + (-width,-height);
+		pair se = position + (-width, height);
+		pair nw = position + ( width,-height);
+		pair ne = position + ( width, height);
+
+		filldraw(pic, sw--se--ne--nw--cycle, fillpen, borderpen);
+	}
+
+	label(pic, L, position, align, textpen, filltype);
+}
+
+
+\end{asydef}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{1-Cycle List Induction}
+\author{Daniel Nikpayuk}
+\date{September 5, 2020}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{../cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+Creative Commons Attribution-NonCommercial 4.0 International.\\[0.3in]
+\end{figure}
+
+\section*{Abstract}
+
+In this essay I give an informal walk-through in how to build a general operator which acts on lists, such that it can
+be specialized to better known list operators such as \emph{map, fold, find}. Its only restriction is that it can cycle
+or parse through a given list at most once.
+
+Such an operator is of theoretical importance as not only are there several 1-cycle algorithms (other than map, fold, find)
+which are defined as specific instances, but there are also many higher-cycle algorithms which can immediately be composed
+out of these 1-cycle specializations.
+
+This operator is also of practical relevance as I have taken care to consider its optimizations, giving its implementation
+a modular design so as to make it realistic for use in many applications.
+
+\section*{Philosophy}
+
+Given that the title of this essay is ``1-Cycle List Induction'' we should discuss this idea of \emph{induction}
+here as it informs the major philosophy of design throughout.
+
+For starters, I borrow this word from the Type Theory expressed in \cite{hott}. There, induction is also called
+\emph{(dependent) elimination}, which if you're unfamiliar can be thought of as a rule that effectively tells us what
+kind of functions are even possible for a given \emph{type} definition. In this sense then, another way of thinking
+about induction is to consider it as an operator which is used to define functions related to a specific type.
+
+My claim then is that the induction operator which is to be presented here can in its potential be used to create \emph{all}
+possible functions that iterate \emph{once} over a list.\footnote{Such an operator can be generalized to sublists of a given
+list, which is why at times I am comfortable stating it is an operator that is of \emph{at most} one cycle.}
+
+\section*{Methodology}
+
+The methodology is this essay can be split into two parts:
+
+\begin{enumerate}
+\item Methods to model list induction.
+\item Methods to model lists as a type.
+\end{enumerate}
+
+\subsection*{Function Induction}
+
+Our model for list induction comes from aspects of \cite{nikfs} as well as \cite{nikfi} which both provide modelling strategies
+for functions in general. In particular we are interested in what is called \emph{grammatical path} modelling from \cite{nikfs}.
+From \cite{nikfi} we will want to make use of \emph{register induction} and in particular its grammatical notations.
+
+As I do not assume reader familiarity with these sources, I will offer a brief as well as \emph{naive} introduction to them here.
+
+\subsubsection*{Grammatical Path Modelling}
+
+The basic idea behind grammatical path modelling is to view a function as having three components: A signature, a tree structure,
+and an evaluator (meta-operator) which first maps the content of the signature to the tree, and then applies accordingly to get
+the final return value.
+
+Let's take the following function:
+$$ y = f(x) = x(x+1)^2 $$
+here expressed in regular \emph{Eulerian} notation, as example. In grammatical path form this would be:
+\ \\
+% y = f(x) = x(x+1)^2 , optimized construction
+%\begin{comment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+
+ pair p00 = (0,0);
+
+ pair p10 = segment(p00, "S", 2);
+ pair p11 = segment(p10, "E", 6.5);
+
+ pair p20 = segment(p10, "S", 1);
+ pair p30 = segment(p20, "S", 1);
+ pair p40 = segment(p30, "S", 1);
+ pair p50 = segment(p40, "S", 1);
+ pair p60 = segment(p50, "S", 1);
+ pair p70 = segment(p60, "S", 1);
+  
+ //
+
+ pair r00 = segment(p10, "EU", 11, 5);
+
+ pair r10 = segment(r00, "S", 1);
+ pair lr10 = offset(r10, "W", 0.06);
+ pair rr10 = offset(r10, "E", 0.06);
+
+ pair r20 = segment(r10, "SL", 1, 65);
+ pair lr20 = offset(r20, "W", 0.06);
+ pair rr20 = offset(r20, "E", 0.06);
+
+ pair r21 = segment(r10, "SL", 1, 40);
+ pair r22 = segment(r10, "SR", 1, 40);
+
+ pair r31 = segment(r22, "SL", 1, 45);
+ pair r32 = segment(r22, "SR", 1, 45);
+  
+ //
+
+ pen arrowcolor = mediumred;
+
+ draw(shift(-1.5,0)*p11--shift(1.5,0)*p11, arrowcolor, Arrow);
+ draw(shift(0.4,-0.5)*p20--shift(0.4,0.5)*p20, arrowcolor, Arrow);
+ draw(shift(0.4,-0.5)*p40--shift(0.4,0.5)*p40, arrowcolor, Arrow);
+ draw(shift(0.4,-0.5)*p60--shift(0.4,0.5)*p60, arrowcolor, Arrow);
+  
+ //
+
+ pen stepcolor = gray;
+ pen bordercolor = heavygray;
+ 
+ draw(lr10--lr20, bordercolor);
+ draw(rr10--rr20, bordercolor);
+
+ draw(r10--r21, bordercolor);
+ draw(r10--r22, bordercolor);
+
+ draw(r22--r31, bordercolor);
+ draw(r22--r32, bordercolor);
+
+ //
+ 
+ label("$y = $", shift(0,-0.06)*p00, E);
+ label("$f$", shift(0.775,0)*p00, E, heavyblue);
+ label("$(x) = x(x+1)^2$", shift(1.015,0)*p00, E);
+ 
+ label("$(*, *, x,\ x+1,\ x+1)$", p10, E, fontsize(10pt));
+
+ label("\scriptsize applicate", p11, N, arrowcolor);
+
+ label("\scriptsize duplicate", shift(0.5,-0.1)*p20, E, arrowcolor);
+
+ label("$(*, x,\ x+1)$", p30, E, fontsize(10pt));
+
+ label("\scriptsize decompress", shift(0.5,-0.1)*p40, E, arrowcolor);
+
+ label("$(*, x)$", p50, E, fontsize(10pt));
+
+ label("\scriptsize prepare", shift(0.5,-0.1)*p60, E, arrowcolor);
+
+ label("$(x)$", p70, E, fontsize(10pt));
+
+ //
+
+ label("$f$:", r00, W, heavyblue);
+
+ label("\scriptsize $0$", shift(0.6,0)*r20, NE, stepcolor);
+ label("\scriptsize $1$", shift(0.2,0)*r21, NE, stepcolor);
+ label("\scriptsize $2$", shift(-0.2,0)*r22, NW, stepcolor);
+
+ label("\scriptsize $1$", shift(0.4,0.17)*r31, NE, stepcolor);
+ label("\scriptsize $2$", shift(-0.4,0.17)*r32, NW, stepcolor);
+
+ safeLabel("$*$", r10, 0.25, 0.25, borderpen = bordercolor);
+
+ safeLabel("$y$", r20, 0.25, 0.25, borderpen = bordercolor);
+ safeLabel("$x$", r21, 0.25, 0.25, borderpen = bordercolor);
+ safeLabel("$*$", r22, 0.25, 0.25, borderpen = bordercolor);
+
+ safeLabel("$x+1$", r31, 0.65, 0.25, borderpen = bordercolor);
+ safeLabel("$x+1$", r32, 0.65, 0.25, borderpen = bordercolor);
+
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\end{comment}
+The idea is to start with the Eulerian function \emph{specification} and make its evaluation process more explicit:
+In particular we begin with a bare minimum signature $ (x) $, expand it to include all required content, map that
+content to create to a proper evaluation ordering, and then evaluate.
+
+The term ``grammatical path'' comes from the tree structure component of the model, where each branch is labelled by number.
+This effectively allows us to refer to any part by \emph{pathname}, starting from the \emph{root} operator. Such a convenience
+makes this notation useful for \emph{algorithmic analysis}. Furthermore, as this notation is much more visually expansive than
+Eulerian notation it is also effective for top-down function design as it allows us to visualize the \emph{whole} of the
+evaluation structure. Both of these reasons are why this modelling language was chosen to be used in this essay.
+
+\subsubsection*{Register Induction Grammar}
+
+The register induction grammar of \cite{nikfi} is a grammar meant for building functions.
+
+\newpage
+
+Getting right into an example of register induction, a \emph{dual block} of such grammar appears as follows:
+
+$$ \def\arraystretch{1.2}
+\begin{array}{lllll|lll}
+\multicolumn{5}{l}{\tab[4ex] \bfmbox{composite}\ \ x}		\col[5ex] \bfmbox{memory}\ \ y		\\[1ex]
+
+	\col \bfmbox{open}	\col[5ex] \bfmbox{pass}		\col[5ex] \bfmbox{call}			\col[3ex] \col[5ex]
+	     \bfmbox{closing}	\col[5ex] \bfmbox{call}		\col[5ex] \bfmbox{call}			\\
+
+0. 	\col policy?\bnms{c}{0}	\col[5ex] next\bnms{c}{0}	\col[5ex] f\bnms{c}{0}			\col[3ex] \col[5ex]
+	     policy?\bnms{m}{0}	\col[5ex] break\bnms{m}{0}	\col[5ex] f\bnms{m}{0}			\\
+       
+1. 	\col policy?\bnms{c}{1}	\col[5ex] next\bnms{c}{1}	\col[5ex] f\bnms{c}{1}			\col[3ex] \col[5ex]
+ 	     policy?\bnms{m}{1}	\col[5ex] break\bnms{m}{1}	\col[5ex] f\bnms{m}{1}			\\
+       
+2. 	\col policy?\bnms{c}{2}	\col[5ex] next\bnms{c}{2}	\col[5ex] f\bnms{c}{2}			\col[3ex] \col[5ex]
+	     policy?\bnms{m}{2}	\col[5ex] break\bnms{m}{2}	\col[5ex] f\bnms{m}{2}			\\
+
+	\col \tab[2.5ex] \vdots	\col[7.5ex] \vdots		\col[5.5ex] \vdots  			\col[3ex] \col[5ex]
+	     \tab[2.5ex] \vdots	\col[7.5ex] \vdots		\col[5.5ex] \vdots  			\\
+
+n.	\col policy?\bnms{c}{n}	\col[5ex] next\bnms{c}{n}	\col[5ex] f\bnms{c}{n}			\col[3ex] \col[5ex]
+	     policy?\bnms{m}{n}	\col[5ex] break\bnms{m}{n}	\col[5ex] f\bnms{m}{n}			\\[1ex]
+
+\multicolumn{5}{l}{\tab[4ex] \bfmbox{closed}}			\col[5ex] \bfmbox{closed}		\\
+\end{array} $$
+
+There's a lot of information here, and there's potentially a lot going on with it, but the interpretation is rather
+straightforward.
+
+First, it is split into two tables: \emph{composite} and \emph{memory}. The idea is each table has its own instruction
+set largely independent of the other, but from time to time these tables might still transfer content to each other.
+The composite table holds the function that is being built, while the memory table can be thought of as a stack.
+We read top down, starting with given input $ x $ for the composite table, and $ y $ for the memory table.
+
+To explain how this grammar is evaluated, let's momentarily isolate the composite table as if it existed on its own:
+We would start the evaluation with the zeroth row, checking if its \emph{policy} was true or false. If true, we would
+compose the input $ x $ with the leftside function (of the \emph{pass} column) within the same row. In the above this
+function is named $ next\bnms{c}{0} $. If false, we would instead compose the input $ x $ with the rightside function
+(of the \emph{call} column) within the same row. This function in turn is named $ f\bnms{c}{0} $.
+
+This is the basic process, which is then conditionally repeated again and again until we evaluate the final row.
+In such a case we would potentially end up composing a chain of functions as our result, for example:
+$$ f\bnms{c}{n-1}\ \circ\ \ldots\ \circ\ f\bnms{c}{2}\ \circ\ f\bnms{c}{1}\ \circ\ x\ \circ\ next\bnms{c}{0}\ \circ\ next\bnms{c}{n} $$
+Overall, that's the idea of this grammatical form. Also note, this chain may appear in an odd order,
+but is in fact valid---this will be explained shortly.
+
+All that's left now is to explain the meaning of the column headers.
+In particular the policy columns get their names from mathematical interval terminology:
+$$ \def\arraystretch{1.25}
+\begin{array}{ll}
+(a, b)		\col[1cm] \mbox{names an \strong{open} interval.}		\\{} % This empty scope is here to prevent a bug.
+[\,a, b)	\col[1cm] \mbox{names a \strong{closing} interval.}		\\{} % This empty scope is here to prevent a bug.
+[\,a, b\,]	\col[1cm] \mbox{names a \strong{closed} interval}		\\
+(a, b\,]	\col[1cm] \mbox{names an \strong{opening} interval}
+\end{array} $$
+The idea in terms of the above grammar is that each table corresponds with one of these intervals. In particular the
+\emph{closing} header of the memory table is meant to suggest it corresponds with a leftside closed interval which in
+terms of its evaluation is to say it halts on its leftside. This closing table also corresponds with a rightside open
+interval and so its evaluation defaults to continuation on its rightside. In contrast to this, the composite table is
+\emph{open} meaning it continues regardless of the policy value.
+
+As for the \strong{call} and \strong{pass} headers, they tell us if we're composing left or composing right.
+To remember which is which think of it like this:
+\begin{itemize}
+\item If we were to \emph{call} a function to be composed with (applied to) our subject of interest, the function would
+      compose on the \emph{left}.
+\item If we were to \emph{pass} a function (as value) to be composed with our subject of interest, the function would
+      compose on the \emph{right}.
+\end{itemize}
+This is how we were able to achieve the unexpected ordering of functions in the above chain composition.
+
+In anycase, the value of register induction and its grammar within this essay is that it offers us a uniform and Turing
+complete way to build functions. In practice we often don't even need the full dual block, as the single composite table
+is sufficient for a surprisingly large number of canonical computational functions.
+
+\subsubsection*{Continuation Passing}
+
+Another way to express functions which we will need to model our 1-cycle inductor is to use what's called
+\emph{continuation passing style}.
+
+The intuitive inspiration of this concept is to take a function $ f $, and redefine it to take an extra
+argument function $ c $ called the continuation, which is applied to the return value of the original $ f $:
+$$ \def\arraystretch{1.5}
+\begin{array}{rll}
+f			& :  & A \to B				\\
+\cont(f)		& :  & A \to (B \to C) \to C		\\
+\cont(f)(x,c)		& := & c \circ f(x)
+\end{array} $$
+From here, we can generalize this concept using the theory of \emph{monads}, to which we can then define a monadic
+composition operator ($ \star $) here called an \emph{endoposition} operator as follows:
+$$ f(x, c_1(y))\ \star\ g(y, c_2(z)) \qdefeq f(\,x,\ \lambda y.g(y, c_2(z))\,) $$
+Keep in mind these generalized continuation passing functions need not have been derived from a standard function!
+As well, the value of this endoposition operator is that it behaves just the way we'd expect of composition operators,
+but is instead applied to non-standard functions. Thus we have parallel theories---different details, similar
+behaviours---which can even be used as alternatives to interpreting the previous register induction grammar
+(us having used only standard composition up until now).
+
+Finally, in the case that we are working with continuation passing functions which were in fact derived from
+standard versions, our endoposition operator can be optimized as follows:
+$$ \cont(f)(x, c_1(y))\ \star\ \cont(g)(y, c_2(z)) \qeq \cont(g \circ f)(\,x,\ c_2(z)\,) $$
+
+\subsubsection*{Stem Operator}
+
+Register induction grammars have been previously implemented in \cite{nikfi} using what's called a \emph{stem operator}
+and its corresponding \emph{conditional endoposition operators}. Although these operators are indirectly relevant to
+us for this reason, they are also directly relevant as they are our means to modularizing the 1-cycle list operator.
+
+For this essay then, I will summarize their definitions here, starting with stem:
+
+%\begin{comment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+\begin{asy}
+unitsize(1cm);
+
+//
+
+pair p00 = (0,0);
+pair p10 = segment(p00, "S", 1.5);
+pair p20 = segment(p10, "S", 1);
+
+pair t00 = segment(p20, "SL", 1, 70);
+
+pair b00 = segment(p20, "S", 1);
+pair b10 = segment(b00, "SL", 1, 40);
+pair b11 = segment(b00, "SR", 1, 45);
+
+pair c00 = segment(p20, "SR", 1, 78);
+pair c10 = segment(c00, "SL", 1, 60);
+pair c11 = segment(c00, "SR", 1, 60);
+pair c20 = segment(c10, "S", 1);
+pair c21 = segment(c11, "SL", 1, 45);
+pair c22 = segment(c11, "SR", 1, 45);
+
+//
+
+pen stepcolor = gray;
+pen fillcolor = lightgray;
+pen bordercolor = heavygray;
+
+draw(p10--p20, bordercolor);
+draw(p20--t00, bordercolor);
+draw(p20--b00, bordercolor);
+draw(p20--c00, bordercolor);
+
+draw(b00--b10, bordercolor);
+draw(b00--b11, bordercolor);
+
+draw(c00--c10, bordercolor);
+draw(c00--c11, bordercolor);
+draw(c10--c20, bordercolor);
+draw(c11--c21, bordercolor);
+draw(c11--c22, bordercolor);
+
+//
+
+label("stem$(policy?, d, e, f, g, h)$:", p00);
+
+label("\scriptsize $1$", shift(0.12, 0.4)*p20, stepcolor);
+
+label("\scriptsize $1$", shift(1.45, 0.38)*t00, stepcolor);
+
+label("\scriptsize $2$", shift(0.12, 0.41)*b00, stepcolor);
+label("\scriptsize $1$", shift(0.36, 0.20)*b10, stepcolor);
+label("\scriptsize $2$", shift(-0.43, 0.20)*b11, stepcolor);
+
+label("\scriptsize $3$", shift(-2.52, 0.37)*c00, stepcolor);
+label("\scriptsize $1$", shift(0.87, 0.20)*c10, stepcolor);
+label("\scriptsize $2$", shift(-0.77, 0.20)*c11, stepcolor);
+
+label("\scriptsize $1$", shift(0.12, 0.4)*c20, stepcolor);
+label("\scriptsize $1$", shift(0.40, 0.15)*c21, stepcolor);
+label("\scriptsize $2$", shift(-0.40, 0.15)*c22, stepcolor);
+
+safeLabel("force", p10, 0.60, 0.25, borderpen = bordercolor);
+safeLabel("if", p20, 0.25, 0.25, borderpen = bordercolor);
+
+safeLabel("$policy?$", t00, 0.80, 0.30, borderpen = bordercolor);
+
+safeLabel("delay", b00, 0.65, 0.27, borderpen = bordercolor);
+safeLabel("$d$", b10, 0.25, 0.25, borderpen = bordercolor);
+safeLabel("$e$", b11, 0.25, 0.25, borderpen = bordercolor);
+
+safeLabel("delay", c00, 0.65, 0.27, borderpen = bordercolor);
+safeLabel("transit", c10, 0.80, 0.25, borderpen = bordercolor);
+safeLabel("delay", c11, 0.65, 0.27, borderpen = bordercolor);
+safeLabel("$f$", c20, 0.25, 0.27, borderpen = bordercolor);
+safeLabel("$g$", c21, 0.25, 0.25, borderpen = bordercolor);
+safeLabel("$h$", c22, 0.25, 0.25, borderpen = bordercolor);
+
+\end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\end{comment}
+
+I would think the general form here is fairly intuitive, with its notable component being the conditional operator \strong{if}.
+Regardless, the interpretation is to compose operators $ d, e $ when the $ policy? $ value is true, and otherwise compose
+$ f, g, h $ when it is false. The \strong{force}, \strong{delay}, \strong{transit} operators are there to prevent unnecessary
+calculations since we are working within a conditional: As we know we are branching, it would be wastefull to compute both
+$ \ d \circ e\ $ and $ \ f \circ g \circ h $. As for their operator definitions, they are as follows:
+$$ \def\arraystretch{1.5}
+\begin{array}{rrl}
+\delay(d, e)		& := & (d, e)				\\
+\force((d, e))		& := & d \circ e			\\
+\transit(f) 		& := & f \circ \force
+\end{array} $$
+Now, in terms of stem's conditional endoposition operators, they are defined in continuation passing style:
+$$ \def\arraystretch{1.75}
+\small
+\begin{array}{lllcl}
+\langle\,policy?,\ break,\ next\,\rangle	& \spose{call call}									&
+cont & \qdefeq					& \stem(\,policy?,\ break,\ -_{arg},\ \lambdacp\ next,\ -_{arg}\,)			\\
+
+\langle\,policy?,\ break,\ x\,\rangle		& \spose{call pass}									&
+cont & \qdefeq					& \stem(\,policy?,\ break,\ -_{arg},\ \lambdacp\ -_{arg},\ x\,)			\\
+
+\langle\,policy?,\ break,\ next,\ x\,\rangle	& \spose{call pose}									&
+cont & \qdefeq					& \stem(\,policy?,\ break,\ -_w,\ \lambdacp\ next,\ x\,)				\\
+
+\langle\,policy?,\ w,\ next\,\rangle		& \spose{pass call}									&
+cont & \qdefeq					& \stem(\,policy?,\ -_{arg},\ w,\ \lambdacp\ next,\ -_{arg}\,)				\\
+
+\langle\,policy?,\ w,\ x\,\rangle		& \spose{pass pass}									&
+cont & \qdefeq					& \stem(\,policy?,\ -_{arg},\ w,\ \lambdacp\ -_{arg},\ x\,)				\\
+
+\langle\,policy?,\ w,\ next,\ x\,\rangle	& \spose{pass pose}									&
+cont & \qdefeq					& \stem(\,policy?,\ -_{break},\ w,\ \lambdacp\ next,\ x\,)				\\
+
+\langle\,policy?,\ break,\ w,\ next\,\rangle	& \spose{pose call}									&
+cont & \qdefeq					& \stem(\,policy?,\ break,\ w,\ \lambdacp\ next,\ -_x\,)				\\
+
+\langle\,policy?,\ break,\ w,\ x\,\rangle	& \spose{pose pass}									&
+cont & \qdefeq					& \stem(\,policy?,\ break,\ w,\ \lambdacp\ -_{next},\ x\,)				\\
+
+\langle\,policy?,\ break,\ w,\ next,\ x\,\rangle& \spose{pose pose}									&
+cont & \qdefeq					& \stem(\,policy?,\ break,\ w,\ \lambdacp\ next,\ x\,)
+\end{array} $$
+This is a lot to take in, but its complexity is mostly representative of small variations.
+
+In anycase, to read this ruleset the endoposition operator (signified in dark gray) first tells us how to compose
+\texttt{stem} operators:
+$$ \stem(\,policy?,\ break,\ arg_1,\ cont,\ next,\ arg_2\,) $$
+Here though, we short form these operators into continuation passing style by refactoring $ \ arg_1,\,arg_2\, $ and then partially
+applying $ \ policy?,\ break,\ next\, $ to derive alternative representations:
+$$ \langle\,policy?,\ break,\ next\,\rangle(\,-_{arg},\ -_c\,) \qdefeq \stem(\,policy?,\ break,\ -_{arg},\ -_c,\ next,\ -_{arg}\,) $$
+Note that $ \langle\,policy?,\ break,\ next\,\rangle $ represents the function name. It's also worth noting that this function
+is in what I would call \emph{conditional continuation passing style}. In particular, if we adhere to the rule that we don't
+apply or simplify the \texttt{stem} operator directly, then all the monadic rules of continuation passing hold. In that case,
+these rules are in the same format as the generic endoposition operator in the continuation passing section:
+$$ f(x, c_1(y))\ \star\ g(y, c_2(z)) \qdefeq f(\,x,\ \lambda y.g(y, c_2(z))\,) $$
+The only difference being that the evaluation has been optimized with knowledge of \texttt{stem}'s definition, and the fact
+that the \emph{right operand} (right argument) is short formed to $ cont $ to reflect this.
+
+As an aside, I can now say at this point that the meaning of the phrase \emph{conditional endoposition} is in the sense that
+once we allow ourselves to evaluate the internal \texttt{stem} operators, we then have to accept that any chain of conditionally
+endoposed functions may \emph{break} before all of such functions are called.
+
+Next, let's discuss the \texttt{pose} keyword expressed within the endopose modifiers: It is a header like \texttt{call} and
+\texttt{pass} which were discussed previously in terms of register induction grammar. Think of it as a convenience operator,
+where instead of taking its input from the evaluation process it has its own specialized and fixed input.
+
+As for the number of definitions within this ruleset, the thing to note is that this list of nine conditional endoposition
+operators is as large as it is because of all the header variations seen within register induction tables. In truth we could
+rely on just a handful of these operators without any loss in \emph{potential}, but we'd also lose much of the existing
+expressivity and convenience.
+
+Finally, the \texttt{closing} nomenclature in the above definitions hint at the way in which \texttt{stem} and its \strong{cposes}
+are used to implement register induction. The general idea then is to pair up these cposes to match the respective composite
+and memory tables of the previously discussed register induction construct. With that said, the matter is not actually this
+straightforward: For starters, there are the other table keywords, namely \texttt{opening}, and \texttt{open}: These respectively
+are presented in \cite{nikfi} as the \texttt{costem}, and \texttt{distem} functions, along with their own \texttt{cpose}
+operators.  Beyond that, evaluating dual blocks only as dual cpose chains leaves no room for the blocks to communicate.
+In this case, the full solution is actually to modify the above definitions to accommodate for these interactions.
+
+\subsection*{Type Theoretic Lists}
+
+With our list induction methodology explained, we now need to address the basic methods of lists as types.
+
+In Type Theory a dependent or polymorphic list is defined recursively as:
+$$ \mbox{List}_A\ :=\ \mbox{Nil}\ |\ A \times \mbox{List}_A $$
+where $ A $ is the dependent type variable, and Nil as a type only has one element:
+$$ \mbox{null} : \mbox{Nil} $$
+In practice, one can thus consider a list of this form to be the recursive nesting of pairs:
+$$ (a, b, c, \ldots, z) = (a, (b, (c, (\ldots, (z,\ \mbox{null}\,) \ldots )))) $$
+
+\subsubsection*{List Operator Primitives}
+
+Let's go over the basic inventory of primitive list operators needed to implement more general ones.
+
+To start, it is safe to assume we have the \emph{pair} constructors known as \strong{cons} and \strong{push}:
+$$ \begin{array}{rcl}
+\cons_A		& :	& A \times \mbox{List}_A \to \mbox{List}_A	\\
+\push_A		& :	& A \times \mbox{List}_A \to \mbox{List}_A	\\
+\end{array} $$
+where \texttt{cons} \emph{prepends} an element of type $ A $ to a given list of type List$ _A $,
+while \texttt{push} \emph{appends} an element of type $ A $ to a given list of type List$ _A $.
+
+We can also assume we have pair projections (also known as eliminators, or selectors):
+$$ \begin{array}{rcl}
+\car_A	& :	& A \times \mbox{List}_A \to A				\\
+\cdr_A	& :	& A \times \mbox{List}_A \to \mbox{List}_A		\\
+\end{array} $$
+Here \strong{car} projects the first element of the pair, while \strong{cdr} projects the second element.
+In coding literature the returned second element is frequently referred to as the \emph{rest} of the list.
+
+The \strong{cons}, \strong{car}, \strong{cdr} terminology I borrow from the LISP programming language. It should be
+noted that this language is an untyped lambda calculus while the functions in this context are intended to be typed.
+With that said, when the context is clear (or otherwise free of potential ambiguity), we will omit the type subscript
+$ A $ in the above notations as well as others yet to be introduced.
+
+The next primitive operator we need is the conditional \strong{if}, which we've already introduced as part of the stem
+operator. As we left that mentioned version untyped, let's now present it in its more technical form:
+$$ \begin{array}{rcl}
+\mbox{if}_{\,C}	& :	& \mbox{Boolean} \times C_{true} \times C_{false} \to C_{\,?}	\\
+\end{array} $$
+Here I'm abusing Type Theory notation: The intended meaning in the above is that the function \strong{if} is defined
+on a family of types $ C $ where $ C $ is indexed by boolean values.\footnote{In Set Theory notation this would be
+$ \{\,C_\alpha\,\}_{\alpha\in\mbox{Boolean}} $} I've written $ C_{\,?} $ at the end to indicate the type index
+(and thus the type itself) of the output value is determined by the boolean input value, meaning it is not known
+until this function is evaluated and is in fact determined as part of the evaluation. In type theory proper,
+they call this a \emph{dependent function type}.
+
+The final core operator we'll need for general lists is a test for equality:
+$$ \begin{array}{rcl}
+\eq_B		& :	& B \times B \to \mbox{Boolean}		\\
+\end{array} $$
+
+To reiterate, our inventory of list operator primitives is as follows:\footnote{It should be mentioned in the following
+should I use well known operators such as addition or multiplication within any examples I take them for granted
+as being outside the scope of this essay, and I am not explicitly counting them here as part of the inventory.}
+$$ \{\,\mbox{if, eq?, cons, car, cdr, push}\,\} $$
+
+As an example of how these can be used to construct general list operators, we implement
+a basic ``length'' function in LISP style grammar with C style comments:
+$$ \begin{array}{lrl}
+(\mbox{define}\ (\mbox{length}'\ count\ list)			& \twoqquad // & \mbox{define length}'			\\
+\ \ (\mbox{if}\ (\eq\ list\ \mbox{null})			& \twoqquad // & \mbox{if } list == \mbox{null}		\\
+\ \           \ count						& \twoqquad // & \mbox{return } count			\\
+\ \           \ (\mbox{length}'\ (+\ count\ 1)\ (\cdr\ list))	& \twoqquad // & \mbox{else (recursively) call }	\\
+\ \ )								& \twoqquad // & \ (\mbox{length}'\ (count + 1)\ rest)	\\
+)
+\end{array} $$
+If this version of the list \emph{length} function is unfamiliar to you,
+the more intuitive interpretation is then specialized as:
+$$ \mbox{length}(list)\ :=\ \mbox{length}'(0, list) $$
+
+\section*{Modelling The 1-Cycle Loop}
+
+With the methodology behind us, we are now ready to start modelling our 1-cycle list operator.
+
+With that said, at this stage we will be focusing on the operator's specification rather than any of its implementations.
+As for our spec, the key intuition needed in helping us to realize its form is that any general 1-cycle operator must
+\emph{recursively} iterate over its given list. Thus, our goal is to focus on determining the recursive
+\emph{loop} of this operator.
+
+As for this spec's exposition: The general paradigm I will take here is \emph{design through incremental attempt},
+where each try is then framed casually as a puzzle to be pieced together.
+
+\subsection*{The Initial Iteration (zeroth try)}
+
+We start with a naive zeroth try, where we reason about a single iteration of the loop, and in particular the initial iteration.
+
+To this end, we will want to begin with an \emph{initial list}. As we are iterating over the list's elements we will
+also want to split this initial list into two components:
+$$ initial\ list \quad = \quad \{\ current\ ,\ rest\ \} $$
+Following this, for our list operator to be meaningful we will then want to act on the list contents in some way.
+Since we only have direct access at the moment to the $ current $ component---$ rest $ being a sublist---we will
+now want to apply some function to it:
+$$ act(current) $$
+Lastly, we will want to pass the results of these steps to the next iteration of the loop:
+$$ \{\ act(current)\ ,\ rest\ \} $$
+\ \\
+
+\subsection*{Loop Functions (first try)}
+
+The problem with the naive try is the input signature (the initial list) doesn't match the output signature:
+$$ (\,act(current),\ rest\,) $$
+This is an issue since we are trying to create a recursive loop, meaning these signatures need to match.
+Even still, the zeroth attempt does provide us with valuable clues as to how we can move forward.
+
+The next attempt starts by synchronizing the two previous signatures. As the \emph{initial list} and the
+\emph{rest} are expected to be lists, we can take a cover term for both, here named as the $ precedent $.
+In that case then, the only difference between the signatures is that the output signature has one extra object
+$ \{ act(current) \} $ than the input signature. With that in mind, I declare our new signature as follows:
+$$ (\,resultant,\ precedent\,) $$
+I've chosen the term $ resultant $ to be generic. Although we do have refined information to work with in the form
+of $ act(current) $, I find it's a better practice not to overspecialize too soon---allowing us to maintain
+higher entropy or flexibility in our design until we have actual reason to restrict our definitions.
+
+Okay, so let's go over our single loop iteration again!
+
+We will want to separate $ precedent $ into two parts the way we did with the initial list. The intuitive choice
+here would be to use the \texttt{car} and \texttt{cdr} functions, but as we're designing for higher entropy right now
+we'll instead split our list with the following weakly specified functions:
+$$ value(precedent) \quad,\quad next(precedent) $$
+From here, and as with our initial attempt, we will want to act on the list component we have access to, that being
+$ value(precedent) $. In this case we can keep the same weakly specified function name:
+$$ act(value(precedent)) $$
+Now, we effectively have the same information as before:
+$$ \{\ act(value(precedent))\ ,\ next(precedent)\ \} $$
+We pass this to the next iteration of the loop, but this time we have one extra piece of (unused) information:
+$$ resultant $$
+In this case $ \,act(value(precedent))\, $ is meant to coincide with the $ resultant $ of the next iteration,
+but we still have the $ resultant $ of this iteration. The way to resolve these distinct objects is to introduce
+a new function to ``unite'' them:
+$$ combine(\,act(value(precedent)),\,resultant\,) $$
+Admittedly, the intuitive choice for $ combine $ would be \texttt{push} so as to build back up a new list to return,
+but we also don't want to restrict ourselves to this only. Certainly we will want this 1-cycle operator to be able
+to specialize as \texttt{map}, but we also want it to specialize as \texttt{fold}, in which case we should not be
+restricted to returning a list. Given this, let it be said that our $ combine $ operator could very well be
+a \emph{monoid}, or something else still for that matter.
+
+In anycase, we now have enough components to make the first real attempt at our loop model. I display it in grammatical
+path visual style as follows:
+
+%\begin{comment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+
+ pair p00 = (0,0);
+
+ pair p10 = segment(p00, "SR", 1.3, 51);
+ pair p20 = segment(p10, "S", 1);
+ pair p30 = segment(p20, "S", 1);
+ pair p40 = segment(p30, "S", 1);
+ pair p50 = segment(p40, "S", 1);
+
+ pair p60 = segment(p50, "SR", 1, 55);
+ pair p61 = segment(p60, "E", 1);
+
+ //
+
+ pair q00 = segment(p60, "E", 3);
+
+ pair q10 = segment(q00, "S", 1);
+ pair lq10 = offset(q10, "W", 0.06);
+ pair rq10 = offset(q10, "E", 0.06);
+
+ pair q20 = segment(q10, "SL", 1, 65);
+ pair lq20 = offset(q20, "W", 0.06);
+ pair rq20 = offset(q20, "E", 0.06);
+
+ pair q21 = segment(q10, "SR", 1, 15);
+ pair q22 = segment(q10, "SR", 1, 76.5);
+
+ pair q31 = segment(q21, "SL", 1, 45);
+ pair q32 = segment(q21, "SR", 1, 55);
+ pair q33 = segment(q22, "S", 1);
+
+ pair q41 = segment(q31, "S", 1);
+ pair q51 = segment(q41, "S", 1);
+
+ //
+
+ draw(shift(0.4,0.5)*p20--shift(0.4,-0.5)*p20, red, Arrow);
+ draw(shift(0.4,0.5)*p40--shift(0.4,-0.5)*p40, red, Arrow);
+
+ draw(shift(0.4,-0.5)*p50{down}..{right}p60, red);
+ draw(p60--p61, red, Arrow);
+ 
+ //
+ 
+ draw(lq10--lq20);
+ draw(rq10--rq20);
+
+ draw(q10--q21);
+ draw(q10--q22);
+
+ draw(q21--q31);
+ draw(q21--q32);
+ draw(q22--q33);
+
+ draw(q31--q41);
+ draw(q41--q51);
+
+ //
+ 
+ label("$y = $", shift(0,-0.065)*p00, E);
+ label("loop", shift(0.775,-0.01)*p00, E, blue);
+ label("$(resultant,\,precedent):$", shift(1.56,0)*p00, E);
+
+ label("$(resultant,\,precedent)$", p10, E, fontsize(10pt));
+
+ label("\scriptsize prepare", shift(0.5,0)*p20, E, red);
+
+ label("$(resultant,\,precedent,\,value,\,act,\,combine,\,next,\,\mbox{cons})$", p30, E, fontsize(10pt));
+
+ label("\scriptsize duplicate", shift(0.5,0)*p40, E, red);
+ 
+ label("$(precedent,\,resultant,\,precedent,\,value,\,act,\,combine,\,next,\,\mbox{cons})$", p50, E, fontsize(10pt));
+
+ label("\scriptsize applicate", shift(0,-0.1)*p61, SW, red);
+
+ //
+
+ pen stepcolor = gray;
+
+ label("loop:", q00, W, blue);
+
+ label("\scriptsize $0$", shift(1.22,0.38)*q20, stepcolor);
+ label("\scriptsize $1$", shift(0.06,0.42)*q21, stepcolor);
+ label("\scriptsize $2$", shift(-2.29,0.38)*q22, stepcolor);
+
+ label("\scriptsize $1$", shift(0.62,0.41)*q31, stepcolor);
+ label("\scriptsize $2$", shift(-0.85,0.41)*q32, stepcolor);
+ label("\scriptsize $1$", shift(-0.13,0.44)*q33, stepcolor);
+
+ label("\scriptsize $1$", shift(0.12,0.41)*q41, stepcolor);
+ label("\scriptsize $1$", shift(0.12,0.44)*q51, stepcolor);
+
+ safeLabel("cons", q10, 0.50, 0.25);
+
+ safeLabel("$y$", q20, 0.25, 0.25);
+ safeLabel("$combine$", q21, 0.90, 0.25);
+ safeLabel("$next$", q22, 0.55, 0.25);
+
+ safeLabel("$act$", q31, 0.40, 0.25);
+ safeLabel("$resultant$", q32, 1.05, 0.25);
+ safeLabel("$precedent$", q33, 1.05, 0.28);
+
+ safeLabel("$value$", q41, 0.65, 0.25);
+ safeLabel("$precedent$", q51, 1.05, 0.28);
+
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\end{comment}
+
+\noindent To summarize, this \emph{loop} iteration function:
+$$ \tcb{\lp}(\,resultant,\,precedent\,) $$
+takes us from one iteration state to the next, where we start with the \emph{facade signature}
+$$ (\,resultant,\,precedent\,) $$
+expand it, meta-map it to the grammatical tree form, then evaluate. In particular, we \texttt{prepare} the facade
+by adding to the signature the unique constant values that will be needed in the evaluation. Then we effectively
+\texttt{duplicate} this data to also be used in the later evaluation. Next, our \texttt{applicate} is the meta-map
+which bijectively positions the contents of the full signature into the tree to be evaluated. As for evaluation,
+it is simply the process already described leading up to this figure. Lastly, we repackage the output $ y $ using
+\texttt{cons} and return it along the $ 0\,$-\,path, which is also signified by the parallel line segment.
+
+To review grammatical path notation, the tree itself is numbered so we can reference its synactic locations, for example:
+$$ \hspace{-2.7em}\tcb{\lp}/\tcg{1}/\tcg{1}/\tcg{1}/ \quad = \quad value $$
+which denotes the $ value $ function. The path starts from the \emph{root operator}, here being \texttt{cons}.
+As another example, such paths represent both functions and objects:
+$$ \tcb{\lp}/\tcg{1}/\tcg{2}/ \quad = \quad resultant $$
+Here in particular it now denotes $ resultant $.
+
+Also, notice the difference between:
+$$ \tcb{\lp}/\tcg{1}/\tcg{1}/\tcg{1} \qquad \mbox{and} \qquad \tcb{\lp}/\tcg{1}/\tcg{1}/\tcg{1}/ $$
+The former refers to the pathname expression itself, while the latter with the extra \emph{slash} at the end (the far right side)
+refers to the object named in the model. In the language of semiotics the former would be the \emph{signifier} while the latter would
+be the \emph{signified}. With that said, as these small differences can be tedious to parse at the human level, I prefer to write:
+$$ \tcb{\lp}/\tcg{1}/\tcg{1}/\tcg{1} \qquad \as \qquad value $$
+instead of 
+$$ \tcb{\lp}/\tcg{1}/\tcg{1}/\tcg{1}/ \qquad = \qquad value $$
+which is a convention I will maintain throughout.
+
+\subsection*{Conditioning the Model (second try)}
+
+As is, our first try model covers much of what a 1-cycle list induction operator is expected to do as we can already
+specialize towards \texttt{map} and \texttt{fold}. The issue for us now is that our model still does not account for
+the operational component which would allow us to specialize toward the \texttt{find} operator. This then,
+is the inspiration for our latest attempt.
+
+In particular, we would like to extend our existing model so that we could potentially \emph{break} the loop each
+time a function is applied within a given iteration. More specifically, we would like to be able to test and possibly
+break \emph{immediately before} as well as \emph{immediately after} a given function application within the loop.
+This then would allow us to specialize toward our \texttt{find} operator.
+
+With that being said, I would like to state that there are actually at least two additional reasons we might want the ability
+to break within a loop:\footnote{One other reason not listed here is that as of yet we aren't actually able to break from
+the recursive loop in general. As it stands it's not a recursive loop, it's an infinite one.}
+
+\begin{itemize}
+\item Loop breaking can act as an effective \emph{short-circuiting} optimization. For example, if we are folding a list using
+multiplication we might at some point end up with the value \emph{zero} as an intermediate result. In that case, assuming
+an appropriate context we might wish to reduce cycle costs by returning immediately rather than finishing the fold.
+\item If our list operator is untyped or even weakly typed, we might want to test the input and output before continuing the
+loop.\footnote{Ideally we would be working in a fully typed system, but in practice it's always possible to come across contexts
+in which such assumptions don't hold. For example part of my motivation for this essay comes from writing a C++ meta-programming
+library: C++ template programming is known to be Turing complete, but as it was never part of the intended design it does not
+provide us with full access the compiler's verification semantics nor debugging tools at that level.}
+\end{itemize}
+By listing these here, we can now account for them within our coming design. Before continuing though, there is a practical
+concern we should also address.
+
+With previous programming exprience I am willing to say that the looping grammars of modern programming languages such as
+\texttt{for}, \texttt{while}, or even \emph{ranges} aren't designed to allow for \emph{selective} branching overhead within
+a loop body. This is to say, we have to ``hard-code'' a break condition as part of the loop's definition, and although we
+can design for any given breaking test to be ignored (set the break condition to always be \emph{false}), the overhead still
+exists. This is relevant to anyone who cares about performance as even overhead costs are proportional to the \emph{length}
+of the input list within a loop.
+
+As an aside to this concern, I should also state that as far as I know modern compilers are often designed to optimize out
+overhead such as \emph{unconditional} conditionals, but for the purpose of this essay I would rather not rely on external
+assumptions---I would rather design specifically to handle this ability ourselves.
+
+Following all of these logics then, we are nearly ready to begin with only a bit of housekeeping still remaining. Notably,
+the previous loop modelling figure was quite large on the page, so we will want to condense it here as follows:
+
+%\begin{comment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+
+ //
+
+ pair p00 = (0,0);
+
+ pair p10 = segment(p00, "S", 2.5);
+ pair lp10 = offset(p10, "N");
+ pair rp10 = offset(p10, "S");
+
+ pair p20 = segment(p10, "S", 1);
+ pair p21 = segment(p20, "EU", 2.5, 15);
+
+ pair p30 = segment(p20, "S", 1);
+ pair p31 = segment(p30, "EU", 2.5, 11);
+
+ pair p41 = segment(p30, "ED", 2.5, 18);
+
+ //
+
+ pair q00 = segment(p00, "E", 5);
+
+ pair q10 = segment(q00, "S", 1.5);
+ pair lq10 = offset(q10, "N");
+ pair rq10 = offset(q10, "S");
+
+ pair q20 = segment(q10, "SL", 3, 56);
+
+ pair q21 = segment(q10, "S", 1);
+ pair q22 = segment(q10, "SR", 1, 76.5);
+
+ pair q31 = segment(q21, "SL", 1, 45);
+ pair q32 = segment(q21, "SR", 1, 55);
+ pair q33 = segment(q22, "S", 1);
+
+ pair q41 = segment(q31, "S", 1);
+ pair q51 = segment(q41, "S", 1);
+
+ //
+
+ draw(p10--p20, red);
+ draw(p20--p30, red);
+
+ draw(p30--p21, red + dashed, Arrow);
+ draw(p30--p31, red + dashed, Arrow);
+ draw(p30--p41, red + dashed, Arrow);
+
+ //
+
+ draw(lq10--lp10);
+ draw(rq10--rp10);
+
+ draw(q10--q21);
+ draw(q10--q22);
+
+ draw(q21--q31);
+ draw(q21--q32);
+ draw(q22--q33);
+
+ draw(q31--q41);
+ draw(q41--q51);
+
+ //
+
+ label("\texttt{loop}", p00);
+ label("$(resultant,\,precedent):$", shift(2.59,0)*p00);
+
+ safeLabel("prepare", p10, 1.05, 0.25, red, red);
+ safeLabel("duplicate", p20, 1.05, 0.25, red, red);
+ safeLabel("applicate", p30, 1.00, 0.25, red, red);
+
+ //
+
+ pen stepcolor = gray;
+
+ label("\scriptsize $0$", shift(2.37,2.40)*q20, stepcolor);
+ label("\scriptsize $1$", shift(0.12,0.42)*q21, stepcolor);
+ label("\scriptsize $2$", shift(-2.29,0.39)*q22, stepcolor);
+
+ label("\scriptsize $1$", shift(0.62,0.41)*q31, stepcolor);
+ label("\scriptsize $2$", shift(-0.85,0.41)*q32, stepcolor);
+ label("\scriptsize $1$", shift(-0.13,0.44)*q33, stepcolor);
+
+ label("\scriptsize $1$", shift(0.12,0.41)*q41, stepcolor);
+ label("\scriptsize $1$", shift(0.12,0.44)*q51, stepcolor);
+
+ safeLabel("cons", q10, 0.50, 0.25);
+
+ safeLabel("$combine$", q21, 0.90, 0.25);
+ safeLabel("$next$", q22, 0.55, 0.25);
+
+ safeLabel("$act$", q31, 0.40, 0.25);
+ safeLabel("$resultant$", q32, 1.05, 0.25);
+ safeLabel("$precedent$", q33, 1.05, 0.28);
+
+ safeLabel("$value$", q41, 0.65, 0.25);
+ safeLabel("$precedent$", q51, 1.05, 0.28);
+
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\end{comment}
+In this figure, we still keep the signature expansion functions as in the previous, but since they are currently outside
+of our loop breaking concerns their details have been left hidden.
+
+There is also a secondary motive for this housekeeping: Displaying the looping model this way helps us to analyze where
+and how to express our conditional tests. To that end, let's revise things a little further and highlight in \tcb{blue}
+(the former color of our \texttt{loop} name) the testing locations we're interested in:
+
+%\begin{comment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+
+ //
+
+ pair p00 = (0,0);
+
+ pair p10 = segment(p00, "S", 2.5);
+ pair lp10 = offset(p10, "N");
+ pair rp10 = offset(p10, "S");
+
+ pair p20 = segment(p10, "S", 1);
+ pair p21 = segment(p20, "EU", 2.5, 15);
+
+ pair p30 = segment(p20, "S", 1);
+ pair p31 = segment(p30, "EU", 2.5, 11);
+
+ pair p41 = segment(p30, "ED", 2.5, 18);
+
+ //
+
+ pair q00 = segment(p00, "E", 5);
+
+ pair q10 = segment(q00, "S", 1.5);
+ pair lq10 = offset(q10, "N");
+ pair rq10 = offset(q10, "S");
+
+ pair q20 = segment(q10, "SL", 3, 56);
+
+ pair q21 = segment(q10, "S", 1);
+ pair q22 = segment(q10, "SR", 1, 76.5);
+
+ pair q31 = segment(q21, "SL", 1, 45);
+ pair q32 = segment(q21, "SR", 1, 55);
+ pair q33 = segment(q22, "S", 1);
+
+ pair q41 = segment(q31, "S", 1);
+ pair q51 = segment(q41, "S", 1);
+
+ //
+
+ draw(p10--p20, red);
+ draw(p20--p30, red);
+
+ draw(p30--p21, red + dashed, Arrow);
+ draw(p30--p31, red + dashed, Arrow);
+ draw(p30--p41, red + dashed, Arrow);
+
+ //
+
+ draw(lq10--lp10);
+ draw(rq10--rp10);
+
+ draw(q10--q21);
+ draw(q10--q22);
+
+ draw(q21--q31);
+ draw(q21--q32);
+ draw(q22--q33);
+
+ draw(q31--q41);
+ draw(q41--q51);
+
+ //
+
+ label("\texttt{loop}", p00);
+ label("$(resultant,\,precedent):$", shift(2.59,0)*p00);
+
+ safeLabel("prepare", p10, 1.05, 0.25, red, red);
+ safeLabel("duplicate", p20, 1.05, 0.25, red, red);
+ safeLabel("applicate", p30, 1.00, 0.25, red, red);
+
+ //
+
+ pen stepcolor = gray;
+
+ label("\scriptsize $0$", shift(2.37,2.40)*q20, stepcolor);
+ label("\scriptsize $1$", shift(0.12,0.42)*q21, stepcolor);
+ label("\scriptsize $2$", shift(-2.29,0.39)*q22, stepcolor);
+
+ label("\scriptsize $1$", shift(0.62,0.41)*q31, stepcolor);
+ label("\scriptsize $2$", shift(-0.85,0.41)*q32, stepcolor);
+ label("\scriptsize $1$", shift(-0.13,0.44)*q33, stepcolor);
+
+ label("\scriptsize $1$", shift(0.12,0.41)*q41, stepcolor);
+ label("\scriptsize $1$", shift(0.12,0.44)*q51, stepcolor);
+
+ safeLabel("cons", q10, 0.50, 0.25, heavyblue);
+
+ safeLabel("$combine$", q21, 0.90, 0.25, heavyblue);
+ safeLabel("$next$", q22, 0.55, 0.25, heavyblue);
+
+ safeLabel("$act$", q31, 0.40, 0.25, heavyblue);
+ safeLabel("$resultant$", q32, 1.05, 0.25);
+ safeLabel("$precedent$", q33, 1.05, 0.28);
+
+ safeLabel("$value$", q41, 0.65, 0.25, heavyblue);
+ safeLabel("$precedent$", q51, 1.05, 0.28);
+
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\end{comment}
+
+From here we can condense the relevant locator pathnames as follows:
+$$ \left\{\tab[2ex]\begin{array}{lcl}
+\tlp					\col[3ex] \mbox{as} \col[2ex] \tcb{\cons},		\\
+\tlp/\tcg{1}				\col[3ex] \mbox{as} \col[2ex] \tcb{combine},		\\
+\tlp/\tcg{1}/\tcg{1}			\col[3ex] \mbox{as} \col[2ex] \tcb{act},		\\
+\tlp/\tcg{1}/\tcg{1}/\tcg{1}		\col[3ex] \mbox{as} \col[2ex] \tcb{value},		\\
+\tlp/\tcg{2}				\col[3ex] \mbox{as} \col[2ex] \tcb{next}
+\end{array}\tab[2ex]\right\} $$
+This is actually incomplete. As stated previously, we would like to test \emph{before} and \emph{after} each function
+and so our locator pathnames are more accurately described as:
+$$ \def\arraystretch{1.1}\left\{\tab[2ex]\begin{array}{lcllcl}
+\tlp/\tcg{0}		& \as & \coo[ ],	\col[10ex] \tlp/\tcg{1}/\tcg{1}/\tcg{0}			& \as & \ao[ ],		\\
+\tlp/\tcg{1}		& \as & \coli[ ],	\col[10ex] \tlp/\tcg{1}/\tcg{1}/\tcg{1}			& \as & \ai[ ],		\\
+\tlp/\tcg{2}		& \as & \cori[ ],	\col[10ex] \tlp/\tcg{1}/\tcg{1}/\tcg{1}/\tcg{0}		& \as & \vo[ ],		\\
+\tlp/\tcg{1}/\tcg{0} 	& \as & \co[ ],		\col[10ex] \tlp/\tcg{1}/\tcg{1}/\tcg{1}/\tcg{1}		& \as & \vi[ ],		\\
+\tlp/\tcg{1}/\tcg{1}	& \as & \cli[ ],	\col[10ex] \tlp/\tcg{2}/\tcg{0}				& \as & \no[ ],		\\
+\tlp/\tcg{1}/\tcg{2}	& \as & \cri[ ],	\col[10ex] \tlp/\tcg{2}/\tcg{1}				& \as & \nei[ ]		\\
+\end{array}\tab[2ex]\right\} $$
+In such cases we take our original locator paths and by convention specify a function argument \emph{pre-test} with
+the appropriate step location $ /n $. We then specify a function image \emph{post-test} using the zero step $ /0 $.
+
+With this housekeeping out of the way, the objective for us now is to \emph{modularize} loop breaking tests at
+the above stated locations, to which we should then be able link chosen modules together to otherwise reform our
+previous loop. Admittedly this may not be so straightforward on first thought, fortunately the solution was already
+given in the methodology: We will use the \texttt{stem} operator and its \texttt{cposes} to implement our loop.
+
+\subsection*{Conditional Reduction (third try)}
+
+It's heartbreaking to say, but we're not yet done.
+
+The current issue beyond our ability to break is less theoretical and more practical: We have twelve breakpoint locations
+in our baseline model, but can we do better? Can we reduce this? The short answer is yes, the long answer is that we need
+to find redundancy or general computations which aren't actually necessary with respect to these locations.
+
+To start with this, the output of \texttt{cons} (with locator path $ /0 $) is intended to be a \emph{container} meant to pass
+information to the next iteration of the loop (implemented as a signature pair). As such there's no point in testing this
+container, meaning we can safely ignore testing within \texttt{prepare}, \texttt{duplicate}, and \texttt{applicate}. As for
+the content of this container---being the $ resultant $ and $ precedent $ arguments (with respective locator paths $ /1, /2 $)
+of \texttt{cons}---it will be tested when we start the next loop iteration, meaning we can ignore testing them before they're
+passed to \texttt{cons}.
+
+From here, we might be tempted to say the output of $ combine $ is redundant, because it becomes the new $ resultant $
+in the next iteration, and it only occurs once in the looping diagram. This is an insightful logic, but if we're thinking
+in terms of future optimizations we may wish to break the loop there and then before we apply further computations. For
+example, let's say we left the testing until the next iteration and only then broke, we'd still have done the computations
+within the functions \texttt{prepare}, \texttt{duplicate}, \texttt{applicate}, and likely for nothing. I'm not saying
+a post-$combine$ test will be done often, but we shouldn't deny its possibility altogether. We'll leave it in.
+
+In anycase, the only other place we might be performing redundant calculations is the output of \emph{next}, which is
+meant to become the new $ precedent $ in the loop iteration which follows. Yet, the same sort of logic we just used with
+the possibility of a post-$combine$ test applies here as well, so we'll also leave this test in.
+
+To summarize, we will from now on focus on the following reduced set of breakpoint locations:
+
+$$ \def\arraystretch{1.1}\left\{\tab[2ex]\begin{array}{lcllcl}
+\tlp/\tcg{1}/\tcg{0} 		& \as & \co[ ],		\col[10ex] \tlp/\tcg{1}/\tcg{1}/\tcg{1}/\tcg{0}		& \as & \vo[ ],		\\
+\tlp/\tcg{1}/\tcg{1}		& \as & \cli[ ],	\col[10ex] \tlp/\tcg{1}/\tcg{1}/\tcg{1}/\tcg{1}		& \as & \vi[ ],		\\
+\tlp/\tcg{1}/\tcg{2}		& \as & \cri[ ],	\col[10ex] \tlp/\tcg{2}/\tcg{0}				& \as & \no[ ],		\\
+\tlp/\tcg{1}/\tcg{1}/\tcg{0}	& \as & \ao[ ],		\col[10ex] \tlp/\tcg{2}/\tcg{1}				& \as & \nei[ ]		\\
+\tlp/\tcg{1}/\tcg{1}/\tcg{1}	& \as & \ai[ ],
+\end{array}\tab[2ex]\right\} $$
+
+\subsection*{Conditional Ordering (fourth try)}
+
+Last issue: We may have our nine modular locations, but how do we order them?
+
+When I say \emph{order}, I don't just mean the locator pathnames in the above set, I mean what order do we evaluate
+our breakpoint tests? For composition chains such as:\,\footnote{Here I am using the contravariant (opposite order)
+composition operator: $ (f\,.\,g)(x) = g(f(x)) $. I am also using this operator to express (in this limited scope)
+partial composition as there should be no confusion in general.}
+$$ \left\{\begin{array}{r}
+value\ .\ act\ .\ combine\ .\ \cons,			\\
+next\ .\ \cons\hspace{0.6ex}
+\end{array}\right\} $$
+Testing necessarily proceeds in link order, that much is a given at least, but with separate chains which are otherwise
+independent of each other how do we sequence our evaluation order?\,\footnote{It's worth adding here that one other
+use for grammatical path notation is it can help to clarify which aspects of a computation are independent,
+further aiding algorithmic analysis.}
+
+This actually brings up the ideas of:
+\begin{center}
+\strong{series evaluation} \qquad \mbox{vs} \qquad \strong{parallel evaluation}
+\end{center}
+I don't want to get too much into this as it takes away from the purpose of the essay, but it would also be unfair to exclude
+the matter entirely. For the record, we will default to series evaluation, but the point worth bringing up as that the policy
+choice either way informs our model design from this point on.
+
+As for parallel evaluation, it's worth stating that as long as we eventually receive all input arguments in terms of
+$ combine $ and \texttt{cons} respectively, I don't foresee\footnote{Knock on wood as they say.} any issues regarding
+the order of these functions' evaluations. As for whether or not this operator is even worth splitting the workload in
+the first place, I suspect it is entirely dependent on the computational cost of the functions being used within the loop.
+
+In terms of series evaluation, the assumption is we have a single processor and have to evaluate things one at a time,
+thus bringing us back to our order of evaluation issue. As to this, I would first mention that without further contextual
+information some aspects of the sequential ordering don't actually matter here. All the same, we still need to pick an order.
+To that end, rather than arbitrarily picking one, let's look to how optimization constraints might force a solution.
+
+For me, the first example that comes mind is actually the breaking condition which checks if the $ precedent $ list is empty
+or not: It would be erroneous to call either \texttt{car} or \texttt{cdr} when the list was empty, and although we could run
+the same test before each of these functions were applied, in practice we tend to run this test only once so as to optimize
+out what is otherwise a redundant calculation. The problem with this is that the order of evaluation now matters: For example
+it's possible to place the test in the wrong location (between \texttt{car} and \texttt{cdr}) meaning we would at some point
+end up calling one of these two functions on an empty list.
+
+In anycase, all of this brings up the point that there's no best order of evaluation in general, and that our intended
+implementation should design for this. Truth be told, setting up code to allow for such variations would complicate this
+essay beyond its intended \emph{intuitive} explanation. As such, I instead choose here a default interpretation, known
+as the \strong{applicative order} of evaluation.\footnote{This order of evaluation is often used as default by interpreters
+and compilers when they're evaluating the source code functions given to them.} Effectively it's the same left-to-right
+enumeration style seen when parsing over a tree diagram.
+
+With the decision made, our loop model's fallback order of evaluation now becomes:
+$$ \def\arraystretch{1.1}\left\{\tab[2ex]\begin{array}{lcllcl}
+\tlp/\tcg{1}/\tcg{1}/\tcg{1}/\tcg{1}	& \as & \vi[ ],		\col[10ex] \tlp/\tcg{1}/\tcg{2}	& \as & \cri[ ],	\\
+\tlp/\tcg{1}/\tcg{1}/\tcg{1}/\tcg{0}	& \as & \vo[ ],		\col[10ex] \tlp/\tcg{1}/\tcg{0}	& \as & \co[ ],		\\
+\tlp/\tcg{1}/\tcg{1}/\tcg{1}		& \as & \ai[ ],		\col[10ex] \tlp/\tcg{2}/\tcg{1}	& \as & \nei[ ],	\\
+\tlp/\tcg{1}/\tcg{1}/\tcg{0}		& \as & \ao[ ],		\col[10ex] \tlp/\tcg{2}/\tcg{0}	& \as & \no[ ]		\\
+\tlp/\tcg{1}/\tcg{1}			& \as & \cli[ ],
+\end{array}\right\} $$
+This being read from top-to-bottom, left-to-right.
+
+As an auxiliary note, and if it helps, this can also be (informally) written as:
+$$ value\ .\ act \qmapsto combine\msbox{\,left} \qmapsto combine\msbox{\,right}
+\qmapsto \cons\msbox{\,left} \qmapsto next \qmapsto \cons\msbox{\,right} $$
+
+Finally, I want to make it clear before finishing this section that it is not my intention to lessen my design with
+this overspecialized order of evaluation. Rather, I would make the claim that no generality will be lost due to the
+modular nature of any implementation using the \texttt{stem} operators and their \texttt{cposes}. In these designs
+evaluative rearrangements of order may not be automated, but it is only a little extra work to extend such support.
+
+\section*{Implementing 1-Cycle Induction}
+
+As our specification is now complete, we are ready to implement the general 1-cycle operator using register induction
+grammar from the methodology section. In this case, we don't actually need a dual block, and can rely simply on
+the composite table, or an equivalent thereof.
+
+Our 1-cycle list induction operator is defined as follows:
+
+$$ \def\arraystretch{1.2}
+\small
+\tab[2.5cm] \begin{array}{lll}
+\multicolumn{3}{l}{\tab[-7.5em]\bfmbox{induct}\ \ \mbox{1-cycle\_operator}\ \ 1\mbox{-}cycle\_name\ \ \
+						  value\ \ act\ \ combine\ \ next}						\\[1ex]
+\multicolumn{3}{l}{\tab[-1.5ex] \begin{array}{llllll}
+				\test\vi? & policy_{0} & break_{0} \col[1em] \test\cri?& policy_{5} & break_{5}			\\
+				\test\vo? & policy_{1} & break_{1} \col[1em] \test\co? & policy_{6} & break_{6}			\\
+				\test\ai? & policy_{2} & break_{2} \col[1em] \test\nei?& policy_{7} & break_{7}			\\
+				\test\ao? & policy_{3} & break_{3} \col[1em] \test\no? & policy_{8} & break_{8}			\\
+				\test\cli?& policy_{4} & break_{4}
+				\end{array}}											\\[9ex]
+\multicolumn{3}{l}{\tab[-3.75em]\bfmbox{define}\ \ 1\mbox{-}cycle\_name\ \ resultant\ \ precedent}				\\[1ex]
+\multicolumn{3}{l}{\bfmbox{repeat}\ \ \infty\ \ (\,resultant,\ precedent\,)}							\\[2ex]
+
+\multicolumn{3}{l}{\alias\ \ (\,\locr,\ \locp\,)}										\\[2ex]
+
+\bfmbox{open}[\star]\ \ \locp		\col[5ex] \bfmbox{pass}				\col[5ex] \bfmbox{pass}			\\[1ex]
+\test\vi?	\col[5ex] \langle\,policy_{0},\ break_0,\ value\,\rangle		\col[5ex] \cont(value)			\\
+\test\vo?	\col[5ex] \langle\,policy_{1},\ break_1,\ \id\,\rangle			\col[5ex] \id				\\
+\test\ai?	\col[5ex] \langle\,policy_{2},\ break_2,\ act\,\rangle			\col[5ex] \cont(act)			\\
+\test\ao?	\col[5ex] \langle\,policy_{3},\ break_3,\ \id\,\rangle			\col[5ex] \id				\\
+\test\cli?	\col[5ex] \langle\,policy_{4},\ break_4,\ combine\,\rangle		\col[5ex] \cont(combine)		\\[1ex]
+
+\multicolumn{3}{l}{\bfmbox{closed}}												\\[2ex]
+
+\multicolumn{3}{l}{\assign\ \ curried\_combine}											\\[2ex]
+
+\bfmbox{open}[\star]\ \ \locr		\col[5ex] \bfmbox{pass}				\col[5ex] \bfmbox{pass}			\\[1ex]
+\test\cri?	\col[5ex] \langle\,policy_{5},\ break_5,\ curried\_combine\,\rangle	\col[5ex] \cont(curried\_combine)	\\
+\test\co?	\col[5ex] \langle\,policy_{6},\ break_6,\ \id\,\rangle			\col[5ex] \id				\\[1ex]
+
+\multicolumn{3}{l}{\bfmbox{closed}}												\\[2ex]
+
+\multicolumn{3}{l}{\assign\ \ curried\_cons\ \ cons}										\\[2ex]
+
+\bfmbox{open}[\star]\ \ \locp		\col[5ex] \bfmbox{pass}				\col[5ex] \bfmbox{pass}			\\[1ex]
+\test\nei?	\col[5ex] \langle\,policy_{7},\ break_7,\ next\,\rangle			\col[5ex] \cont(next)			\\
+\test\no?	\col[5ex] \langle\,policy_{8},\ break_8,\ \id\,\rangle			\col[5ex] \id				\\[1ex]
+\multicolumn{3}{l}{\bfmbox{closed}}												\\[2ex]
+
+\multicolumn{3}{l}{curried\_cons}												\\
+\multicolumn{3}{l}{\bfmbox{halt}}
+\end{array} $$
+I would hope that much of this induction is sufficiently clear and intuitive---or at least its meaning can be guessed
+at with some accuracy---but I shouldn't assume either.
+
+The first thing to note is the \strong{induct} keyword, which tells us we're defining a family of functions.
+The scope of induction operators ends with the keyword \strong{halt}. The first parameter of this induction
+is \texttt{1-cycle\_operator} which is the name of this particular operator. Its second parameter is
+$ 1\mbox{-}cycle\_name $ which is the name of the specific function we're defining---this is given that we're
+working within a family of such \emph{1-cycle operators}. Following that we have the parameters for the various
+$ \ value,\ act,\ combine,\ next\ $ functions of our model. After that we then have a whole lot of parameters
+which specify the breakpoints we might want to \texttt{test}. These parameters can be grouped as triples:
+$$ \mbox{test}?\tab[1cm] policy\tab[1cm] break $$
+Here we would tell our inductor whether or not we want a breakpoint \texttt{test} at the given location, and if so we
+then specify which $ policy $ and $ break $ functions to partially apply to the \emph{conditional continuation passing}
+function we're (potentially) building within the chain. In the case we don't want a break point, we switch to an alternative
+continuation passing function, which is made possible by using an \texttt{open} table, but we'll discuss that detail soon enough.
+Also, if we don't want a break point at all, the choices of $ policy $ and $ break $ then become moot, for which default values
+such as $ false $ and \texttt{id} can be provided.
+
+Next, we have the \strong{define} keyword where we are declaring that our $ 1\mbox{-}cycle\_name $ function is being defined.
+As it is a function it is expected to have its own arguments, which here are the $ \ resultant\ $ and $ \ precedent\ $ values
+of our model. As for the body of the function, it starts with a \strong{repeat} keyword previously introduced in \cite{nikfi}.
+This keyword says that the code which follows is to be repeated infinitely many times until its halting conditions are met.
+In many cases, the $ \infty $ modifier could be replaced with the more precise $ \ \length(precedent)\ $ which would guarantee
+it to halt, but for greater generality it's better to leave it as is.\footnote{If you'd like the option to specialize you could
+always add this as its own variable in a modified induction definition.}
+
+The first grammatical construct in the function body following \texttt{repeat} is the \texttt{alias} keyword which lets us
+\emph{pattern match} and locally name the input. It might seem redundant, but given this block of code will likely repeat itself,
+the values of any intermediate output may end up differing from the initial $ \ resultant\ $ and $ \ precedent\ $ input
+(which are assumed immutable).
+
+With the setup out of the way, we finally arrive at the core behaviour of the model. We've established the order of evaluation
+for breakpoints, but when translated into register induction grammar it becomes split into three blocks of \texttt{open} tables.
+The initial value at the beginning of each block can be translated into a continuation passing constant function to start the
+composition process.\footnote{This is made possible using the \emph{unit} component of the underlying continuation passing monad.}
+Each of these tables create an endoposition of functions, where the block decidedly ends with a curried function, to which we then
+\texttt{assign} a name for later reference. This much it should be pointed out is actually a convenience to make the instruction
+set more readable.
+
+Beyond that, we also need to discuss the modified form of \texttt{open}:
+$$ \bfmbox{open}[\star] $$
+What this keyword means is that instead of using the baseline composition operator [$ \circ $] to connect the respective column
+functions, we are now using the standard continuation passing endoposition. Monadic composition parallels its baseline, and even
+though we introduced register induction grammars as being implemented with \texttt{stem} functions and their \texttt{cposes},
+they can also readily be extended to endoposition style register induction tables by defining ``higher composition''
+\texttt{stem} extensions as well.
+
+The final thing to consider in this implementation is the use of identity functions. For starters, they are not labelled,
+and it is assumed that their respective \emph{domains} and \emph{codomains} can be inferred. In particular, unless specified
+the identity functions in the above algorithm also tend to be in continuation passing style. Beyond this, there are performance
+considerations: When we build a chain of endoposed functions, are we saying that identity functions are in the chain? Will
+they be called and applied unnecessarily? That generally seems wasteful, and weakens the appeal of this style of coding.
+
+Fortunately for us, this particular performance issue has been dealt with in \cite{nikfi}: Instead of using \texttt{stem}
+(or in this case \texttt{distem}) directly, we switch to an alternative within a known lattice, allowing the induction
+process to optimize out unnecessary identity compositions. Although the details won't be provided here, the lattice
+is as follows:
+
+%\begin{comment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+\begin{asy}
+unitsize(1cm);
+
+//
+
+pair p00 = (0,0);
+
+pair p10 = segment(p00, "SL", 1, 60);
+pair p11 = segment(p00, "SR", 1, 60);
+
+pair p20 = segment(p10, "SL", 1, 60);
+pair p21 = segment(p11, "SL", 1, 60);
+pair p22 = segment(p11, "SR", 1, 60);
+
+pair p30 = segment(p21, "SL", 1, 60);
+pair p31 = segment(p21, "SR", 1, 60);
+
+pair p40 = segment(p31, "SL", 1, 60);
+
+//
+
+pen linecolor = gray;
+
+draw(p00--p10, linecolor, MidArrow(size = 4));
+draw(p00--p11, linecolor, MidArrow(size = 4));
+
+draw(p10--p20, linecolor, MidArrow(size = 4));
+draw(p10--p21, linecolor, MidArrow(size = 4));
+draw(p11--p21, linecolor, MidArrow(size = 4));
+draw(p11--p22, linecolor, MidArrow(size = 4));
+
+draw(p20--p30, linecolor, MidArrow(size = 4));
+draw(p21--p30, linecolor, MidArrow(size = 4));
+draw(p21--p31, linecolor, MidArrow(size = 4));
+draw(p22--p31, linecolor, MidArrow(size = 4));
+
+draw(p30--p40, linecolor, MidArrow(size = 4));
+draw(p31--p40, linecolor, MidArrow(size = 4));
+
+//
+
+pen bordercolor = white;
+
+safeLabel("distem$_{\scriptscriptstyle\,(3,3)}$", shift(0.3,0)*p00, 1.00, 0.30, borderpen = bordercolor, bordertype = "box");
+
+safeLabel("stem$_{\scriptscriptstyle\,(2,3)}$", shift(0.25,0)*p10, 0.85, 0.30, borderpen = bordercolor, bordertype = "box");
+safeLabel("costem$_{\scriptscriptstyle\,(3,2)}$", shift(0.2,0)*p11, 1.00, 0.30, borderpen = bordercolor, bordertype = "box");
+
+safeLabel("pend$_{\scriptscriptstyle\,(1,3)}$", shift(0.4,0)*p20, 0.85, 0.30, borderpen = bordercolor, bordertype = "box");
+safeLabel("dihold$_{\scriptscriptstyle\,(2,2)}$", shift(0.3,0)*p21, 1.00, 0.30, borderpen = bordercolor, bordertype = "box");
+safeLabel("copend$_{\scriptscriptstyle\,(3,1)}$", p22, 1.00, 0.30, borderpen = bordercolor, bordertype = "box");
+
+safeLabel("hold$_{\scriptscriptstyle\,(1,2)}$", shift(0.25,0)*p30, 0.85, 0.30, borderpen = bordercolor, bordertype = "box");
+safeLabel("cohold$_{\scriptscriptstyle\,(2,1)}$", shift(0.2,0)*p31, 1.00, 0.30, borderpen = bordercolor, bordertype = "box");
+
+safeLabel("if$_{\scriptscriptstyle\,(1,1)}$", p40, 0.60, 0.30, borderpen = bordercolor, bordertype = "box");
+
+\end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\end{comment}
+
+\section*{Specializations}
+
+Let's build some 1-cycle list functions. We start with \texttt{map}:
+
+$$ \def\arraystretch{1.2}
+\small
+\tab[0.5cm] \begin{array}{llcl|l|l}
+\multicolumn{5}{l}{\tab[-0.5cm] \bfmbox{1-cycle\_operator}\ \ \mbox{map}}							\\[1ex]
+\multicolumn{5}{l}{\tab[2cm] value = \car \tab[1cm] act \tab[1cm] combine = \push \tab[1cm] next = \cdr}			\\[1ex]
+	& \test\vi?	& = true	&\col[0.25cm] policy_{0} = \isNull\ \locp	\col[0.25cm] break_{0} = \locr		\\
+	& \test\vo?	& = false	&\col[0.25cm] policy_{1} = false			\col[0.25cm] break_{1} = \id	\\
+	& \test\ai?	& = false	&\col[0.25cm] policy_{2} = false			\col[0.25cm] break_{2} = \id	\\
+	& \test\ao?	& = false	&\col[0.25cm] policy_{3} = false			\col[0.25cm] break_{3} = \id	\\
+	& \test\cli?	& = false	&\col[0.25cm] policy_{4} = false			\col[0.25cm] break_{4} = \id	\\
+	& \test\cri?	& = false	&\col[0.25cm] policy_{5} = false			\col[0.25cm] break_{5} = \id	\\
+	& \test\co? 	& = false	&\col[0.25cm] policy_{6} = false			\col[0.25cm] break_{6} = \id	\\
+	& \test\nei?	& = false	&\col[0.25cm] policy_{7} = false			\col[0.25cm] break_{7} = \id	\\
+	& \test\no? 	& = false	&\col[0.25cm] policy_{8} = false			\col[0.25cm] break_{8} = \id
+\end{array} $$
+This is followed by \texttt{fold}:
+$$ \def\arraystretch{1.2}
+\small
+\tab[0.5cm] \begin{array}{llcl|l|l}
+\multicolumn{5}{l}{\tab[-0.5cm] \bfmbox{1-cycle\_operator}\ \ \mbox{fold}}							\\[1ex]
+\multicolumn{5}{l}{\tab[2cm] value = \car \tab[1cm] act = \id \tab[1cm] combine \tab[1cm] next = \cdr}				\\[1ex]
+	& \test\vi?	& = true	&\col[0.25cm] policy_{0} = \isNull\ \locp	\col[0.25cm] break_{0} = \locr		\\
+	& \test\vo?	& = false	&\col[0.25cm] policy_{1} = false			\col[0.25cm] break_{1} = \id	\\
+	& \test\ai?	& = false	&\col[0.25cm] policy_{2} = false			\col[0.25cm] break_{2} = \id	\\
+	& \test\ao?	& = false	&\col[0.25cm] policy_{3} = false			\col[0.25cm] break_{3} = \id	\\
+	& \test\cli?	& = false	&\col[0.25cm] policy_{4} = false			\col[0.25cm] break_{4} = \id	\\
+	& \test\cri?	& = false	&\col[0.25cm] policy_{5} = false			\col[0.25cm] break_{5} = \id	\\
+	& \test\co? 	& = false	&\col[0.25cm] policy_{6} = false			\col[0.25cm] break_{6} = \id	\\
+	& \test\nei?	& = false	&\col[0.25cm] policy_{7} = false			\col[0.25cm] break_{7} = \id	\\
+	& \test\no? 	& = false	&\col[0.25cm] policy_{8} = false			\col[0.25cm] break_{8} = \id
+\end{array} $$
+And finally, we have \texttt{find}:
+$$ \def\arraystretch{1.2}
+\small
+\tab[0cm] \begin{array}{llcl|l|l}
+\multicolumn{5}{l}{\tab[0cm] \bfmbox{1-cycle\_operator}\ \ \mbox{find}}								\\[1ex]
+\multicolumn{5}{l}{\tab[1cm] value = \car \tab[1cm] act = \id \tab[1cm] combine = \push \tab[1cm] next = \cdr}			\\[1ex]
+	& \test\vi?	& = true	&\col[0.25cm] policy_{0} = \isNull\ \locp	\col[0.25cm] break_{0} = (\locr, \locp)	\\
+	& \test\vo?	& = true	&\col[0.25cm] policy_{1} = \mbox{match?}\ arg	\col[0.25cm] break_{1} = (\locr, \locp)	\\
+	& \test\ai?	& = false	&\col[0.25cm] policy_{2} = false		\col[0.25cm] break_{2} = \id		\\
+	& \test\ao?	& = false	&\col[0.25cm] policy_{3} = false		\col[0.25cm] break_{3} = \id		\\
+	& \test\cli?	& = false	&\col[0.25cm] policy_{4} = false		\col[0.25cm] break_{4} = \id		\\
+	& \test\cri?	& = false	&\col[0.25cm] policy_{5} = false		\col[0.25cm] break_{5} = \id		\\
+	& \test\co? 	& = false	&\col[0.25cm] policy_{6} = false		\col[0.25cm] break_{6} = \id		\\
+	& \test\nei?	& = false	&\col[0.25cm] policy_{7} = false		\col[0.25cm] break_{7} = \id		\\
+	& \test\no? 	& = false	&\col[0.25cm] policy_{8} = false		\col[0.25cm] break_{8} = \id
+\end{array} $$
+I would hope by now such detailed figures are largely straightforward, and so I won't explain how these specializations
+are read, but there is also a potential issue we need to discuss before concluding.
+
+In particular, if you're concerned about the scope of the variables $ \ \locr\ $, $ \ \locp\ $, and $ arg $
+(and the fact that we're breaking the \emph{abstraction} principle of design), you'd be right in your concern:
+These variable names are meant to be restricted to the body of the function definition, not as part of specializations
+declared outside the original. And yet, as this is still only an essay I am allowing these ill-formed expressions for
+the sake of conceptual clarity, and the fact that the broader issue can be expressed in terms of what's known as the
+\emph{signature problem}.
+
+The signature problem is actually straightforward to solve using register induction grammar. The explanation of the problem
+and its solution are given in \cite{nikfi}. Truth be told, I did not implement this solution in the above 1-cycle definition
+as again the goal of this essay is aimed more toward conceptual clarity, but once you're comfortable enough with how the
+algorithm works it's not difficult to extend it to safely designate bound variables which are otherwise outside of their
+respective scopes.
+
+In fact the signature problem also applies to the situation where we might want to designate the $ act $ and $ combine $
+function variables (of our looping model) differently: Notably, one might want to declare such variables as part of
+a 1-cycle function definition rather than as part of the inductor definition as we've currently done with our existing
+implementation. For example, there are contexts in implementing the \texttt{map} operator in which declaring $ act $ as
+a function argument makes more sense. At the same time, there are also contexts in implementing the \texttt{fold}
+operator in which declaring $ combine $ as a function argument then makes more sense. In anycase, the signature
+solution would allow us a modified 1-cycle inductor to do these things as well.\footnote{Too long don't read: We define
+an induction operator for the 1-cycle induction operator (viewed as a function).}
+
+With that said, register induction---the grammar that allows for the solution to the signature problem---is actually based
+off of a theory of computation coinciding with what I am calling \emph{concept theory}, which is a language describing concepts
+and associated terms such as \emph{specification; weak, refined, resolved specification}. In terms of practical programming,
+a compiler based off of concept theory would allow us to declare a variable as a weak specification, where we could then resolve
+its \emph{spec} as being a compile time or run time variable accordingly, which is to say \emph{when needed}.\footnote{Although
+such flexibility in a compiler is technically required to solve the signature problem, there are still workarounds in other
+genres of programming languages, to which the 1-cycle implementation offered in this essay is still a valuable design.}
+
+\section*{Conclusion}
+
+I normally have more to say in my essay conclusions, but for this one I've pretty much already said everything I wanted to say,
+with the exception of: Thank you, I hope this text was sufficiently clear, and that it was helpful to you. Take care.
+\ \\
+
+Pijariiqpunga.
+
+\vfill
+
+\begin{thebibliography}{99}
+\bibitem{hott} Homotopy Type Theory: Univalent Foundations of Mathematics. The Univalent Foundations Program (2013). 
+\bibitem{nikfs} D.~Nikpayuk. Toward the Semantic Reconstruction of Mathematical Functions (2020).\\
+    https://github.com/Daniel-Nikpayuk/Mathematics/blob/main/Essays/Function\%20Semantics/Version-Two/semantics.pdf
+\bibitem{nikfi} D.~Nikpayuk. Grammatical Elements of Function Induction (2020).\\
+    https://github.com/Daniel-Nikpayuk/Mathematics/blob/main/Essays/Function\%20Induction/Version-Two/induction.pdf
+\end{thebibliography}
+
+\end{document}
+

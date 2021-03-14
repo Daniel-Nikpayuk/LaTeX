@@ -1,0 +1,313 @@
+% Copyright 2018 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1cm,right=1cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{asymptote}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+
+\newcommand{\then}{\ensuremath{\quad\Longrightarrow\quad}}
+\newcommand{\quadbar}{\ensuremath{\quad |\quad}}
+\newcommand{\quadcomma}{\ensuremath{\quad ,\quad}}
+\newcommand{\equals}{\ensuremath{\quad =\quad}}
+\newcommand{\defequals}{\ensuremath{\quad :=\quad}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\newenvironment{proof}[1][Proof]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1:}]}{\end{trivlist}}
+\newenvironment{example}[1][Example]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{remark}[1][Remark]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+\newcommand{\qed}{\nobreak \ifvmode \relax \else
+      \ifdim\lastskip<1.5em \hskip-\lastskip
+      \hskip1.5em plus0em minus0.5em \fi \nobreak
+      \vrule height0.75em width0.5em depth0.25em\fi}
+
+\title{Concept Theory}
+\author{Daniel Nikpayuk}
+\date{April 15, 2018}
+\pagestyle{empty}
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{../cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+
+\ \\[0.5cm]
+
+$$ \begin{array}{rlrl}
+ \mbox{A \bfseries concept:}										\\
+													\\
+ \mbox{is a \bfseries model:}	&			&  \qquad\qquad \mbox{with a \bfseries filter:}	\\
+ & \left\{\begin{array}{rcl}
+   p_0	& :=		& /s_{0,0}/\ldots/s_{0,j}			\\
+   p_1	& :=		& /s_{1,0}/\ldots/s_{1,k}			\\
+         & \vdots	& 						\\
+   p_n	& :=		& /s_{n,0}/\ldots/s_{n,m}			\\
+   \end{array}\right\} && \left\{\begin{array}{c}
+   P_0(p_0,\ldots,p_n)							\\
+   P_1(p_0,\ldots,p_n)							\\
+   \vdots								\\
+   P_\ell(p_0,\ldots,p_n)						\\
+   \end{array}\right\}
+\end{array} $$
+
+A {\bfseries model} is a collection of \emph{paths} (each made up of \emph{steps}), while a {\bfseries filter} is a collection
+of \emph{properties} on those paths---paths can be bound to values, or can be said to relate to each other in some way.
+The model offers the syntax, while the filter provides the semantics.
+
+\ \\[0.5cm]
+
+Concept theory as a foundation for math/computing is oriented to be a language with more expressive grammar than existing set theories.
+For the sake of a casual explanation, you can think of concept theory as an alternative set theory with alternative constructions.
+This is to say: We can assume the axioms of \emph{finite set theory}, but instead of building constructs such as
+{\bfseries pairs, cartesian products, relations, functions}, etc. directly, we build {\bfseries concepts} and use concepts
+to construct everything else.
+
+My claim is that concepts are more expressive---especially in regards to programming languages---than existing set theories:
+$$ \begin{array}{lcllcll}
+\mbox{\bfseries concept:} \quad & := \quad & \{ &  \mbox{\bfseries model: } A & | & \mbox{\bfseries filter: } B & \}		\\
+\mbox{\bfseries subconcept}': \quad & := \quad & \{ & \mbox{\bfseries model: } A' & | & \mbox{\bfseries filter: } B' & \}	\\
+\mbox{\bfseries subconcept}'': \quad & := \quad & \{ & \mbox{\bfseries model: } A'' & | & \mbox{\bfseries filter: } B'' & \}	\\
+\end{array} $$
+where
+$$ \begin{array}{rcl}
+A & = & A'\cup A''		\\
+B & = & B'\cup B''		\\
+\end{array} $$
+The reason for my claim is that concepts fundamentally represent expressive grammatical \emph{syntax} rather than
+\emph{semantics} (in regards to linguistics). This is to say we can decompose a concept into arbitrary (even non-intuitive)
+components which offers a finer approach to practical constructions, potentially reducing constructive redundancy.
+Again this is relevant to a computational way of thinking.
+
+\newpage
+
+There are some philosophical differences between concept theory and set theory:
+\begin{itemize}
+\item {\bfseries finite representations:} I've already stated that for convenience we can assume finite set theory to define
+concepts. The reason we don't need anything more potent is because concept theory models language itself, and if you look at
+all the math notation (language) used to express infinite sets, the notation itself is finite. Concept theory adheres to
+this philosophy.
+\item {\bfseries narrative decompression (bootstrapping):} There are several design subtleties the various set theories
+don't generally consider. For example, in the narrative construction of the language, one would define a
+\emph{set theoretic function} as a specialized set theoretic relation. Now, a relation is made up of ordered pairs,
+but if you give it some thought, to access the elements of a pair, you need in some form or another two functions
+(projections), but functions aren't yet defined.
+
+The way in which this subtlety is navigated is never formally expressed in the axioms of set theory itself. It is deferred
+to the linguistic / philosophy side of things, where one starts thinking about the nature of using an internal language to
+talk about other external languages. Concept theory formally solves this style of problem within the language itself
+by means of bootstrapping which we'll get to shortly.
+\end{itemize}
+
+A practical comparison between set theory and concept theory is the construction of the natural numbers $ \mathbb{N} $.
+In set theory we define the set operator succ$ (x) := x \cup \{x\} $, then we define an inductive set $ \mathcal{I} $ as:
+\begin{enumerate}
+\item There exists an $ e \in \mathcal{I} $ ($ \mathcal{I} $ is non-empty),
+\item For all $ n \in \mathcal{I} $ we have succ$ (n) \in \mathcal{I} $.
+\end{enumerate}
+We then axiomatically assume such an \emph{inductive set} exists because we cannot prove it. Finally, we use such an
+inductive set to define the natural numbers to be a smallest such inductive set (using subsets and intersections).
+
+On the other hand\ldots
+
+\newpage
+
+In concept theory we start with concepts:
+$$ \mbox{\bfseries concept:} \quad = \quad \{\ \mbox{\bfseries model: } A\ |\ \mbox{\bfseries filter: } B\ \} $$
+$ A, B $ are finite sets, in particular the \emph{modelling} set is defined to contain {\bfseries paths} which
+themselves are made up of {\bfseries steps}. The \emph{filtering} set is defined to contain {\bfseries predicates}.
+So here's the thing, since concept theory privileges \emph{bootstrapping}, we want to define these and as many
+other ideas as we can internally to the language.
+
+As another part of the methodology then, it is common practice to define a ``type'' or ``kind'' of concept manually
+for a few single values, then automatically or recursively for the rest. For example the first three steps
+are defined as follows:
+$$ \begin{array}{lcllll}
+0 & := & \{\ \mbox{\bfseries model: } \emptyset & | & \mbox{\bfseries filter: } \emptyset & \}	\\
+1 & := & \{\ \mbox{\bfseries model: } \{0\} & | & \mbox{\bfseries filter: } \emptyset & \}	\\
+2 & := & \{\ \mbox{\bfseries model: } \{0,1\} & | & \mbox{\bfseries filter: } \emptyset & \}	\\
+\end{array} $$
+With $ 0,1 $ we now have boolean values, and with steps $ 0,1,2 $ we can now define boolean monoids: binary logical
+operators. This in turn would give us the basic logical \emph{implication} operator ($ \Rightarrow $), which we can
+then use to define our first function: the successor function. Finally, we can then define the remaining (first round
+of) steps which correspond to the natural numbers.
+
+From here, we can define more general paths because we can also locally define \emph{projection functions} and thus
+\emph{pairs}.  I have already worked out a computational narrative in building \emph{applicable objects, copairs,
+if-then-else operator, lists} (and their recursive operators), \emph{colists} (switch statements). All of this can
+be done rigorously all the while privileging bootstrapping.
+
+The one clear tradeoff to privileging bootstrapping as a value is when one prefers consistently defined types (such
+as functions): Once the scalable (universal) definition is given, we would need to show the previously defined
+manual instances also satisfy the universal definitions.
+
+\ \\[0.5cm]
+
+The intention of this essay is to demonstrate a universal property of mathematical functions
+that parallels the ``subsetting'' paradigm from Set Theory:
+$$ \{\,x\in A\ |\ P(x)\,\} $$
+Here we can view the set $ A $ as a \emph{model}, and the predicate $ P(x) $ as a \emph{filter}. The idea being
+presented then is that a function can be similarly decomposed into a model component followed by a filter component.
+
+For example a function such as:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p10 = segment(p00, "SL", 1, 20);
+ pair p11 = segment(p00, "SR", 1, 40);
+ pair p12 = segment(p00, "SR", 1, 60);
+ pair p13 = segment(p00, "SR", 1, 70);
+ 
+ pair p20 = segment(p12, "SL", 1, 20);
+ pair p21 = segment(p12, "SR", 1, 50);
+ 
+ //
+ 
+ draw(p00--p10);
+ draw(p00--p11);
+ draw(p00--p12);
+ draw(p00--p13);
+ 
+ draw(p12--p20);
+ draw(p12--p21);
+ 
+ //
+ 
+ label("$y_f=f(x_1,g(w),x_3)$:", (0,0.75), N);
+ 
+ safeLabel("$f$", p00, 0.25, 0.25);
+ 
+ safeLabel("$y_f$", p10, 0.25, 0.25);
+ safeLabel("$x_1$", p11, 0.25, 0.25);
+ safeLabel("$g$", p12, 0.25, 0.25);
+ safeLabel("$x_3$", p13, 0.25, 0.25);
+ 
+ safeLabel("$x_2$", p20, 0.25, 0.25);
+ safeLabel("$w$", p21, 0.25, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+can be defined conceptually as follows:
+
+$$ \begin{array}{rlrl}
+ \mbox{function \bfseries model:}	&			&  \qquad\qquad \mbox{function \bfseries filter:}	\\
+ & \left\{\begin{array}{rcl}
+   p_0	& :=		& /						\\
+   p_1	& :=		& /0						\\
+   p_2	& :=		& /1						\\
+   p_3	& :=		& /2						\\
+   p_4	& :=		& /2/0						\\
+   p_5	& :=		& /2/1						\\
+   p_6	& :=		& /3						\\
+   \end{array}\right\} && \left\{\begin{array}{rcl}
+   p_0	& =		& f						\\
+   p_1	& =		& y_f						\\
+   p_2	& =		& x_1						\\
+   p_3	& =		& g						\\
+   p_4	& =		& x_2						\\
+   p_5	& =		& w						\\
+   p_6	& =		& x_3						\\
+   \end{array}\right\}
+\end{array} $$
+The philosophical consequence of defining a function this way is that it is a \emph{relational} object.
+
+
+Let $ X $ be a non-empty set of \emph{paths}. A \emph{type} $ \mathcal{T} $ is defined as follows:
+$$ \mathcal{T} \subseteq \mathbb{P}(X) $$
+where $ \mathbb{P}(\cdot) $ is the \emph{powerset} of $ X $.
+In particular, for any $ \mathcal{I}\in\mathcal{T} $, $ \mathcal{I} $ is called an \emph{instance}
+of the given type, and any subset $ \mathcal{S}\subseteq\mathcal{T} $ is a \emph{subtype}.
+
+The advantage of this way of defining types---possessing an internal structure---is their respective paths allow us to define
+a \emph{filter algebra} by means of a path grammar, which allows us to express subtypes and instances as \emph{concepts}.
+In practice, many concepts correspond to subtypes, but as it's possible $ \mathbb{P}(X)\backslash\mathcal{T}\neq\emptyset $,
+concepts are a more general idea than a type.
+
+\begin{align*}
+\mbox{\bf byte type}		& \defequals (0+1)^8 \defequals \{\, \mu^m\sigma^n \quadbar 1\le m\le 8,\ 1\le n\le 2 \,\}		\\
+\mbox{\bf byte instance}	& \defequals \mathcal{I} \subseteq (0+1)^8 \quadcomma
+					     \mu^m\sigma^k\,,\ \mu^m\sigma^\ell \in \mathcal{I} \then k = \ell
+\end{align*}
+
+{\bf Algorithm} for defining (designing) concepts:
+
+\begin{enumerate}
+\item Given a concrete universal grammar, specify the type as a space of paths. For a byte,
+      we construct $ (0+1)^8 $ which is the eight term \emph{product} of the two term \emph{disjoint union} of objects $ 0, 1 $.
+
+      Here $ \mu $ is the product operator with $ \mu^m $ its $ m $th operand; $ \sigma $ the disjoint union operator
+      with $ \sigma^n $ its $ n $th operand. In particular $ \mu^m\sigma^n $ denotes a given path within the space $ (0+1)^8 $.
+\item Given a type, we specify its instances by constructing a predicate \emph{filter} which generates a family of subsets
+      of the space. Each subset of paths within the family is an instance.
+\end{enumerate}
+
+Consequences of this approach to {\bf type theory}:
+
+\begin{enumerate}
+\item Concept theory requires a concrete universal grammar for constructing spaces of paths. Fortunately much research
+      in type theory, category theory, homotopy type theory, and analytic combinatorics has already been done to that end.
+\item A concept generalizes the idea of a type as well as an instance. A concept is the dual of a filter---growing the filter
+      shrinks the concept. A concept representing a unique type instance is said to have its identity resolved. Filters are
+      specified by predicate logic, where the predicates are themselves concretely specified by the grammar used in constructing
+      the space of paths.
+\item Unresolved concepts are isomorphic to mutable data structures.
+\item By using paths as the medium of exchange in our design, we imply every concept \emph{as} data structure already has an
+      implicit natural coordinate system---a universal medium for navigating every subconcept as well as every path resolution
+      within the concept as type.
+\end{enumerate}
+
+Narrative:
+
+$$ \begin{array}{rclll}
+\mbox{\bf bit type}		& \defequals & \ 0+1
+				& \defequals & \{\, \sigma^n \quadbar 1\le n\le 2 \,\}							\\
+\mbox{\bf bit instance}		& \defequals & \mathcal{B} \subseteq (0+1)
+				& \quadcomma & \sigma^{n_1}\,,\ \sigma^{n_2} \in \mathcal{B} \then n_1 = n_2				\\
+																	\\
+\mbox{\bf word type}		& \defequals & (0+1)^N
+				& \defequals & \{\, \mu^m\sigma^n \quadbar 1\le m\le N,\ 1\le n\le 2 \,\}				\\
+\mbox{\bf word instance}	& \defequals & \mathcal{W} \subseteq (0+1)^N
+				& \quadcomma & \mu^m\sigma^{n_1}\,,\ \mu^m\sigma^{n_2} \in \mathcal{W} \then n_1 = n_2			\\
+																	\\
+\mbox{\bf address type}		& \defequals & (0+1)^{NM}
+				& \defequals & \{\, \mu^\ell\mu^m\sigma^n \quadbar 1\le \ell\le M,\ 1\le m\le N,\ 1\le n\le 2 \,\}	\\
+\mbox{\bf address instance}	& \defequals & \mathcal{A} \subseteq (0+1)^{NM}
+				& \quadcomma & \mu^\ell\mu^m\sigma^{n_1}\,,\ \mu^\ell\mu^m\sigma^{n_2} \in \mathcal{A} \then n_1 = n_2	\\
+																	\\
+\mbox{\bf tree type}		& \defequals & L(0+1)^{NM}
+				& \defequals & \{\, \sigma^k\mu^\ell\mu^m\sigma^n \quadbar
+					       1\le k\le L, 1\le \ell\le M,\ 1\le m\le N,\ 1\le n\le 2 \,\}				\\
+\mbox{\bf tree instance}	& \defequals & \mathcal{T} \subseteq L(0+1)^{NM}
+				& \quadcomma & \sigma^k\mu^\ell\mu^m\sigma^{n_1}\,,\ \sigma^k\mu^\ell\mu^m\sigma^{n_2}
+					       \in \mathcal{T} \then n_1 = n_2								\\
+\end{array} $$
+
+\end{document}

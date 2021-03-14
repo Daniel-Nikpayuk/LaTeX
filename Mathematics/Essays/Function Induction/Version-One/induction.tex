@@ -1,0 +1,1438 @@
+% Copyright 2020 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=2.5cm,right=2.5cm,top=2cm,bottom=2.5cm]{geometry}
+\usepackage{asymptote}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{verbatim}
+\usepackage{xcolor}
+
+\newcommand{\strong}[1]{{\bfseries #1}}
+\newcommand{\twoqquad}{\ensuremath{\qquad\qquad}}
+\newcommand{\threeqquad}{\ensuremath{\qquad\qquad\qquad}}
+\newcommand{\fourqquad}{\ensuremath{\qquad\qquad\qquad\qquad}}
+
+\newcommand{\dtab}{\hspace{1.14cm}}
+\newcommand{\stab}{\hspace{1.69cm}}
+\newcommand{\otab}{\hspace{1.85cm}}
+\newcommand{\btab}{\hspace{-1.85cm}}
+
+\newcommand{\samp}{& \hspace{0.15cm}}
+\newcommand{\lamp}{& \hspace{0.45cm}}
+
+\newcommand{\then}{\ensuremath{\quad\Longrightarrow\quad}}
+\newcommand{\qeq}{\ensuremath{\quad =\quad}}
+\newcommand{\qqeq}{\ensuremath{\qquad =\qquad}}
+\newcommand{\qdefeq}{\ensuremath{\quad :=\quad}}
+\newcommand{\qqdefeq}{\ensuremath{\qquad :=\qquad}}
+\newcommand{\qmapsto}{\ensuremath{\quad \mapsto \quad}}
+
+\newcommand{\vn}{\ensuremath{\varnothing}}
+\newcommand{\s}{\mbox{s}}
+\newcommand{\bv}[1][v]{\mathbf{#1}}
+
+\newcommand{\induct}[1]{\mbox{induct}_{\mbox{\scriptsize #1}}}
+
+\newcommand{\delay}{\mbox{delay}}
+\newcommand{\force}{\mbox{force}}
+\newcommand{\transit}{\mbox{transit}}
+\newcommand{\apply}{\mbox{apply}}
+\newcommand{\coapply}{\mbox{coapply}}
+
+\newcommand{\define}{\mbox{define}}
+\newcommand{\drop}{\mbox{drop}}
+\newcommand{\keep}{\mbox{keep}}
+\newcommand{\assign}[2]{#1\ \gets\ #2}
+
+\newcommand{\stem}{\mbox{stem}}
+\newcommand{\costem}{\mbox{costem}}
+\newcommand{\distem}{\mbox{distem}}
+
+\newcommand{\bind}[2]{\ensuremath{\textcolor{#1}{>\hspace{-1ex}>\!=_{\mbox{\scriptsize #2}}}}}
+
+\newcommand{\pass}[1][blue]{\bind{#1}{pass}}
+\newcommand{\copass}[1][blue]{\bind{#1}{copass}}
+\newcommand{\dipass}[1][blue]{\bind{#1}{dipass}}
+\newcommand{\lepass}[1][blue]{\bind{#1}{lepass}}
+\newcommand{\ripass}[1][blue]{\bind{#1}{ripass}}
+\newcommand{\fipass}[1][blue]{\bind{#1}{fipass}}
+\newcommand{\ficopass}[1][blue]{\bind{#1}{ficopass}}
+
+\newcommand{\post}[1][blue]{\bind{#1}{post}}
+\newcommand{\copost}[1][blue]{\bind{#1}{copost}}
+\newcommand{\dipost}[1][blue]{\bind{#1}{dipost}}
+\newcommand{\lepost}[1][blue]{\bind{#1}{lepost}}
+\newcommand{\ripost}[1][blue]{\bind{#1}{ripost}}
+\newcommand{\fipost}[1][blue]{\bind{#1}{fipost}}
+\newcommand{\ficopost}[1][blue]{\bind{#1}{ficopost}}
+
+\newcommand{\id}{\mbox{id}}
+\newcommand{\cons}{\mbox{cons}}
+\newcommand{\car}{\mbox{car}}
+\newcommand{\cdr}{\mbox{cdr}}
+\newcommand{\eq}{\mbox{eq?}}
+\newcommand{\isNull}{\mbox{isNull?}}
+
+\newcommand{\consx}[2]{\ensuremath{\cons(#1, #2)}}
+\newcommand{\carx}[1][precedent]{\ensuremath{\car(#1)}}
+\newcommand{\cdrx}[1][precedent]{\ensuremath{\cdr(#1)}}
+
+\title{Grammatical Elements\\of Function Induction}
+\author{Daniel Nikpayuk}
+\date{March 10, 2020}
+\pagestyle{empty}
+
+\begin{asydef}
+// this comment prevents a compilation bug.
+
+real direction(bool value)
+{
+	return value ? 1 : -1;
+}
+
+pair offset(pair current, string align, real x = 0.03)
+{
+	pair shifter =	(align == "E") ? (x, 0) :
+			(align == "N") ? (0, x) :
+			(align == "W") ? (-x, 0) :
+			(align == "S") ? (0, -x) : (0,0);
+
+	return shift(shifter)*current;
+}
+
+pair segment(pair current = (0,0), string align, real projection, real angle = 0)
+{
+	align = (align == "E") ? "EU" :
+		(align == "N") ? "NL" :
+		(align == "W") ? "WD" :
+		(align == "S") ? "SR" : align;
+
+	real base          = direction(substr(align, 0, 1) == "E" || substr(align, 0, 1) == "N");
+	real adjacent      = direction(substr(align, 1, 1) == "R" || substr(align, 1, 1) == "U") * Tan(angle);
+	pair initialVertex = (substr(align, 0, 1) == "E" || substr(align, 0, 1) == "W") ? (base, adjacent) : (adjacent, base);
+	pair scaledVertex  = scale(projection) * initialVertex;
+	pair shiftedVertex = shift(current)    * scaledVertex;
+
+	return shiftedVertex;
+}
+
+//
+
+void drawpath(path p)
+{
+	draw(p);
+
+	for (int k=0; k < size(p); ++k)
+	{
+		dot(point(p, k));
+	}
+}
+
+void safeLabel(picture pic = currentpicture, Label L, pair position, real width, real height,
+	align align = NoAlign, pen textpen = currentpen, pen borderpen = currentpen,
+	pen fillpen = white, filltype filltype = NoFill, string bordertype = "round")
+{
+	if (bordertype == "round")
+	{
+		pair w = position + (-width, 0);
+		pair e = position + ( width, 0);
+		pair n = position + (0, height);
+		pair s = position + (0,-height);
+
+		filldraw(pic, w{up}::n{right}::e{down}::s{left}::cycle, fillpen, borderpen);
+	}
+	else if (bordertype == "box")
+	{
+		pair sw = position + (-width,-height);
+		pair se = position + (-width, height);
+		pair nw = position + ( width,-height);
+		pair ne = position + ( width, height);
+
+		filldraw(pic, sw--se--ne--nw--cycle, fillpen, borderpen);
+	}
+
+	label(pic, L, position, align, textpen, filltype);
+}
+
+
+\end{asydef}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\section*{Abstract}
+
+In this essay I give an informal walk-through in how to build functions that build functions, and the grammar
+that allows for such possibilities.
+
+This is of theoretical importance as it provides a point of direction toward general induction operators for function types.
+It is also of practical importance as it offers a way to create inventories of variant\footnote{Sometimes \emph{variant}
+just means optimized variations.} functions without having to code each function manually.
+
+\section*{Philosophy}
+
+In Modern Type Theories there's a special function for each \emph{type} called the \strong{induction} function, which
+is also called \emph{dependent elimination}. As a rule, it effectively tells us what kind of functions are even possible
+for its given \emph{type} definition, but we can also think of it as the function used to build other functions acting
+on the given type. The philosophy of this essay takes inspiration from this formal version of induction and generalizes
+it as a concept to include pretty much any function that defines other functions.
+
+The question then becomes: How do we construct functions that construct functions? In a very broad sense, looking
+at programming languages, we use grammar to build functions, so it would make sense that our focus here should be
+on function building grammar.
+
+Beyond that, the major idea pushing the plot of this essay forward, so to speak, is that an \strong{interpretation}
+is the common thread between evaluating a function and constructing that same function. This is to say: If we can
+express how a function is evaluated, we can express how it is constructed. Informally, the only major difference
+between the two is that we \emph{read} the interpretation when evaluating, while we \emph{write} the interpretation
+when constructing.
+
+This of course is philosophy, not something that can be proven here. At the very least, it is still enough to
+motivate the following methodology.
+
+\section*{Methodology}
+
+Under the premise that an interpretation is the abstract intersection between function evaluation and function
+construction, the strategy in discovering \emph{construction grammar} is in fact to focus on isolating function
+evaluation grammar.\footnote{Another way to look at this: We are effectively translating automatic into manual.}
+Although not identical, the translation should be relatively straightforward from there. This is also a practical
+approach given how much literature already exists regarding interpreters, evaluators, compilers.
+
+Generally speaking this is the main methodology, unfortunately there are a few complications: Ideally we would like
+to go straight to known powerful versions of our intended construction grammar, but we quickly run into what I would
+call \strong{the signature problem}. Otherwise, our approach is to introduce basic versions of our construction
+grammar first---ones which don't have the signature problem---then use them to mitigate the signature problem.
+After that we can finally build the powerful versions of the grammar we seek.
+
+As for the signature problem, we start by implementing function signatures as tuples. This means we will want to look
+more closely at tuples themselves and how to build them. Notably, it's easier to define constructors for tuples of a fixed
+length, but less so for ones that allow for a few different lengths. For example, what if we want to be able to create various
+subtuples of a given fixed tuple? This is the core of the signature problem, and solving it allows us to extend our construction
+grammar to greater potential.
+
+In detail, the approach in this essay can be outlined as follows:
+
+\begin{enumerate}
+\item We introduce construction primitives (apply, delay, force, transit, if), along with conditional compositions
+      (coapply, stems, binds).
+\item We introduce function signatures and implement them as tuples, further requiring us to introduce tuple primitives
+      (cons, car, cdr, eq?).
+\item We extend the conditional compositions by solving the signature problem, also showing how more complex functions can be built.
+\end{enumerate}
+
+Beyond this, in terms of algorithmic analysis I will use what's called \strong{grammatical path theory} and its notation.
+I have researched and written this up in \cite{nikfs}. With that said, there is no formal requirement for the casual
+reader to have this prerequisite, and for that reason I have largely kept grammatical path theory explanations at
+an intuitive level---providing basic explanations when needed.
+
+\subsection*{nonlinear combinations}
+
+An induction function is one used to create all other functions for a given type, so if we now consider all such
+functions for their given type as a \emph{space}, how would we go about constructing and representing its elements?
+
+The traditional approaches are through \strong{modelling}: Either as emergent combinations which we'll here call
+\emph{primary} models, or submodels of those primaries, which we'll call \emph{secondary} models. For example,
+regarding emergent combinations, we have linear combinations within \emph{vector space theory}:
+$$ a_1\,\bv_1\ +\ \ldots\ +\ a_n\,\bv_n $$
+which represent all vectors in the \emph{span} of a basis. Notably this representation is considered to be
+a \strong{closed form}. To contrast this, we can take a primary model such as $ \mathbb{R}^2 $ and subset
+it to derive the submodel known as the unit closed disk:
+$$ \mathcal{D}\ :=\ \{\ (x,y)\in\mathbb{R}^2\ |\ x^2+y^2 \le 1\ \} $$
+My claim is that in theory we can represent the elements of a type's function space as either a primary or secondary
+model, but in practice both have their strengths and weaknesses and are better suited for different contexts.
+
+We'll start with the secondary submodelling approach: It is better suited for function design. It's one thing to build
+a function, but we have to know what to build in the first place---which often means we need to design then translate
+that design into a construction. I should mention that using submodelling for design is possibly my own bias,
+but I find having a single umbrella function as a model in this context really does help clarify its design.
+
+As for the primary emergent combination approach\footnote{Note, this in fact coincides with the idea of \emph{induction}
+itself.}: Due to the desire for performance it is usually a better fit when actually implementing our function construction.
+To emphasize this point---and in analogy to linear combinations where nothing is wasted in the construction---we will refer
+to such constructions here as \strong{nonlinear combinations}. We take the name \emph{nonlinear} because these functions
+are built exactly in that way---nonlinearly: They are combinations by means of function composition.
+
+The other advantage to taking this approach when implementing function definitions is that such combinations create
+a coded combinatorial inventory: We know what exactly should be in this space, allowing us to make room for its functions
+when we're organizing our code library. It also allows us to take a \strong{lazy policy} during implementation,
+as we are only required to build the functions we need when we need them. Later, down the road if we need more
+we already have a location for where they should be within our designs.
+
+\subsection*{divide and compress}
+
+Nonlinear combinations allow us to define functions by breaking them up into smaller more manageable functions,
+but in doing so we actually create a new problem for ourselves: \strong{Compression}, which plays a more active
+role in function definitions than we might realize.
+
+In fact we compress for two clear reasons: The first is just to make our human user notations easier to read and work with.
+The following function has a sufficiently complicated grammatical path representation such that we would want to refactor
+its information and hide any of the details we'd want to take for granted:
+
+% y = f(x) = x(x+1)^2 , canonical construction
+%\begin{comment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+
+ pair p00 = (0,0);
+
+ pair p10 = segment(p00, "S", 2);
+ pair p11 = segment(p10, "E", 6.5);
+
+ pair p20 = segment(p10, "S", 1);
+ pair p30 = segment(p20, "S", 1);
+ pair p40 = segment(p30, "S", 1);
+ pair p50 = segment(p40, "S", 1);
+
+ //
+
+ pair q00 = segment(p10, "EU", 11, 5);
+
+ pair q10 = segment(q00, "S", 1);
+ pair lq10 = offset(q10, "W", 0.06);
+ pair rq10 = offset(q10, "E", 0.06);
+
+ pair q20 = segment(q10, "SL", 1, 65);
+ pair lq20 = offset(q20, "W", 0.06);
+ pair rq20 = offset(q20, "E", 0.06);
+
+ pair q21 = segment(q10, "SL", 1, 40);
+ pair q22 = segment(q10, "SR", 1, 40);
+
+ pair q31 = segment(q22, "SL", 1, 45);
+ pair q32 = segment(q22, "SR", 1, 45);
+
+ pair q41 = segment(q31, "SL", 1, 30);
+ pair q42 = segment(q31, "SR", 1, 30);
+ pair q43 = segment(q32, "SL", 1, 30);
+ pair q44 = segment(q32, "SR", 1, 30);
+
+ //
+
+ draw(shift(-1.5,0)*p11--shift(1.5,0)*p11, red, Arrow);
+ draw(shift(0.4,-0.5)*p20--shift(0.4,0.5)*p20, red, Arrow);
+ draw(shift(0.4,-0.5)*p40--shift(0.4,0.5)*p40, red, Arrow);
+ 
+ //
+
+ pen stepcolor = gray;
+ pen bordercolor = heavygray;
+ 
+ draw(lq10--lq20, bordercolor);
+ draw(rq10--rq20, bordercolor);
+
+ draw(q10--q21, bordercolor);
+ draw(q10--q22, bordercolor);
+
+ draw(q22--q31, bordercolor);
+ draw(q22--q32, bordercolor);
+
+ draw(q31--q41, bordercolor);
+ draw(q31--q42, bordercolor);
+ draw(q32--q43, bordercolor);
+ draw(q32--q44, bordercolor);
+
+ //
+ 
+ label("$y = $", shift(0,-0.06)*p00, E);
+ label("$f$", shift(0.775,0)*p00, E, heavyblue);
+ label("$(x) = x(x+1)^2$", shift(1.015,0)*p00, E);
+
+ label("$(*, *, +, +, x, x, 1, x, 1)$", p10, E);
+
+ label("\scriptsize applicate", p11, N, red);
+
+ label("\scriptsize duplicate", shift(0.5,-0.1)*p20, E, red);
+
+ label("$(*, +, x, 1)$", p30, E);
+
+ label("\scriptsize prepare", shift(0.5,-0.1)*p40, E, red);
+
+ label("$(x)$", p50, E);
+
+ //
+
+ label("$f$:", q00, W, heavyblue);
+
+ label("\scriptsize $0$", shift(0.6,0)*q20, NE, stepcolor);
+ label("\scriptsize $1$", shift(0.2,0)*q21, NE, stepcolor);
+ label("\scriptsize $2$", shift(-0.2,0)*q22, NW, stepcolor);
+
+ label("\scriptsize $1$", shift(0.4,0.17)*q31, NE, stepcolor);
+ label("\scriptsize $2$", shift(-0.4,0.17)*q32, NW, stepcolor);
+
+ label("\scriptsize $1$", shift(0.2,0.17)*q41, NE, stepcolor);
+ label("\scriptsize $2$", shift(-0.2,0.17)*q42, NW, stepcolor);
+
+ label("\scriptsize $1$", shift(0.2,0.17)*q43, NE, stepcolor);
+ label("\scriptsize $2$", shift(-0.2,0.17)*q44, NW, stepcolor);
+
+ safeLabel("$*$", q10, 0.25, 0.25, borderpen = bordercolor);
+
+ safeLabel("$y$", q20, 0.25, 0.25, borderpen = bordercolor);
+ safeLabel("$x$", q21, 0.25, 0.25, borderpen = bordercolor);
+ safeLabel("$*$", q22, 0.25, 0.25, borderpen = bordercolor);
+
+ safeLabel("$+$", q31, 0.25, 0.25, borderpen = bordercolor);
+ safeLabel("$+$", q32, 0.25, 0.25, borderpen = bordercolor);
+
+ safeLabel("$x$", q41, 0.25, 0.25, borderpen = bordercolor);
+ safeLabel("$1$", q42, 0.25, 0.25, borderpen = bordercolor);
+ safeLabel("$x$", q43, 0.25, 0.25, borderpen = bordercolor);
+ safeLabel("$1$", q44, 0.25, 0.25, borderpen = bordercolor);
+
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\end{comment}
+This diagram is described as \emph{canonical}, in the sense that the tree component of this grammatical path notation
+is of maximum size. In anycase, if we go in the reverse direction of the mapping arrows, we're able to compress the
+function signature, first reducing redundancy, then hiding those values that are otherwise held constant, allowing
+us to simplify all the way down to $ (x) $.
+
+The second reason we compress is for computational performance. If you'll notice in the above diagram there is some
+redundancy with the $ (x+1) $ expressions, which if we calculated separately would be wasteful. In this case, if
+we were to again refactor the tree into a signature, we could take advantage of this repetition and simplify:
+
+% y = f(x) = x(x+1)^2 , optimized construction
+%\begin{comment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+
+ pair p00 = (0,0);
+
+ pair p10 = segment(p00, "S", 2);
+ pair p11 = segment(p10, "E", 6.5);
+
+ pair p20 = segment(p10, "S", 1);
+ pair p30 = segment(p20, "S", 1);
+ pair p40 = segment(p30, "S", 1);
+ pair p50 = segment(p40, "S", 1);
+ pair p60 = segment(p50, "S", 1);
+ pair p70 = segment(p60, "S", 1);
+  
+ //
+
+ pair r00 = segment(p10, "EU", 11, 5);
+
+ pair r10 = segment(r00, "S", 1);
+ pair lr10 = offset(r10, "W", 0.06);
+ pair rr10 = offset(r10, "E", 0.06);
+
+ pair r20 = segment(r10, "SL", 1, 65);
+ pair lr20 = offset(r20, "W", 0.06);
+ pair rr20 = offset(r20, "E", 0.06);
+
+ pair r21 = segment(r10, "SL", 1, 40);
+ pair r22 = segment(r10, "SR", 1, 40);
+
+ pair r31 = segment(r22, "SL", 1, 45);
+ pair r32 = segment(r22, "SR", 1, 45);
+  
+ //
+
+ draw(shift(-1.5,0)*p11--shift(1.5,0)*p11, red, Arrow);
+ draw(shift(0.4,-0.5)*p20--shift(0.4,0.5)*p20, red, Arrow);
+ draw(shift(0.4,-0.5)*p40--shift(0.4,0.5)*p40, red, Arrow);
+ draw(shift(0.4,-0.5)*p60--shift(0.4,0.5)*p60, red, Arrow);
+  
+ //
+
+ pen stepcolor = gray;
+ pen bordercolor = heavygray;
+ 
+ draw(lr10--lr20, bordercolor);
+ draw(rr10--rr20, bordercolor);
+
+ draw(r10--r21, bordercolor);
+ draw(r10--r22, bordercolor);
+
+ draw(r22--r31, bordercolor);
+ draw(r22--r32, bordercolor);
+
+ //
+ 
+ label("$y = $", shift(0,-0.06)*p00, E);
+ label("$f$", shift(0.775,0)*p00, E, heavyblue);
+ label("$(x) = x(x+1)^2$", shift(1.015,0)*p00, E);
+ 
+ label("$(*, *, x,\ x+1,\ x+1)$", p10, E);
+
+ label("\scriptsize applicate", p11, N, red);
+
+ label("\scriptsize duplicate", shift(0.5,-0.1)*p20, E, red);
+
+ label("$(*, x,\ x+1)$", p30, E);
+
+ label("\scriptsize decompress", shift(0.5,-0.1)*p40, E, red);
+
+ label("$(*, x)$", p50, E);
+
+ label("\scriptsize prepare", shift(0.5,-0.1)*p60, E, red);
+
+ label("$(x)$", p70, E);
+
+ //
+
+ label("$f$:", r00, W, heavyblue);
+
+ label("\scriptsize $0$", shift(0.6,0)*r20, NE, stepcolor);
+ label("\scriptsize $1$", shift(0.2,0)*r21, NE, stepcolor);
+ label("\scriptsize $2$", shift(-0.2,0)*r22, NW, stepcolor);
+
+ label("\scriptsize $1$", shift(0.4,0.17)*r31, NE, stepcolor);
+ label("\scriptsize $2$", shift(-0.4,0.17)*r32, NW, stepcolor);
+
+ safeLabel("$*$", r10, 0.25, 0.25, borderpen = bordercolor);
+
+ safeLabel("$y$", r20, 0.25, 0.25, borderpen = bordercolor);
+ safeLabel("$x$", r21, 0.25, 0.25, borderpen = bordercolor);
+ safeLabel("$*$", r22, 0.25, 0.25, borderpen = bordercolor);
+
+ safeLabel("$x+1$", r31, 0.65, 0.25, borderpen = bordercolor);
+ safeLabel("$x+1$", r32, 0.65, 0.25, borderpen = bordercolor);
+
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\end{comment}
+
+So far so good, but how then does compression become an issue?
+
+Compression works best with \strong{complete information}. Generally, we would look at the bigger picture all at
+once to find those repetitive patterns we'd want to compress. This becomes an issue when we \emph{divide and express}
+our above mentioned functions through nonlinear combination: By modularizing out simpler functions we create
+information silos---we isolate our ability to recognize redundant patterns across functions. We can still compress
+each component function, but our ability to compress overall, along with our compression ratios, will on average lessen.
+Can we mitigate this issue?
+
+Yes, fortunately. We mitigate this issue by realizing that the \strong{applicate} function above---which bijectively maps
+the \emph{raw} (uncompressed) signature content to the tree nodes---can be reinterpreted to handle \strong{just in time}
+compression: We equip our applicate function with the idea of ``lazy evaluation'' creating a kind of ``delayed applicate''.
+It has the same mapping pattern as before, but now it only maps as needed.
+
+The implication in this change is we can now map parts of the signature to the whole tree piece by piece---parts
+corresponding to component functions used to define the function whole. In this sense we have what I would
+call a \strong{scope signature}, a component of local memory that spans across each module function. In
+practice what this means is we can \emph{after the fact} push our compressions---otherwise redundant
+computations---onto this scope memory to be used across the range of function components.
+
+\section*{Conditional Composition}
+
+It's time to finally get started. In this section we seek to isolate grammar
+from function evaluators for reuse within our desired construction grammar.
+
+We begin with the most basic of evaluator primitives:
+$$ \apply(f, x) \qqdefeq f(x) $$
+which takes a function $ f $, and some value $ x $ and \emph{applies} them to get their output value. The first thing
+to realize about this evaluator in terms of how it can be translated into a constructor is to realize that if the value
+$ x $ is the output of another function $ g $ then the \strong{apply} operator effectively becomes composition:
+$$ \apply(f, g(x)) \qeq f(g(x)) \qeq f \circ g\,(x) $$
+
+Although interesting, this exact result isn't quite useful on its own. For one, we may wish to compose two functions
+without evaluating at a given value, but also, we want more flexibility in our ability to express our compositions.
+Even still, this apply operator can point us in the right direction. To that end, and to create more effective
+composition operators, let's go back to apply and decompose it:
+$$ \begin{array}{lrl}
+\delay(f, x)		& := & (f, x)				\\
+\force((f, x))		& := & f(x)				\\
+								\\
+\apply			&  = & \force \circ \delay		\\
+\end{array} $$
+The terminology for \strong{delay} and \strong{force} come from \cite{sicp}, and are otherwise key grammar when
+implementing \strong{normal order evaluation}---also known as \emph{lazy evaluation}---a style of programming
+that only evaluates the parts of a function that are actually used.
+
+As we've now decomposed \emph{apply}, all we're missing is the \strong{if} conditional
+$$ \mbox{if}\,(\,boolean,\ antecedent,\ consequent\,) $$
+to achieve our first point of constructive grammar. Here $ boolean $ is a truth value, when
+$ true $ this function returns the $ antecedent $, when $ false $ it returns the $ consequent $.
+
+\newpage
+
+We are now ready to introduce our first conditional composition operator.
+\ \\
+
+\noindent\strong{The coapply function:}
+%\begin{comment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+\begin{asy}
+unitsize(1cm);
+
+//
+
+pair p00 = (0,0);
+pair p10 = segment(p00, "S", 1.5);
+pair p20 = segment(p10, "S", 1);
+
+pair t00 = segment(p20, "SL", 1, 70);
+
+pair b00 = segment(p20, "S", 1);
+pair b10 = segment(b00, "SL", 1, 40);
+pair b11 = segment(b00, "SR", 1, 40);
+
+pair c00 = segment(p20, "SR", 1, 70);
+pair c10 = segment(c00, "SL", 1, 40);
+pair c11 = segment(c00, "SR", 1, 40);
+
+//
+
+pen stepcolor = gray;
+pen fillcolor = lightgray;
+pen bordercolor = heavygray;
+
+draw(p10--p20, bordercolor);
+draw(p20--t00, bordercolor);
+draw(p20--b00, bordercolor);
+draw(p20--c00, bordercolor);
+
+draw(b00--b10, bordercolor);
+draw(b00--b11, bordercolor);
+
+draw(c00--c10, bordercolor);
+draw(c00--c11, bordercolor);
+
+//
+
+label("coapply$(true?, d, e, f, g)$:", p00);
+
+label("\scriptsize $1$", shift(0.12, 0.4)*p20, stepcolor);
+
+label("\scriptsize $1$", shift(1.50, 0.40)*t00, stepcolor);
+
+label("\scriptsize $2$", shift(0.12, 0.42)*b00, stepcolor);
+label("\scriptsize $1$", shift(0.35, 0.20)*b10, stepcolor);
+label("\scriptsize $2$", shift(-0.36, 0.20)*b11, stepcolor);
+
+label("\scriptsize $3$", shift(-1.50, 0.40)*c00, stepcolor);
+label("\scriptsize $1$", shift(0.35, 0.20)*c10, stepcolor);
+label("\scriptsize $2$", shift(-0.35, 0.20)*c11, stepcolor);
+
+safeLabel("force", p10, 0.60, 0.25, borderpen = bordercolor);
+safeLabel("if", p20, 0.25, 0.25, borderpen = bordercolor);
+
+safeLabel("$true?$", t00, 0.65, 0.26, borderpen = bordercolor);
+
+safeLabel("delay", b00, 0.65, 0.27, borderpen = bordercolor);
+safeLabel("$d$", b10, 0.25, 0.25, borderpen = bordercolor);
+safeLabel("$e$", b11, 0.25, 0.25, borderpen = bordercolor);
+
+safeLabel("delay", c00, 0.65, 0.27, borderpen = bordercolor);
+safeLabel("$f$", c10, 0.25, 0.27, borderpen = bordercolor);
+safeLabel("$g$", c11, 0.25, 0.25, borderpen = bordercolor);
+
+\end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\end{comment}
+
+If we were to code this in the LISP programming language style, it would be along these lines:
+$$ \hspace{-8cm}\begin{array}{l}
+(\mbox{define}\ (\coapply\ true?\ d\ e\ f\ g)			\\
+\ \ (\force							\\
+\ \ \ \ (\mbox{if}\ true?					\\
+\ \ \ \ \ (\delay\ d\ e)					\\
+\ \ \ \ \ (\delay\ f\ g))					\\
+))
+\end{array} $$
+
+This is a good start, but to evaluate more general functions we will need grammar that lets us not only compose
+two functions, but several. In the case of such \emph{chain compositions}, we mostly already have what we need,
+but we do still need to introduce one more function---the \strong{transit} operator:
+$$ \transit(g) \qqdefeq g \circ \force $$
+With this we can extend the coapply function to allow for \emph{continuation passing} within the first serious
+contender for our induction grammar.
+\ \\
+
+\noindent\strong{The stem function:}
+%\begin{comment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+\begin{asy}
+unitsize(1cm);
+
+//
+
+pair p00 = (0,0);
+pair p10 = segment(p00, "S", 1.5);
+pair p20 = segment(p10, "S", 1);
+
+pair t00 = segment(p20, "SL", 1, 70);
+
+pair b00 = segment(p20, "S", 1);
+pair b10 = segment(b00, "SL", 1, 40);
+pair b11 = segment(b00, "SR", 1, 45);
+
+pair c00 = segment(p20, "SR", 1, 78);
+pair c10 = segment(c00, "SL", 1, 60);
+pair c11 = segment(c00, "SR", 1, 60);
+pair c20 = segment(c10, "S", 1);
+pair c21 = segment(c11, "SL", 1, 45);
+pair c22 = segment(c11, "SR", 1, 45);
+
+//
+
+pen stepcolor = gray;
+pen fillcolor = lightgray;
+pen bordercolor = heavygray;
+
+draw(p10--p20, bordercolor);
+draw(p20--t00, bordercolor);
+draw(p20--b00, bordercolor);
+draw(p20--c00, bordercolor);
+
+draw(b00--b10, bordercolor);
+draw(b00--b11, bordercolor);
+
+draw(c00--c10, bordercolor);
+draw(c00--c11, bordercolor);
+draw(c10--c20, bordercolor);
+draw(c11--c21, bordercolor);
+draw(c11--c22, bordercolor);
+
+//
+
+label("stem$(true?, d, e, f, g, h)$:", p00);
+
+label("\scriptsize $1$", shift(0.12, 0.4)*p20, stepcolor);
+
+label("\scriptsize $1$", shift(1.45, 0.38)*t00, stepcolor);
+
+label("\scriptsize $2$", shift(0.12, 0.41)*b00, stepcolor);
+label("\scriptsize $1$", shift(0.36, 0.20)*b10, stepcolor);
+label("\scriptsize $2$", shift(-0.43, 0.20)*b11, stepcolor);
+
+label("\scriptsize $3$", shift(-2.52, 0.37)*c00, stepcolor);
+label("\scriptsize $1$", shift(0.87, 0.20)*c10, stepcolor);
+label("\scriptsize $2$", shift(-0.77, 0.20)*c11, stepcolor);
+
+label("\scriptsize $1$", shift(0.12, 0.4)*c20, stepcolor);
+label("\scriptsize $1$", shift(0.40, 0.15)*c21, stepcolor);
+label("\scriptsize $2$", shift(-0.40, 0.15)*c22, stepcolor);
+
+safeLabel("force", p10, 0.60, 0.25, borderpen = bordercolor);
+safeLabel("if", p20, 0.25, 0.25, borderpen = bordercolor);
+
+safeLabel("$true?$", t00, 0.65, 0.26, borderpen = bordercolor);
+
+safeLabel("delay", b00, 0.65, 0.27, borderpen = bordercolor);
+safeLabel("$d$", b10, 0.25, 0.25, borderpen = bordercolor);
+safeLabel("$e$", b11, 0.25, 0.25, borderpen = bordercolor);
+
+safeLabel("delay", c00, 0.65, 0.27, borderpen = bordercolor);
+safeLabel("transit", c10, 0.80, 0.25, borderpen = bordercolor);
+safeLabel("delay", c11, 0.65, 0.27, borderpen = bordercolor);
+safeLabel("$f$", c20, 0.25, 0.27, borderpen = bordercolor);
+safeLabel("$g$", c21, 0.25, 0.25, borderpen = bordercolor);
+safeLabel("$h$", c22, 0.25, 0.25, borderpen = bordercolor);
+
+\end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\end{comment}
+In this case we branch as before, but if the boolean value is false and we return the \emph{consequent} instead of the
+\emph{antecedent}, we not only force the function and value pair $ g, h $, we also pass them as input to the function $ f $.
+
+In LISP style, and based off our above coapply definition, stem would be coded as:
+
+$$ \hspace{-6cm}\begin{array}{l}
+(\define\ (\stem\ true?\ d\ e\ f\ g\ h)						\\
+\ \ (\coapply\ true?\ d\ e\ (\transit\ f)\ (\delay\ g\ h))			\\
+)
+\end{array} $$
+The stem function is interesting in many ways in its own right,\footnote{I call it the stem function in analogy to
+\emph{stem cells} in biology. As a function model it can specialize to several important compositional patterns---such
+as recursion---known in existing computational theories.} but for our purposes here its greatest value is in its ability
+to chain compose with itself. For this reason, and to simplify notation a little, it is worth introducing \strong{bind}
+operators.
+\ \\
+
+\noindent\strong{stem's bind operators:}
+$$ \begin{array}{rclcl}
+(\,true?,\ break,\ w,\ next\,)		& \pass	  & cont & \qqdefeq & \stem(\,true?,\ break,\ w,\ cont,\ next,\ -\,)		\\
+																\\
+(\,true?,\ break,\ w,\ x\,)		& \post	  & cont & \qqdefeq & \stem(\,true?,\ break,\ w,\ cont,\ -,\ x\,)		\\
+																\\
+(\,true?,\ next\,)			& \fipass & cont & \qqdefeq & \stem(\,true?,\ cont,\ -,\ cont,\ next,\ -\,)		\\
+																\\
+(\,true?,\ x\,)				& \fipost & cont & \qqdefeq & \stem(\,true?,\ cont,\ -,\ cont,\ -,\ x\,)
+\end{array} $$
+The operators here are variations that otherwise let us chain compose stem with alternate instances of itself.
+
+In particular, the \strong{pass} bind operator takes a tuple as left input and a single function $ cont $ as right
+input, and simply composes them such that---within the context of stem's meaning---when the boolean value $ true? $
+breaks\footnote{Branches from the intended main continuation.} we have specified stem's output $ w $ along with its
+continuation, aptly named $ break $. When on the other hand $ true? $ doesn't break then $ cont $ will act as the
+continuation of some specific function $ next $ applied to the variable input denoted $ - $.\footnote{The meaning
+of $ - $ is that it in fact indicates a new function which is created because even though a stem function is
+returned from pass, it was only partially applied so we are still left with a function of one variable,
+the aforementioned $ - $.}
+
+One thing we haven't discussed about general composition
+$$ f \circ g $$
+is that we can hold either functions $ f, g $ as constant, and we end up with two specializations: \emph{pre-composition}
+and \emph{post-composition}. This is where \strong{post} bind comes in: It is identical in meaning to the pass bind,
+but unlike pass which \emph{passes} the variable, post bind applies a fixed value $ x $ to the variable. This of
+course implies that the variable $ - $ signifies a function.
+
+Finally, the \strong{fipass} and \strong{cofipass} are specializations which we will discuss when we introduce the
+\emph{distem} function, but for the now let's continue with our construction grammar. The biggest value of the bind
+operators is they allow us to create very clean grammar for conditional chain compositions:\footnote{If you're comfortable
+with Category Theory, this works because there is a \emph{monad} buried within the continuation passing of stem.}
+$$ \begin{array}{lr}
+(\,true?_0,\ break_0,\ w_0,\ f_0\,)				& \quad\pass		\\
+(\,true?_1,\ break_1,\ w_1,\ f_1\,)				& \quad\pass		\\
+(\,true?_2,\ break_2,\ w_2,\ f_2\,)				& \quad\pass		\\
+
+\hspace{2cm}\vdots									\\
+
+(\,true?_n,\ break_n,\ w_n,\ f_n\,)				& \quad\pass		\\
+\hspace{1ex}\,\id\ \ x
+\end{array} $$
+Hidden within this sequence is a chain composition because when all $ break $s fail we end up with:
+$$ f_n \circ f_{n-1} \circ \ldots \circ f_1 \circ f_0\,(x) $$
+
+Let's figure this notation out a little though as it might not be entirely straightforward.
+In terms of theory the meaning of this chain can be rewritten as follows:
+$$ \begin{array}{lcl}
+		&   & \stem(\,true?_0,\ break_0,\ w_0,\ cont_0,\ f_0,\ x\,)					\\
+cont_0		& = & \stem(\,true?_1,\ break_1,\ w_1,\ cont_1,\ f_1,\ -\,)					\\
+cont_1		& = & \stem(\,true?_2,\ break_2,\ w_2,\ cont_2,\ f_2,\ -\,)					\\
+
+		&\vdots&											\\
+
+cont_{n-1}	& = & \stem(\,true?_n,\ break_n,\ w_n,\ cont_n,\ f_n,\ -\,)					\\
+cont_n		& = & \id
+\end{array} $$
+The main idea is we actually start at the end with the identity function $ \id $, and compose
+our chain of binds that way---binds being right associative. We then properly define each
+$$ cont_n,\ cont_{n-1},\ \ldots,\ cont_1,\ cont_0 $$
+in sequence, which again in theory should leave us with a single function which in this case takes the value $ x $.
+
+In practice, the strength of this notation is not only that it's theoretically sound, but that it can also be readily
+optimized: We don't need to start at the end of this chain and compose backwards, the nature of the stem function
+is such that we can evaluate the conditional at the beginning and branch to the appropriate output. In the case
+that the $ break $ fails, the output just continues with the next tuple in line. In fact, given the regularity
+of the interpretation here we could simplify this whole sequence into the following formal grammatical pattern:
+$$ \begin{array}{llll}
+\mbox{\bfseries pass}\ \ x				\\
+true?_0 & break_0 & w_0 & f_0				\\
+true?_1 & break_1 & w_1 & f_1				\\
+true?_2 & break_2 & w_2 & f_2				\\
+
+	 & \hspace{2em}\vdots				\\
+
+true?_n & break_n & w_n & f_n
+\end{array} $$
+which can be readily implemented within several existing programming languages. That is the stem function, and its binds.
+
+Next, and for convenience as well as performance, it is also worth introducing the \strong{costem} function.
+\ \\
+
+\noindent\strong{The costem function:}
+
+%\begin{comment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+\begin{asy}
+unitsize(1cm);
+
+//
+
+pair p00 = (0,0);
+pair p10 = segment(p00, "S", 1.5);
+pair p20 = segment(p10, "S", 1);
+
+pair t00 = segment(p20, "SL", 1, 70);
+
+pair b00 = segment(p20, "S", 1);
+pair b10 = segment(b00, "SL", 1, 40);
+pair b11 = segment(b00, "SR", 1, 60);
+pair b20 = segment(b10, "S", 1);
+pair b21 = segment(b11, "SL", 1, 40);
+pair b22 = segment(b11, "SR", 1, 40);
+
+pair c00 = segment(p20, "SR", 1, 78);
+pair c10 = segment(c00, "SL", 1, 40);
+pair c11 = segment(c00, "SR", 1, 40);
+
+//
+
+pen stepcolor = gray;
+pen fillcolor = lightgray;
+pen bordercolor = heavygray;
+
+draw(p10--p20, bordercolor);
+draw(p20--t00, bordercolor);
+draw(p20--b00, bordercolor);
+draw(p20--c00, bordercolor);
+
+draw(b00--b10, bordercolor);
+draw(b00--b11, bordercolor);
+draw(b10--b20, bordercolor);
+draw(b11--b21, bordercolor);
+draw(b11--b22, bordercolor);
+
+draw(c00--c10, bordercolor);
+draw(c00--c11, bordercolor);
+
+//
+
+label("costem$(true?, d, e, f, g, h)$:", p00);
+
+label("\scriptsize $1$", shift(0.12, 0.4)*p20, stepcolor);
+
+label("\scriptsize $1$", shift(1.47, 0.38)*t00, stepcolor);
+
+label("\scriptsize $2$", shift(0.12, 0.42)*b00, stepcolor);
+label("\scriptsize $1$", shift(0.50, 0.38)*b10, stepcolor);
+label("\scriptsize $2$", shift(-0.93, 0.38)*b11, stepcolor);
+
+label("\scriptsize $1$", shift(0.12, 0.4)*b20, stepcolor);
+label("\scriptsize $1$", shift(0.35, 0.20)*b21, stepcolor);
+label("\scriptsize $2$", shift(-0.35, 0.20)*b22, stepcolor);
+
+label("\scriptsize $3$", shift(-2.45, 0.37)*c00, stepcolor);
+label("\scriptsize $1$", shift(0.35, 0.20)*c10, stepcolor);
+label("\scriptsize $2$", shift(-0.35, 0.20)*c11, stepcolor);
+
+safeLabel("force", p10, 0.60, 0.25, borderpen = bordercolor);
+safeLabel("if", p20, 0.25, 0.25, borderpen = bordercolor);
+
+safeLabel("$true?$", t00, 0.65, 0.26, borderpen = bordercolor);
+
+safeLabel("delay", b00, 0.65, 0.27, borderpen = bordercolor);
+safeLabel("transit", b10, 0.80, 0.25, borderpen = bordercolor);
+safeLabel("delay", b11, 0.65, 0.27, borderpen = bordercolor);
+safeLabel("$d$", b20, 0.25, 0.25, borderpen = bordercolor);
+safeLabel("$e$", b21, 0.25, 0.25, borderpen = bordercolor);
+safeLabel("$f$", b22, 0.25, 0.27, borderpen = bordercolor);
+
+safeLabel("delay", c00, 0.65, 0.27, borderpen = bordercolor);
+safeLabel("$g$", c10, 0.25, 0.25, borderpen = bordercolor);
+safeLabel("$h$", c11, 0.25, 0.25, borderpen = bordercolor);
+
+\end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\end{comment}
+which in LISP would be:
+
+$$ \hspace{-6cm}\begin{array}{l}
+(\define\ (\costem\ true?\ d\ e\ f\ g\ h)					\\
+\ \ (\coapply\ true?\ (\transit\ d)\ (\delay\ e\ f)\ g\ h)			\\
+)
+\end{array} $$
+
+Note that costem could be defined using stem simply by negating the $ true? $ value, but again, for performance
+it's worth just defining them independently. Costem also has its own bind operators of course.
+\ \\
+
+\noindent\strong{costem's bind operators:}
+
+$$ \begin{array}{rclcl}
+(\,true?,\ next,\ break,\ w\,)		& \copass   & cont & \qqdefeq & \costem(\,true?,\ cont,\ next,\ -,\ break,\ w\,)	\\
+																\\
+(\,true?,\ x,\ break,\ w\,)		& \copost   & cont & \qqdefeq & \costem(\,true?,\ cont,\ -,\ x,\ break,\ w\,)		\\
+																\\
+(\,true?,\ next\,)			& \ficopass & cont & \qqdefeq & \costem(\,true?,\ cont,\ next,\ -,\ cont,\ -\,)	\\
+																\\
+(\,true?,\ x\,)				& \ficopost & cont & \qqdefeq & \costem(\,true?,\ cont,\ -,\ x,\ cont,\ -\,)
+\end{array} $$
+
+Finally, we end this section with the \strong{distem} function.
+\ \\
+
+\noindent\strong{The distem function:}
+
+%\begin{comment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+\begin{asy}
+unitsize(1cm);
+
+//
+
+pair p00 = (0,0);
+pair p10 = segment(p00, "S", 1.5);
+pair p20 = segment(p10, "S", 1);
+
+pair t00 = segment(p20, "SL", 1, 70);
+
+pair b00 = segment(p20, "S", 1);
+pair b10 = segment(b00, "SL", 1, 40);
+pair b11 = segment(b00, "SR", 1, 60);
+pair b20 = segment(b10, "S", 1);
+pair b21 = segment(b11, "SL", 1, 40);
+pair b22 = segment(b11, "SR", 1, 40);
+
+pair c00 = segment(p20, "SR", 1, 78);
+pair c10 = segment(c00, "SL", 1, 40);
+pair c11 = segment(c00, "SR", 1, 60);
+pair c20 = segment(c10, "S", 1);
+pair c21 = segment(c11, "SL", 1, 40);
+pair c22 = segment(c11, "SR", 1, 40);
+
+//
+
+pen stepcolor = gray;
+pen fillcolor = lightgray;
+pen bordercolor = heavygray;
+
+draw(p10--p20, bordercolor);
+draw(p20--t00, bordercolor);
+draw(p20--b00, bordercolor);
+draw(p20--c00, bordercolor);
+
+draw(b00--b10, bordercolor);
+draw(b00--b11, bordercolor);
+draw(b10--b20, bordercolor);
+draw(b11--b21, bordercolor);
+draw(b11--b22, bordercolor);
+
+draw(c00--c10, bordercolor);
+draw(c00--c11, bordercolor);
+draw(c10--c20, bordercolor);
+draw(c11--c21, bordercolor);
+draw(c11--c22, bordercolor);
+
+//
+
+label("distem$(true?, d, e, f, g, h)$:", p00);
+
+label("\scriptsize $1$", shift(0.12, 0.4)*p20, stepcolor);
+
+label("\scriptsize $1$", shift(1.47, 0.38)*t00, stepcolor);
+
+label("\scriptsize $2$", shift(0.12, 0.42)*b00, stepcolor);
+label("\scriptsize $1$", shift(0.50, 0.38)*b10, stepcolor);
+label("\scriptsize $2$", shift(-0.93, 0.38)*b11, stepcolor);
+
+label("\scriptsize $1$", shift(0.12, 0.4)*b20, stepcolor);
+label("\scriptsize $1$", shift(0.35, 0.20)*b21, stepcolor);
+label("\scriptsize $2$", shift(-0.35, 0.20)*b22, stepcolor);
+
+label("\scriptsize $3$", shift(-2.45, 0.37)*c00, stepcolor);
+label("\scriptsize $1$", shift(0.50, 0.38)*c10, stepcolor);
+label("\scriptsize $2$", shift(-0.93, 0.38)*c11, stepcolor);
+
+label("\scriptsize $1$", shift(0.12, 0.4)*c20, stepcolor);
+label("\scriptsize $1$", shift(0.35, 0.20)*c21, stepcolor);
+label("\scriptsize $2$", shift(-0.35, 0.20)*c22, stepcolor);
+
+safeLabel("force", p10, 0.60, 0.25, borderpen = bordercolor);
+safeLabel("if", p20, 0.25, 0.25, borderpen = bordercolor);
+
+safeLabel("$true?$", t00, 0.65, 0.26, borderpen = bordercolor);
+
+safeLabel("delay", b00, 0.65, 0.27, borderpen = bordercolor);
+safeLabel("transit", b10, 0.80, 0.25, borderpen = bordercolor);
+safeLabel("delay", b11, 0.65, 0.27, borderpen = bordercolor);
+safeLabel("$d$", b20, 0.25, 0.25, borderpen = bordercolor);
+safeLabel("$e$", b21, 0.25, 0.25, borderpen = bordercolor);
+safeLabel("$f$", b22, 0.25, 0.27, borderpen = bordercolor);
+
+safeLabel("delay", c00, 0.65, 0.27, borderpen = bordercolor);
+safeLabel("transit", c10, 0.80, 0.25, borderpen = bordercolor);
+safeLabel("delay", c11, 0.65, 0.27, borderpen = bordercolor);
+safeLabel("$d$", c20, 0.25, 0.25, borderpen = bordercolor);
+safeLabel("$g$", c21, 0.25, 0.25, borderpen = bordercolor);
+safeLabel("$h$", c22, 0.25, 0.25, borderpen = bordercolor);
+
+\end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\end{comment}
+in LISP:
+
+$$ \hspace{-4cm}\begin{array}{l}
+(\define\ (\distem\ true?\ d\ e\ f\ g\ h)								\\
+\ \ (\coapply\ true?\ (\transit\ d)\ (\delay\ e\ f)\ (\transit\ d)\ (\delay\ g\ h))			\\
+)
+\end{array} $$
+
+The importance of the distem operator is that it extends \emph{continuation passing} to both sides of the conditional:
+Instead of the possibility of $ break $ing as with stem and costem, it continues no matter what. This allows for
+\emph{chain branching}, thus increasing our expressivity to build functions greatly. Either way, distem has four
+bind operators of its own.
+\ \\
+
+\noindent\strong{distem's bind operators:}
+
+$$ \begin{array}{rclcl}
+(\,true?,\ next_1,\ next_2\,)		& \dipass & cont & \qqdefeq & \distem(\,true?,\ cont,\ next_1,\ -,\ next_2,\ -\,)	\\
+																\\
+(\,true?,\ x,\ next\,)			& \lepost & cont & \qqdefeq & \distem(\,true?,\ cont,\ -,\ x,\ next,\ -\,)		\\
+																\\
+(\,true?,\ next,\ w\,)			& \ripost & cont & \qqdefeq & \distem(\,true?,\ cont,\ next,\ -,\ -,\ w\,)		\\
+																\\
+(\,true?,\ x,\ w\,)			& \dipost & cont & \qqdefeq & \distem(\,true?,\ cont,\ -,\ x,\ -,\ w\,)
+\end{array} $$
+Here \emph{lepost} is short for ``left post'', while \emph{ripost} stands for ``right post''. This also means it's not
+unreasonable to alias lepost as \emph{ripass}, or to alias ripost as \emph{lepass}.\footnote{Truth be told I'm not fully
+satisfied with this nomenclature, but as any experienced programmer knows, naming is one of the harder problems in computing.}
+
+This by the way is the reason \strong{fipass, fipost, ficopass, ficopost} exist---they are technically distem binds, where one
+of the ``next'' functions is set to the identity function $ \id $.  We could implement these cases using distem of course,
+but for performance---given that $ \id $ doesn't actually do anything even though we're still required to waste resources
+calling it---it's better to implement them as special cases of stem and costem instead.
+
+\section*{Function Signatures}
+
+We've now introduced our basic function construction grammar. How then do we extend it? The most natural way would be to
+expand upon the input that $ true? $ accepts. At the moment it's just a boolean truth value, but in practice we might want
+it to be a function instead:
+$$ match?(\ldots) $$
+
+This is where the signature problem comes in: How do we define the signature\footnote{From the perspective of grammatical
+path theory, if $ match? $ accepts signature input, it implies it is defined as a composite function---the expectation
+is that it takes the signature and expands it before mapping to its given syntax tree. This by the way is a reasonable
+assumption as most context based boolean functions are built as composite to test their respective contexual information.}
+of such a function? Truth be told, the signature could be anything we want, and it sounds easy enough to build: We just
+compose our respective stem function of interest with the $ match? $ we want. Overall this works, except for when we want
+the signature to contain stem's other variables:
+$$ (d,\, e,\, f,\, g,\, h) $$
+This is to say: What if we wanted the ability to test the other input of our respective stem function?
+There's a few ways to solve this. We could encapsulate the whole stem function within another function and set the variable
+values accordingly, but this is somewhat wasteful. Another option is we could have simply defined our stem function to take
+the full signature as its input from the beginning, but what if we only want some of the variables:
+$$ (e,\, h) $$
+not all of them. In this case, when implementing $ match? $ we could still define it with the full signature and simply
+choose which variables to use and which to ignore, but this is also wasteful, you know?
+
+In some contexts these approaches are perfectly valid, but there are also \emph{mission critical} contexts where every
+extra computation counts. The point is, regardless of these alternatives, we should at least have the option to be able
+to further optimize if we choose. Fortunately, the major point of this essay is to show how we can actually create
+such variations of a function. To that end, let's figure out how to solve this \emph{signature problem} with the tools
+we've build so far. Before this though, we still need to look more closely at signatures themselves.
+
+In practical theory signatures are usually implemented as \strong{tuples}, where one can consider a tuple of a given
+length to be the recursive nesting of pairs:
+$$ (a, b, c, \ldots, z) = (a, (b, (c, (\ldots, (z,\ \mbox{null}\,) \ldots )))) $$
+where the final value is always the null tuple, or  $ 0\, $-tuple.
+
+In anycase, we should start by figuring out what tuple primitives
+are available to us. In fact, in addition to previously introduced primitives, there are four that will be shown as sufficient:
+$$ \{\,\mbox{cons, car, cdr, eq?}\,\} $$
+three of which are defined as follows:\footnote{The definition of $ \eq $ is slightly trickier as it requires recursion,
+but informally at least we can define it as follows:
+$ \eq(t_1,t_2)\ :=\ (\car(t_1) = \car(t_2))\ \wedge\ \eq(\,\cdr(t_1),\ \cdr(t_2)\,) $}
+$$ \begin{array}{lcl}
+\cons(x, y)	& := & (x, y)								\\
+\car((x,y))	& := & x								\\
+\cdr((x,y))	& := & y
+\end{array} $$
+The \strong{cons}, \strong{car}, \strong{cdr} terminology I borrow from the LISP programming language. In particular, cons
+is the pair or $ 1 $-tuple constructor, car is the first element projection function, and cdr the second element projection
+function.\footnote{Truth be told, for the purposes of this essay we only actually need \strong{cons} and \strong{null},
+but given the importance of tuples here I thought it worth introducing the core basics for those who are unfamiliar
+either with the theory, or with LISP style nomenclature.} In coding literature the second element of a tuple is
+frequently referred to as the \emph{rest} of the tuple following the first element, which is a convention we
+will use in the following example.
+
+Before heading on we implement\footnote{In fact, the $ \eq $ function can be implemented this way as well.} a basic
+``length'' function in LISP style grammar with C style comments in order to demonstrate how these primitives can be used:
+$$ \hspace{-2cm}\begin{array}{lrl}
+(\mbox{define}\ (\mbox{length}'\ count\ tuple)			& \twoqquad // & \mbox{define length}'			\\
+\ \ (\mbox{if}\ (\eq\ tuple\ \mbox{null})			& \twoqquad // & \mbox{if } tuple == \mbox{null}	\\
+\ \           \ count						& \twoqquad // & \mbox{return } count			\\
+\ \           \ (\mbox{length}'\ (+\ count\ 1)\ (\cdr\ tuple))	& \twoqquad // & \mbox{else (recursively) call }	\\
+\ \ )								& \twoqquad // & \ (\mbox{length}'\ (count + 1)\ rest)	\\
+)
+\end{array} $$
+By the way, if this version of the tuple \emph{length} function is
+unfamiliar to you, the more intuitive interpretation is achieved as:
+$$ \mbox{length}(tuple)\ :=\ \mbox{length}'(0, tuple) $$
+
+Getting back to the signature problem, how then do we go about creating the variations of the following tuple:
+$$ (d,\, e,\, f,\, g,\, h) $$
+The variations---thirty-two to be exact---come from whether or not we include particular variables. We need a function
+where we input whether to \emph{keep} or \emph{drop} particular variables, and it creates the respective tuple for us.
+Now, if you recall from the methodology section, I discussed the idea that there are primary and secondary models,
+and that secondary or derived models are better suited for function design. Here is an example of that approach
+to modelling, applied to this particular tuple function:
+
+%\begin{comment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+\begin{asy}
+unitsize(1cm);
+
+//
+
+pair p00  = (0,0);
+
+pair p10  = segment(p00, "S", 1.25);
+
+pair d00 = segment(p10, "S", 1);
+pair d10 = segment(d00, "SL", 0.5, 70);
+pair d11 = segment(d00, "SR", 0.5, 70);
+
+pair e00 = segment(d11, "S", 1);
+pair e10 = segment(e00, "SL", 0.5, 70);
+pair e11 = segment(e00, "SR", 0.5, 70);
+
+pair f00 = segment(e11, "S", 1);
+pair f10 = segment(f00, "SL", 0.5, 70);
+pair f11 = segment(f00, "SR", 0.5, 70);
+
+pair g00 = segment(f11, "S", 1);
+pair g10 = segment(g00, "SL", 0.5, 70);
+pair g11 = segment(g00, "SR", 0.5, 70);
+
+pair h00 = segment(g11, "S", 1);
+pair h10 = segment(h00, "SL", 0.5, 70);
+pair h11 = segment(h00, "SR", 0.5, 70);
+
+//
+
+pen stepcolor = gray;
+pen altcolor = gray;
+pen fillcolor = lightgray;
+pen bordercolor = heavygray;
+
+draw(p10--d00, bordercolor);
+draw(d00--d10, bordercolor);
+draw(d00--d11, bordercolor);
+
+draw(d11--e00, bordercolor);
+draw(e00--e10, bordercolor);
+draw(e00--e11, bordercolor);
+
+draw(e11--f00, bordercolor);
+draw(f00--f10, bordercolor);
+draw(f00--f11, bordercolor);
+
+draw(f11--g00, bordercolor);
+draw(g00--g10, bordercolor);
+draw(g00--g11, bordercolor);
+
+draw(g11--h00, bordercolor);
+draw(h00--h10, bordercolor);
+draw(h00--h11, bordercolor);
+
+//
+
+label("signature$\,(\,keep_d?,\ keep_e?,\ keep_f?,\ keep_g?,\ keep_h?\,)$:", shift(1,0)*p00);
+
+label("$ = \{\,\mbox{id or cdr}\,\}$", shift(1.75, 0)*p10, altcolor);
+label("$ = \{\,\mbox{id or cdr}\,\}$", shift(1.75, 0)*d11, altcolor);
+label("$ = \{\,\mbox{id or cdr}\,\}$", shift(1.75, 0)*e11, altcolor);
+label("$ = \{\,\mbox{id or cdr}\,\}$", shift(1.75, 0)*f11, altcolor);
+label("$ = \{\,\mbox{id or cdr}\,\}$", shift(1.75, 0)*g11, altcolor);
+
+label("\scriptsize $1$", shift(0.12, 0.41)*d00, stepcolor);
+label("\scriptsize $1$", shift(0.38, -0.05)*d10, stepcolor);
+label("\scriptsize $2$", shift(-0.38, -0.05)*d11, stepcolor);
+
+label("\scriptsize $1$", shift(0.12, 0.41)*e00, stepcolor);
+label("\scriptsize $1$", shift(0.38, -0.05)*e10, stepcolor);
+label("\scriptsize $2$", shift(-0.38, -0.05)*e11, stepcolor);
+
+label("\scriptsize $1$", shift(0.12, 0.41)*f00, stepcolor);
+label("\scriptsize $1$", shift(0.38, -0.05)*f10, stepcolor);
+label("\scriptsize $2$", shift(-0.38, -0.05)*f11, stepcolor);
+
+label("\scriptsize $1$", shift(0.12, 0.41)*g00, stepcolor);
+label("\scriptsize $1$", shift(0.38, -0.05)*g10, stepcolor);
+label("\scriptsize $2$", shift(-0.38, -0.05)*g11, stepcolor);
+
+label("\scriptsize $1$", shift(0.12, 0.41)*h00, stepcolor);
+label("\scriptsize $1$", shift(0.38, -0.05)*h10, stepcolor);
+label("\scriptsize $2$", shift(-0.63, -0.05)*h11, stepcolor);
+
+safeLabel(" ", p10, 0.25, 0.25, borderpen = bordercolor, fillpen = fillcolor);
+
+safeLabel("cons", d00, 0.50, 0.25, borderpen = bordercolor);
+safeLabel("$d$", d10, 0.25, 0.25, borderpen = bordercolor);
+safeLabel(" ", d11, 0.25, 0.25, borderpen = bordercolor, fillpen = fillcolor);
+
+safeLabel("cons", e00, 0.50, 0.25, borderpen = bordercolor);
+safeLabel("$e$", e10, 0.25, 0.25, borderpen = bordercolor);
+safeLabel(" ", e11, 0.25, 0.25, borderpen = bordercolor, fillpen = fillcolor);
+
+safeLabel("cons", f00, 0.50, 0.25, borderpen = bordercolor);
+safeLabel("$f$", f10, 0.25, 0.27, borderpen = bordercolor);
+safeLabel(" ", f11, 0.25, 0.25, borderpen = bordercolor, fillpen = fillcolor);
+
+safeLabel("cons", g00, 0.50, 0.25, borderpen = bordercolor);
+safeLabel("$g$", g10, 0.25, 0.25, borderpen = bordercolor);
+safeLabel(" ", g11, 0.25, 0.25, borderpen = bordercolor, fillpen = fillcolor);
+
+safeLabel("cons", h00, 0.50, 0.25, borderpen = bordercolor);
+safeLabel("$h$", h10, 0.25, 0.25, borderpen = bordercolor);
+safeLabel("null", h11, 0.50, 0.25, borderpen = bordercolor);
+
+\end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\end{comment}
+Here, each $ keep? $ variable is meant to be set to either \emph{id} or \emph{cdr}, where \emph{id} corresponds to
+\emph{keep} and \emph{cdr} corresponds to \emph{drop}.  You'll notice the inefficiencies in this function definition,
+there's a lot of unnecessary calculations to achieve the desired effects, but it does offer a starting point.
+
+In fact the above model points out that we're not trying to build the tuples themselves, we're trying to build functions
+that build these tuples. When we look at it this way, it becomes readily translateable into our conditional composition
+grammars from before:
+
+$$ \hspace{-5cm}\begin{array}{l}
+\mbox{\bfseries define}\ \induct{signature}(\keep_d?,\ \keep_e?,\ \keep_f?,\ \keep_g?,\ \keep_h?):	\\
+													\\
+\dtab \mbox{\bfseries ficopost}\ \id									\\
+													\\
+\stab \begin{array}{ll}
+\keep_d?	\lamp (\cons\ d)									\\
+\keep_e?	\lamp (\cons\ e)									\\
+\keep_f?	\lamp (\cons\ f)									\\
+\keep_g?	\lamp (\cons\ g)									\\
+\keep_h?	\lamp (\cons\ h)									\\
+\end{array}												\\
+\otab \mbox{null}
+\end{array} $$
+Here the various $ \keep $ variables are boolean valued, allowing us to directly express our policy for each of the original
+tuple variables $ d, e, f, g, h $. Otherwise the interpretation is that we test each policy, and if we choose to keep its
+given variable we $ \cons $ it and pass this \emph{curried} (partially applied) function as the next input for the function
+we're currently building, in effect currying it as well. Notice that each step before the last is building the final
+function in the same way it would be evaluated if it already existed. This works due to the way \emph{ficopost} is defined.
+
+Before heading on, I should mention if you're wondering whether or not the \emph{id} at the beginning of this chain is
+wasteful,\footnote{Since that's a point of design I've privileged throughout this essay.} technically yes, but it's also
+only one additional computation, and it can't be helped due to the nature of continuation passing. Keep in mind that in
+practice we wouldn't just be building a signature though, we'd be attaching it to some function, in which case we'd
+replace \emph{id} at the beginning with that function---very possibly a function that lets us store the respective
+output in memory as a new variable, assuming the language supports such a feature.
+
+\section*{Refined Conditional Composition}
+
+We now have everything we need to extend our inductive grammar.
+
+Let's say we wanted to redefine our \strong{stem} function to test one of its input values $ h $:
+$$ \hspace{-9cm}\begin{array}{l}
+(\mbox{define}\ (\stem\ match?\ d\ e\ f\ g\ h)			\\
+\ \ (\force							\\
+\ \ \ \ (\mbox{if}\ (match?\ h)					\\
+\ \ \ \ \ (\delay\ d\ e)					\\
+\ \ \ \ \ (\delay\ (\transit\ f)\ (\delay\ g\ h))		\\
+)))
+\end{array} $$
+
+We would first implement \emph{stem}'s induction operator:
+$$ \hspace{-5cm}\begin{array}{l}
+\mbox{\bfseries define}\ \induct{stem}(\keep_d?,\ \keep_e?,\ \keep_f?,\ \keep_g?,\ \keep_h?):		\\
+													\\
+\dtab \mbox{\bfseries ficopost}\ (\force\ \mbox{if}\ match?)						\\
+													\\
+\stab \begin{array}{ll}
+\keep_d?	\lamp (\cons\ d)									\\
+\keep_e?	\lamp (\cons\ e)									\\
+\keep_f?	\lamp (\cons\ f)									\\
+\keep_g?	\lamp (\cons\ g)									\\
+\keep_h?	\lamp (\cons\ h)									\\
+\end{array}												\\
+\otab \mbox{null}											\\
+													\\
+\otab (\delay\ d\ e)											\\
+\otab (\delay\ (\transit\ f)\ (\delay\ g\ h))
+\end{array} $$
+
+At which point, we'd simply define our variant \emph{stem} as:\footnote{Mind you,
+I'm intermixing a few notational styles here, I hope this much at this point can be forgiven.}
+$$ \hspace{-7cm}\begin{array}{l}
+(\mbox{define}\ (\stem_h\ match?\ d\ e\ f\ g\ h)					\\
+\ \ (\induct{stem}\ \ \drop_d\ \ \drop_e\ \ \drop_f\ \ \drop_g\ \ \keep_h)		\\
+)
+\end{array} $$
+
+One issue with the above I should bring up as we've nearly reached the end of this essay is the \strong{ambiguity}
+of curried composition. With this \emph{ficopost} construct, we have curried 
+$$ \mbox{if}\ match?\ - $$
+which is not only one partially applied function, it's two.
+Let's say we were then to compose some other function $ f $ similarly:
+$$ \mbox{if}\ match?\ f $$
+Does this mean we're composing $ f $ with \emph{if} or with the $ match? $ function? In our case, as we're sticking
+to a left-to-right tree enumeration pattern in terms of our curried construction, and our $ match? $ function only
+takes one (signature) input, the ambiguity can be resolved.
+
+\section*{Afterthoughts}
+
+We've reached the end of this essay.
+
+I titled this final section as \emph{afterthoughts} instead of the standard ``summary'' or ``conclusion''
+one might expect because for me the ideas presented here are still very much the subject of open research.
+With that said, I wanted to leave off in such a discussion.
+
+First of all, I feel I should note that in the methodology section I had introduced the idea that \emph{compression}
+is an issue in need of mitigation when constructing functions, and that scope signatures---made possible through delayed
+application---offers a solution.
+
+Yet, none of the inductive constructions actually made use of scope signatures or delayed application in the above
+examples. In fact none of them required the need for compression, but this should not be construed as being a poor
+choice in introducing the issue.  For the most part, the reason I did not pursue this line of research further in
+this text is because I have not settled on ``best practice'' grammar to \emph{push} variable/value bindings to the
+scope signature memory structure.\footnote{Currently the line of research which seems most promising is the realization
+that a memory system is just a function implemented in memoization style. In which case, grammar that lets us build
+functions that build such memoized functions already falls in line with the larger designs presented here.}
+
+Secondly, the other line of research worth bringing up is the \strong{ambiguity} issue raised in the previous section.
+Grammatical ambiguity is already a known issue and is explored within other theories such as pushdown automata and
+context free grammars, so it's not an unexpected issue. In our case we avoided the problem by assuming our grammatical
+construct \emph{ficopost} knew how many variables $ match? $ took and so could deduce when it became closed, or fully
+applied (instead of just partially applied). This is one possible way to solve this problem, but there are others,
+and as of yet I don't know which design is a best fit keeping in line with the larger narrative I'm trying to build here.
+
+Finally, it's also possible---and not unreasonable---that we might generally wish to construct other functions in more
+expressive ways that allow us to compose functions while not being restricted to this left-to-right compositional
+ordering constraint. In fact, there's no reason not to expand our function induction grammar to include such expressive
+possibilities, only that this too is an open problem. Again, I do not \emph{yet} know the best way forward.
+
+Beyond this, and out of respect to you the reader, I would like to say that all the grammar presented in this essay
+is new, even to me, and in terms of open research it's the sort of thing where I would like to construct many
+and various functions first, to become fluent in this paradigm, before I commit to further grammatical designs.
+
+Thank you.
+
+\vspace{\fill}
+
+\begin{thebibliography}{99}
+\bibitem{nikfs} D.~Nikpayuk. Toward the Semantic Reconstruction of Mathematical Functions (2020).\\
+    https://github.com/Daniel-Nikpayuk/Mathematics/blob/main/Essays/Function\%20Semantics/Version-Two/semantics.pdf
+\bibitem{sicp} H.~Abelson, G.J.~Sussman. Structure and Interpretation of Computer Programs (second edition).
+               The Massachusetts Institute of Technology Press (1996).
+\end{thebibliography}
+
+\end{document}
+

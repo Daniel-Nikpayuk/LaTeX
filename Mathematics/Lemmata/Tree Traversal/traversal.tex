@@ -1,0 +1,125 @@
+% Copyright 2015 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1cm,right=1cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+
+\newenvironment{proof}[1][Proof]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+\newcommand{\qed}{\nobreak \ifvmode \relax \else
+      \ifdim\lastskip<1.5em \hskip-\lastskip
+      \hskip1.5em plus0em minus0.5em \fi \nobreak
+      \vrule height0.5em width0.5em depth0.25em\fi}
+
+\pagestyle{empty}
+\begin{document}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+This short article provides a quick summary of how to traverse a tree data-structure by means of a space-minimal stack.
+
+Let us first define the set $ \mathbb{S} $:
+$$ \mathbb{S} := \bigcup_{n\in\mathbb{N}}\mathbb{N}^n $$
+to be the set of all finite length sequences of natural numbers, to be interpreted as all possible stacks.
+
+Let $ iterator $ be a tree-node iterator of a given tree:
+
+$$ iterator:=
+\left\{\begin{array}{cccl}
+\mbox{stack}		& \in\mathbb{S}			& : & \mbox{is a stack holding a path of the current iterator's node from its root.} \\
+			&				&   & \\
+\mbox{children}		& \in\mathbb{N}			& : & \mbox{is the number of children of th current iterator's node.} \\
+			&				&   & \\
+\mbox{push($ c $)}	& \mathbb{Z}\to\emptyset	& : & \mbox{if $ c < $ children, then this method moves the iterator forward} \\
+			&				&   & \mbox{by updating children to the number of its $ c $th child,} \\
+			&				&   & \mbox{as well as pushes $ c $ onto stack; otherwise it does nothing.} \\
+			&				&   & \\
+\mbox{pop($ h $)}	& \mathbb{S}\to\mathbb{N}	& : & \mbox{if $ h $.stack is a proper substack, this method moves backward} \\
+			&				&   & \mbox{by updating children to the number of its parent, as well as pops} \\
+			&				&   & \mbox{the top $ c $ of stack and returns it; otherwise it only returns} \\
+			&				&   & \mbox{the value $ -1 $.}
+\end{array}\right\} $$
+Notice it is implicitly assumed that the methods have a direct access means of determining the number of children of
+its parent or given child (assuming they exist) with no additional information than what is on its stack. Furthermore,
+notice $ pop $ takes what seems to be an unnecessary argument, but is in fact defined this way for \emph{genericicity}.
+This way, you can specify any node to be the ``root'' for this class of iterators. In practice I'm sure it could be coded
+as a compile-time parameter rather than a run-time parameter.
+
+If $ head $ is a node of a given tree, with $ next = 0 $ and $ move\in\mathbb{N} $ (arbitrary), then the given algorithm:
+
+------
+
+\hspace{5cm} current $ := $ head\\[0.1cm]
+
+\hspace{5cm} while (current $ \neq $ head $ \wedge $ move $ \neq -1\wedge $ next $ \neq $ head.children)
+
+\hspace{6cm} if (next $ < $ current.children)
+
+\hspace{7cm} current.push(move $ := $ next)
+
+\hspace{7cm} next $ := 0 $
+
+\hspace{6cm} else
+
+\hspace{7cm} move $ := -1 $
+
+\hspace{7cm} next $ := $ current.pop(head) $ + 1 $
+
+------
+
+\begin{enumerate}
+\item Halts for all finite trees, with final state next $ = $ head.children; move $ = -1 $; current $ = $ head.
+\item Traverses all nodes possessing $ head $ as a substack, furthermore, with a shortest number of moves.
+\end{enumerate}
+
+\begin{proof} The proof is by mathematical induction on the depth of the assumed tree (relative to \emph{head}).
+
+{\bfseries depth = 0:} We enter the while loop (move $ \neq -1 $). Given depth $ = 0 $ (head only) we know that
+head.children $ = 0 $ as well as next $ = 0 $. Thus by the initial assumptions, we move to the \emph{else} clause
+and set move $ = -1 $, but since current $ = $ head, by the definition of \emph{pop} we only return $ -1 $
+and thus next $ = 0 $.
+
+The conditions for the while loop are no longer satisified and thus the algorithm halts. By default, it is noted
+that we have iterated the one-and-only node possessing head as a substack, and that we didn’t actually move. This
+is to say the number of movements made in this iteration is zero, which is a minimum.
+
+And so concludes this portion of the proof.
+
+{\bfseries depth} $ \leq d\Longrightarrow $ {\bfseries depth }$ d + 1 $: We enter the while loop (move $ \neq -1 $).
+Given that depth $ = d + 1 > 0 $ we know that
+$$ 0 = \mbox{next} < \mbox{head.children} $$
+and so we enter the \emph{if} clause. We set move $ = $ next, and push move onto the stack. Finally, we set next $ = 0 $.
+
+This is to say, we visit the $ 0 $th child of head in a single move. From there---from an inductive step point
+of view---we have a new head, call it $ head0 $ with the conditions that next $ = 0 $ and move $ \in\mathbb{N} $.
+This subtree of head is of depth at most $ d $ and so by the inductive step we can reapply the algorithm to this
+subtree with head0 as its root and minimalistically traverse and halt in final state next $ = $ head0.children;
+move $ = -1 $; current $ = $ head0.
+
+We return our original loop conditions and find that we now enter it again: (current $ \neq $ head). We notice
+$$ \mbox{next} = \mbox{head0.children} \not < \mbox{current.children} $$
+and so we enter the \emph{else} clause. We set move $ = -1 $, pop $ 0 $ off the stack, set next $ = 1 $, and current $ = $ head.
+
+If there are no more children, we are done. If not, we repeat this process until next $ = $ head.children, in which
+case the algorithm halts. As such, we have visited each child and traversed it; moreover, for each such traversal, we
+made exactly one move from our head to the given child, and exactly one move back: thus we have made a bare minimum journey.
+In any case, the conditions are now met, completing our proof. \qed
+
+\end{proof}
+
+As a corollary, to traverse an entire tree, set head $ = $ root and for simplicity set move $ = $ 0. Any implementation
+of this algorithm requires minimal translation, for which a new proof only need consider the translation details.
+
+\end{document}
+

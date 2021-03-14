@@ -1,0 +1,17 @@
+#!/bin/bash
+
+FILE="Grambinatorics"
+
+if [ ! -d "tmp" ]; then mkdir "tmp"; fi
+cp "$FILE.tex" "tmp"
+cd "tmp"
+
+pdflatex "$FILE.tex"
+asy "$FILE-"*".asy"
+pdflatex "$FILE.tex"
+pdflatex "$FILE.tex"
+
+cp "$FILE.pdf" ..
+
+evince "$FILE.pdf"
+

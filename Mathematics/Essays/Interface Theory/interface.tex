@@ -1,0 +1,72 @@
+% Copyright 2018 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1cm,right=1cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amsmath}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\newenvironment{proof}[1][Proof]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1:}]}{\end{trivlist}}
+\newenvironment{example}[1][Example]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{remark}[1][Remark]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+\newcommand{\qed}{\nobreak \ifvmode \relax \else
+      \ifdim\lastskip<1.5em \hskip-\lastskip
+      \hskip1.5em plus0em minus0.5em \fi \nobreak
+      \vrule height0.75em width0.5em depth0.25em\fi}
+
+\title{Interface Theory}
+\author{Daniel Nikpayuk}
+\date{March 2, 2018}
+\pagestyle{empty}
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+The general formula for cleanly designing any interface:
+
+\begin{enumerate}
+\item Constructively define the structure being modeled.
+\item Define every possible substructure.
+\item Find all possible algebras (spaces) of substructures.
+\item Compress each substructure space, this is an interface.
+\item Determine how each interface relates to every other interface.
+\item Use chains of interfaces to stratify and mitigate levels of interface privilege,
+      this allows for the trade-off between optimization and safety.
+\end{enumerate}
+
+This is the direct approach, although in practice if your initial structure is infinite in size, there will be infinite combinatorial
+possibilities so it becomes impractical. Even in finite cases, the combinatorial possibilities generally increase rapidly,
+so heuristic approaches will still need to be taken. Very rarely can you actually brute force the algorithm,
+but just knowing what it is actually helps quite a lot.
+
+Following this, one of the first orders of business is to find a basis if possible. As our entire space is constructive,
+what are the constructive grammatical elements that allow us to build any given interface? Finding such bases reveals
+the bare minimum we'd need to equip a library with to build a given interface. In practice, a common paradigm or template
+strategy is to look at the lifecycle ecology of the constructs within the given interface.
+
+Another first order of business is to prove interface chains are \emph{transitive}, meaning for every subinterface
+(indirect interface), there exists an isomorphic direct interface. From a user's perspective, this means you can interface
+indirectly, then subinterface, then subinterface, and so on, until you're working with your intended interface resolution,
+or you can work directly at that resolution level, or any level in-between. From a compiler's perspective, this means
+you can inline (translate) any indirect grammar into direct grammar for optimization purposes.
+
+\end{document}

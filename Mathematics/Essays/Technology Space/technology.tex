@@ -1,0 +1,347 @@
+% Copyright 2014 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1cm,right=1cm,top=6.5cm,bottom=2cm]{geometry}
+\usepackage{asymptote}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\title{Technology Space}
+\author{Daniel Nikpayuk}
+\date{December 9, 2014}
+\pagestyle{empty}
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+\newpage
+
+\begin{asydef}
+import graph;
+unitsize(1cm);
+
+pair [] z=new pair[15];
+z[0]=(-7.5,0);
+z[1]=(-5.5,0.175);
+z[2]=(-4,-0.4);
+z[3]=(-3.5,0.35);
+z[4]=(-2.5,0.05);
+z[5]=(-1.3,0.7);
+z[6]=(-0.9,-0.8);
+z[7]=(0,-0.9);
+z[8]=(0,0);
+z[9]=(0.3,0.75);
+z[10]=(2,1);
+z[11]=(3,-0.9);
+z[12]=(3,0);
+z[13]=(4,-0.1);
+z[14]=(6.25,0.27);
+
+real [] o=new real[4];
+o[0]=0;
+o[1]=0;
+o[2]=9;
+o[3]=1.5;
+
+real [] lEllipse(real [] e)
+{
+	real [] le;
+	le[0]=e[0]-(5*e[2])/10;
+	le[1]=e[1]+(4*e[2])/10;
+	le[2]=e[2]/4;
+	le[3]=e[3]/4;
+
+	return le;
+}
+
+real [] mEllipse(real [] e)
+{
+	real [] me;
+	me[0]=e[0];
+	me[1]=e[1]+(5*e[2])/10;
+	me[2]=e[2]/5;
+	me[3]=e[3]/5;
+
+	return me;
+}
+
+real [] rEllipse(real [] e)
+{
+	real [] re;
+	re[0]=e[0]+(4*e[2])/10;
+	re[1]=e[1]+(4*e[2])/10;
+	re[2]=e[2]/3;
+	re[3]=e[3]/3;
+
+	return re;
+}
+
+real [] fEllipse(real [] e)
+{
+	real [] fe;
+	fe[0]=e[0];
+	fe[1]=e[1]+(2*e[2])/5;
+	fe[2]=(7*e[2])/10;
+	fe[3]=(7*e[3])/10;
+
+	return fe;
+}
+
+void drawEllipse(real [] e)
+{
+	draw(ellipse((e[0], e[1]), e[2], e[3]), black);
+}
+
+void drawDottedEllipse(real [] e)
+{
+	draw(ellipse((e[0], e[1]), e[2], e[3]), dashed+lightblue);
+}
+
+\end{asydef}
+
+\begin{center}
+\noindent\hspace*{-0.8cm}\begin{asy}
+//Context Space Visual:
+
+drawEllipse(o);
+	real [] l=lEllipse(o);
+	drawEllipse(l);
+		real [] ll=lEllipse(l);
+		drawEllipse(ll);
+
+		real [] lr=rEllipse(l);
+		drawEllipse(lr);
+			real [] lrl=lEllipse(lr);
+			drawEllipse(lrl);
+
+			real [] lrm=mEllipse(lr);
+			drawEllipse(lrm);
+
+	real [] r=rEllipse(o);
+	drawEllipse(r);
+		real [] rl=lEllipse(r);
+		drawEllipse(rl);
+			real [] rlr=rEllipse(rl);
+			drawEllipse(rlr);
+
+		real [] rm=mEllipse(r);
+		drawEllipse(rm);
+
+		real [] rr=rEllipse(r);
+		drawEllipse(rr);
+			real [] rrr=rEllipse(rr);
+			drawEllipse(rrr);
+				real [] rrrr=rEllipse(rrr);
+				drawEllipse(rrrr);
+
+//Ambiguity:
+
+draw(z[0]..z[1]---z[2], red);
+draw(z[0]{NE}..{E}z[3], red);
+draw(z[0]{E}..{N}z[3], red);
+draw(z[1]{NE}..z[3], red);
+draw(z[8]{SW}..z[4], red);
+draw(z[8]{W}..{N}((z[5]+z[8])/2){N}..{W}z[5], red);
+draw(z[8]..z[6], red);
+draw(z[8]{NE}..z[9]{NW}..z[5], red);
+draw(z[8]..z[12]..z[13], red);
+draw(z[7]{E}..{N}((z[7]+z[11])/2){N}..{E}z[11], red);
+draw(z[10]{E}..{S}((z[10]+z[14])/2){S}..{E}z[14], red);
+draw(z[10]{E}..{S}z[12], red);
+draw(z[12]{NW}..z[11], red);
+draw(z[9]{S}..{E}z[11], red);
+draw(z[2]{S}..{N}z[5], red);
+draw(z[11]{E}..{W}z[14], red);
+draw(z[14]{W}..{S}((z[14]+z[2])/2){S}..{W}z[2], red);
+draw(z[9]{W}..{S}((z[9]+z[1])/2){S}..{N}z[1], red);
+
+dot(z);
+
+//Subtext:
+
+label("Context Space", (0, -3));
+
+real xLabel=9.25;
+label("- 0 (ambiguity)", (xLabel, 0), E);
+label("- 1 (context)", (xLabel, 3.4), E);
+label("- 2 (subtext)", (xLabel, 4.5), E);
+label("- 3 (\ldots)", (xLabel, 5), E);
+
+\end{asy}
+\end{center}
+
+One starts with the Context Space:\vspace*{0.65cm}
+
+First there is \emph{ambiguity}! It's not that one starts with no ``meaning'' in this universe and creates it from nothing,
+rather there is too much meaning and we carve it from everything.  There's equal possibility for all meanings, and thus no
+way to know if one meaning is privileged over another.
+
+From ambiguity comes order, but for each pattern of order introduced, much is still left unordered and ambiguous,
+allowing for many many possible orders still.  The first and lowest patterning of order is called an \emph{infrastructure};
+or framework; or discourse; or semantics; or just plain context. As humans we come together by means of common experience.
+There are many experiences in our lives which bring us so much joy, or so much pain; many of these experiences are common
+and cannot be avoided---we must bring meaning to them. The Context Space is the first level above complete ambiguity
+in establishing common and individual meanings for our lives.
+
+Once an infrastructure of communication is established, one can further restrict the possibility for ambiguity,
+resulting in sub-contexts, or \emph{subtexts}. And from subtexts themselves one can further restrict out subtexts
+(subsubtexts).  This may continue many times.
+
+It is possible to reach a point of restriction when only one unique possibility remains; an unique meaning.
+
+There is also \emph{intertextuality} to consider. Comparing contexts with their related subtexts.
+
+Keep note though, a common human error is to assume two contexts are comparable when in fact they do not even
+belong to the same infrastructure. Maybe a metric of comparison can be designed to allow a comparision, but one
+should not assume from the start that all things are naturally comparable. At times, justification is needed.
+
+\newpage
+
+\begin{center}
+\noindent\begin{asy}
+//Semiotic Space Visual:
+
+drawDottedEllipse(o);
+
+label("``The rabbit heard a noise and ran.''", (0, 3));
+label("Semiotic Space", (0, -3));
+
+label("The", (0,0), blue);
+label("rabbit", (-6,0), blue);
+label("heard", (3,1), blue);
+label("a", (-2.7,-0.4), blue);
+label("noise", (5,-0.2), blue);
+label("and", (3.2,0.1), blue);
+label("ran", (-4,0.23), blue);
+label("\ldots", (-2.9,0.41), blue);
+label("\ldots", (-1,1.1), blue);
+label("\ldots", (2.4,-0.72), blue);
+
+\end{asy}
+\end{center}
+
+Next comes the Semiotic Space:\vspace*{0.65cm}
+
+Signs, signifiers, signifieds. Fancy words, which just mean \emph{representation}. With so much diversity and depth and complexity
+in infinitely many ways in infinitely many contexts it helps to build tools---or technology---to navigate, to simplify.
+
+The most common tools to move around and navigate are \emph{words} themselves. Any individual word captures a portion of context:
+On the one hand, that portion is still highly ambiguous, but on the other it is also embedded with much meaning---so much meaning
+in a single word.
+
+One can save a lot of work in interacting with a context by using word tools to make the process easier. But be warned, how much is missed?
+how much is ``lost in translation'' when one becomes too comfortable with their tools? their technologies?
+When one lets meaning become routine\ldots
+
+\newpage
+
+\begin{center}
+\noindent\hspace*{-0.75cm}\begin{asy}
+//Media Space Visual:
+
+real [] f=fEllipse(fEllipse(o));
+f[1]=0;
+drawEllipse(f);
+	real [] ff=fEllipse(f);
+	drawEllipse(ff);
+		real [] fff=fEllipse(ff);
+		drawEllipse(fff);
+			real [] ffff=fEllipse(fff);
+			drawEllipse(ffff);
+				real [] fffff=fEllipse(ffff);
+				drawEllipse(fffff);
+
+real h=5;
+
+label("``The rabbit heard a noise and ran.''", (-12, h+1));
+label("Media Space", (-7, -2));
+
+draw((-12,h)--(-13,h-1), lightred);
+	draw((-13,h-1)--(-14,h-2), lightred);
+	draw((-13,h-1)--(-12,h-2), lightred);
+		draw((-14,h-2)--(-15,h-3), lightred);
+		draw((-12,h-2)--(-13,h-3), lightred);
+draw((-12,h)--(-11,h-1), lightred);
+
+real ew=6.3, eh=0;
+draw((-14,h-2){S}..{E}(-ew,eh), dashed+lightblue, Arrow);
+
+ew=(7*ew)/10; eh+=(2*ew)/5;
+draw((-12,h-2){S}..{E}(-ew,eh), dashed+lightblue, Arrow);
+
+ew=(7*ew)/10; eh+=(2*ew)/5;
+draw((-13,h-1){ESE}..{E}(-ew,eh), dashed+lightblue, Arrow);
+
+ew=(7*ew)/10; eh+=(2*ew)/5;
+draw((-11,h-1){E}..{E}(-ew,eh), dashed+lightblue, Arrow);
+
+ew=(7*ew)/10; eh+=(2*ew)/5;
+draw((-12,h){E}..{E}(-ew,eh), dashed+lightblue, Arrow);
+
+real few=1, feh=0.25;
+fill(ellipse((-12,h), few, feh), white);
+	fill(ellipse((-13,h-1), few, feh), white);
+		fill(ellipse((-14,h-2), few, feh), white);
+			fill(ellipse((-15,h-3), few, feh), white);
+		fill(ellipse((-12,h-2), few, feh), white);
+			fill(ellipse((-13,h-3), few, feh), white);
+	fill(ellipse((-11,h-1), few, feh), white);
+
+label("and", (-12,h), orange);
+	label("heard", (-13,h-1), orange);
+		label("rabbit", (-14,h-2), orange);
+			label("The", (-15,h-3), orange);
+		label("noise", (-12,h-2), orange);
+			label("a", (-13,h-3), orange);
+	label("ran", (-11,h-1), orange);
+
+\end{asy}
+\end{center}
+
+Finally the dynamic; the Media Space:\vspace*{0.65cm}
+
+It is the place where context and semiotics interact, where we produce and imagine and create unique meaning!
+
+One \emph{parses} a sequence of words, a \emph{sentence}. One parses these words with a syntax, with a grammar,
+which in simpler terms is the way in which one gives order to the process of sifting out meaning---it is the
+way in which one applies each word successively to a context space to form an understanding.
+
+In this example, one starts with ``rabbit'' and from the infrastructure we raise, we lift, we sift;
+we use the word as a \emph{context filter}. The word itself narrows the infrastructure,
+resulting in a narrower but still vague context.
+
+On top of that filter, one adds another filter forming ``The rabbit'' and then ``The rabbit heard''
+etc.. We continue this process until we've applied all possible filters, narrowing the meaning each time until
+the ideal result: Once the final filter has been applied, a unique meaning, or a unique \emph{interpretation} is established.
+
+What an amazing technology! so much can be said by reusing and recycling a far fewer number words than contexts.
+How efficient but also flexible, adaptable, modular, extensible!
+
+But do not take this for granted! So much can go wrong. What if you're inexperienced and parse the same sentence
+but in a different order? What if you apply the same context filters but in a different order? Sometimes a subtly
+different unique meaning is derived; sometimes a very different unique meaning is obtained; sometimes one arrives
+at a context in which there is still much ambiguity and yet no unique meaning.
+
+We use this Technology Space called \emph{language} all the time and yet take
+for granted what it \emph{is}; what its potential is; and what could go wrong in its use.
+
+How can we really get to know someone else, or even ourselves if we take for granted one of our main interfaces
+to understanding that person? How can we really contribute back to our families and our communities if we lack
+a mature understanding of the tools we use to read, write, navigate? to decode, encode, translate? to maintain our relations
+in an ever changing world?
+
+P.S. If you're only interested in linear parsing, all you need are context filters; otherwise for non-linear parsing you need
+both filters and projectors (functional inverses of each other).
+
+\end{document}
+//label("("+xCoor+", "+yCoor+")", (0,0));
+//label("", (, ));
+
+

@@ -1,0 +1,276 @@
+% Copyright 2015 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1cm,right=1cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{bm}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+
+\newenvironment{proof}[1][Proof]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries Definition (#1):}]}{\end{trivlist}}
+
+\newcommand{\qed}{\nobreak \ifvmode \relax \else
+      \ifdim\lastskip<1.5em \hskip-\lastskip
+      \hskip1.5em plus0em minus0.5em \fi \nobreak
+      \vrule height0.5em width0.5em depth0.25em\fi}
+
+\pagestyle{empty}
+\begin{document}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+This short article provides a quick informal look at the idea that inequality expressions---or intervals---can be viewed
+as objects in their own right with their own algebra. As this idea occurred to me recently (at the time of this writing:
+September 3rd, 2015) I have additionally googled it and it seems it is a \emph{topological algebra}, something I very much
+plan on looking into in the future but as of yet have only heard about. The difference here as stated is this is an informal
+treatment, deriving the simplest of results needed for other projects.
+
+Our general inequality expressions are of the following nature:
+
+$$ a\le x\le b $$
+
+In particular, I reserve the lower end of the alphabet (in the expression as: $ a, b $) for constant real numbers $ \mathbb{R} $,
+while the upper end of the alphabet (in the expression as: $ x $) is for real number variables. Although we could represent the
+same construct with interval notation:
+
+$$ x\in[a,b] $$
+
+for the purpose of this article the interval representation flows better within the narrative of a vector style object.
+
+Informally, the inequality $ a\le x\le b $ has a truth-value: \emph{true} or \emph{false}. If you had need, you could also
+give it a partial truth-value ($ a\le x: true $, but $ x\le b $ false for example), but such complicated logics aren't of use
+here.  I mention this to emphasize the point that if the whole inequality expression is not \emph{true}, it defaults to
+\emph{false}.  Another point to bring up is, although an expression can be false, we are only interested in ones which
+are true for our algebra. This is to say, we view the expression to \emph{exist} as an \emph{object} if it is true.
+
+With this in mind, here is our first lemma regarding \emph{componentwise addition}:
+
+\begin{lemma} {$$ a\le b\quad\mbox{and}\quad c\le d\qquad\Longrightarrow\qquad a+c\le b+d $$}
+\end{lemma}
+
+\begin{proof}
+First we note that
+$$ \begin{array}{rclll}
+a\le b	&	\Longleftrightarrow	&	0\le b-a	&			&		\\
+	&	\Longleftrightarrow	&	0=b-a		&	\mbox{or}	& 	0 < b-a	\\
+c\le d	&	\Longleftrightarrow	&	0\le d-c	&			&		\\
+	&	\Longleftrightarrow	&	0=d-c		&	\mbox{or}	& 	0 < d-c	\\
+\end{array} $$
+
+If $ 0=b-a $ then $ 0\le (d-c)=(d-c)+(b-a) $ which is equivalent to $ a+c\le b+d $. This symmetrically holds for when
+$ 0=d-c $. As such, this covers all cases except when $ 0 < b-a $ and $ 0 < d-c $. We take it for granted that a
+\emph{positive} number plus a \emph{positive} number equals a \emph{positive} number, so it follows $ 0 < (d-c)+(b-a) $
+which is equivalent to $ a+c < b+d $.  Hence, regardless of case, we have at worst $ a+c\le b+d $.\qed
+
+\end{proof}
+
+Moving onto our second lemma, we take a look at subtraction (more or less):
+
+\begin{lemma} $$ a\le b\qquad\Longleftrightarrow\qquad -b\le -a $$
+\end{lemma}
+
+\begin{proof}
+The proof is as follows:
+$$ \begin{array}{rcll}
+a\le b	&	\Longleftrightarrow	&	0\le b-a	&		\\
+	&	\Longleftrightarrow	&	0\le (-a)-(-b)	&		\\
+	&	\Longleftrightarrow	&	-b\le -a	&	\qed	\\
+\end{array} $$
+\end{proof}
+
+\newpage
+
+As for our next lemma, we move onto multiplication:
+
+\begin{lemma} $$ a\le b\quad\mbox{and}\quad 0\le c\qquad\Longrightarrow\qquad ac\le bc $$
+\end{lemma}
+
+\begin{proof}
+Similar to the addition lemma, we note that
+$$ \begin{array}{rclll}
+a\le b	&	\Longleftrightarrow	&	0\le b-a	&			&		\\
+	&	\Longleftrightarrow	&	0=b-a		&	\mbox{or}	& 	0 < b-a	\\
+0\le c	&	\Longleftrightarrow	&	0=c		&	\mbox{or}	& 	0 < c	\\
+\end{array} $$
+
+If $ 0=b-a $ then $ 0\le 0=c(b-a)=cb-ca $ which is equivalent to $ ac\le bc $. This similarly holds for $ 0=c $. As such the
+only case left is when $ 0 < b-a $ and $ 0 < c $. We take it for granted that a \emph{positive} number times a \emph{positive}
+number is equal to a \emph{positive} number. Hence $ 0 < c(b-a) $ which is equivalent to $ ac < bc $. Thus, regardless of case,
+we have at worst $ ac\le bc $.\qed
+
+\end{proof}
+
+For our final lemma, we have division:
+
+\begin{lemma} $$ 0<a\le b\qquad\Longleftrightarrow\qquad 0 < \frac{1}{b}\le\frac{1}{a} $$
+\end{lemma}
+
+\begin{proof}
+We take for granted that the multiplicative inverse of a \emph{positive} number is a \emph{positive} number.
+
+{\bfseries case: ``$ \Longrightarrow $''}
+Since $ 0 < a\le b $ we have both $ 0 < a $ and $ 0 < b $, and so $ 0 < a^{-1}, b^{-1} $. As such, by the multiplication lemma:
+$$ \begin{array}{lcrrrr}
+a\le b	&	\Longrightarrow	&	aa^{-1}	&	\le	&	ba^{-1}		\\
+	&	\Longrightarrow	&	1	&	\le	&	ba^{-1}		\\
+	&	\Longrightarrow	&	b^{-1}	&	\le	&	b^{-1}ba^{-1}	\\
+	&	\Longrightarrow	&	b^{-1}	&	\le	&	a^{-1}		\\
+\end{array} $$
+
+{\bfseries case: ``$ \Longleftarrow $''}
+Since $ 0 < b^{-1}\le a^{-1} $ we have both $ 0 < a^{-1} $ and $ 0 < b^{-1} $, and so $ 0 < a, b $. As such, by the multiplication lemma:
+$$ \begin{array}{lcrrrrr}
+b^{-1}\le a^{-1}	&	\Longrightarrow	&	b^{-1}b	&	\le	&	a^{-1}b		&		\\
+			&	\Longrightarrow	&	1	&	\le	&	a^{-1}b		&		\\
+			&	\Longrightarrow	&	a	&	\le	&	aa^{-1}b	&		\\
+			&	\Longrightarrow	&	a	&	\le	&	b		&	\qed	\\
+\end{array} $$
+
+\end{proof}
+
+We have enough now for our theorems:
+
+\begin{theorem}
+\color{blue}
+$$ a\le x\le b\quad\mbox{and}\quad c\le y\le d\qquad\Longrightarrow\qquad a+c\le x+y\le b+d $$
+\end{theorem}
+
+\begin{proof}
+$$ \begin{array}{lcrrr}
+a\le x\le b	&	\Longleftrightarrow	&	a\le x		&	\mbox{and}	&	x\le b		\\
+c\le y\le d	&	\Longleftrightarrow	&	c\le y		&	\mbox{and}	&	y\le d		\\
+		&	\Longrightarrow		&	a+c\le x+y	&	\mbox{and}	&	x+y\le b+d	\\
+		&	\Longleftrightarrow	&	a+c\le x+y\le b+d	&		&	\qed		\\
+\end{array} $$
+\end{proof}
+
+\begin{theorem}
+\color{blue}
+$$ a\le x\le b\qquad\Longleftrightarrow\qquad -b\le -x\le -a $$
+\end{theorem}
+
+\begin{proof}
+$$ \begin{array}{lcrrr}
+a\le x\le b	&	\Longleftrightarrow	&	a\le x		&	\mbox{and}	&	x\le b		\\
+		&	\Longleftrightarrow	&	-x\le -a	&	\mbox{and}	&	-b\le -x	\\
+		&	\Longleftrightarrow	&	-b\le -x	&	\mbox{and}	&	-x\le -a	\\
+		&	\Longleftrightarrow	&	-b\le -x\le -a	&			&	\qed		\\
+\end{array} $$
+\end{proof}
+
+\newpage
+
+\begin{theorem}
+\color{blue}
+$$ 0\le a\le x\le b\quad\mbox{and}\quad 0\le c\le y\le d\qquad\Longrightarrow\qquad 0\le ac\le xy\le bd $$
+\end{theorem}
+
+\begin{proof}
+$$ \begin{array}{lcrrr}
+0\le a	&	\mbox{and}	&	0\le c	& \Longrightarrow	&	\textcolor{blue}{0c}\le\textcolor{blue}{ac}	\\
+c\le y	&	\mbox{and}	&	0\le a	& \Longrightarrow	&	\textcolor{blue}{ac}\le ay			\\
+a\le x	&	\mbox{and}	&	0\le y	& \Longrightarrow	&	ay\le\textcolor{blue}{xy}			\\
+y\le d	&	\mbox{and}	&	0\le x	& \Longrightarrow	&	\textcolor{blue}{xy}\le xd			\\
+x\le b	&	\mbox{and}	&	0\le d	& \Longrightarrow	&	xd\le \textcolor{blue}{bd}			\\
+\end{array} $$
+The transitive law assures us that $ 0\le ac\le xy\le bd $\qed
+\end{proof}
+
+\begin{theorem}
+\color{blue}
+$$ 0 < a\le x\le b\qquad\Longleftrightarrow\qquad 0 < \frac{1}{b}\le\frac{1}{x}\le\frac{1}{a} $$
+\end{theorem}
+
+\begin{proof}
+$$ \begin{array}{lcrrr}
+0 < a\le x\le b	&	\Longleftrightarrow	&	0 < a\le x	&	\mbox{and}	&	0 < x\le b		\\
+		&				&			&			&				\\
+		&	\Longleftrightarrow	&	0 < \frac{1}{b}\le\frac{1}{x}	&	\mbox{and}	&	0 < \frac{1}{x}\le\frac{1}{a}		\\
+		&				&			&			&				\\
+		&	\Longleftrightarrow	&	0 < \frac{1}{b}\le\frac{1}{x}\le\frac{1}{a}	&	\qed	\\
+\end{array} $$
+\end{proof}
+
+We finally have enough for some constructive object definitions:
+
+\begin{definition}[additive object]
+Let $$ (a\le x\le b)\quad ,\quad (c\le y\le d) $$
+be objects, then $$ (a\le x\le b)+(c\le y\le d)\qquad :=\qquad (a+c\le x+y\le b+d) $$
+\end{definition}
+
+\begin{definition}[additive inverse object]
+Let $$ (a\le x\le b)\qquad $$ be an object, then $$ -(a\le x\le b)\qquad :=\qquad (-b\le -x\le -a) $$
+\end{definition}
+
+\begin{definition}[multiplicative object]
+Let $$ 0\le(a\le x\le b)\quad ,\quad 0\le(c\le y\le d) $$
+be objects, then $$ (a\le x\le b)(c\le y\le d)\qquad :=\qquad (ac\le xy\le bd) $$
+\end{definition}
+
+Notice here I used the notation $ 0\le(a\le x\le b) $, though not formalized I mean to intuitively say the object is ``positive'',
+which in particular translates as $ 0\le a\le x\le b $.
+
+\begin{definition}[multiplicative inverse object]
+Let $$ 0<(a\le x\le b)\qquad $$ be an object, then $$ \frac{1}{(a\le x\le b)}\qquad :=\qquad (\frac{1}{b}\le\frac{1}{x}\le\frac{1}{a}) $$
+\end{definition}
+
+A note about these definitions: To be fair, it seems likely with the above definitions you have to take an equivalence
+relation to stabilize the objects, but such finer considerations are for an actual theory of intervals as topological algebra.
+
+\newpage
+
+As mentioned in the opening, my intention here is much more the theorems to use for other projects than anything else.
+Regarding such other projects: generally \emph{numerical analysis} where one needs to find inequality bounds for error
+terms within approximations. The thing is, \emph{real analysis} at its lower levels makes heavy use of inequalities as
+well, and although the nature of such ``arithmetic yoga''---as a topology professor of mine once referred to them---is
+subtly different, this discrete style of inequality manipulation may be of use there as well.
+
+I'll leave you with a final thought-provoking example. Consider the inequality:
+$$ 1\le a\le x\le b $$
+Let's say we wanted a bound on $ (x-1)^2 $ instead, we could do this as follows:
+$$ \begin{array}{lcrclclcl}
+1\le a\le x\le b	& \Longrightarrow & 0 & \le & a-1	& \le & x-1	& \le & b-1	\\
+			& \Longrightarrow & 0 & \le & (a-1)^2	& \le & (x-1)^2	& \le & (b-1)^2	\\
+\end{array} $$
+and so we have our bound already. The thing is, we also know $ (x-1)^2=x^2-2x+1 $,
+so we could have also derived our bound in the additional following way:
+$$ \begin{array}{lcrclclcl}
+1\le a\le x\le b	& \Longrightarrow &	a^2		& \le & x^2		& \le & b^2		\\
+			& \Longrightarrow &	-2b		& \le & -2x		& \le & -2a		\\
+			& \Longrightarrow &	1		& \le & 1		& \le & 1		\\\hline
+			& \Longrightarrow &	a^2-2b+1	& \le & x^2-2x+1	& \le & b^2-2a+1	\\
+			& \Longrightarrow &	a^2-2b+1	& \le & (x-1)^2		& \le & b^2-2a+1	\\
+\end{array} $$
+where we took the top three inequalities and added them together to get the bottom two.
+
+First of all, this alone is thought provoking if you've never really studied it or considered it before---\emph{identity
+manipulations don't preserve inequality manipulations!} I mean it makes sense once you really think about it, but when you
+spend all your time with identity manipulations you might form the bad habit of expecting preservation. What's more thought
+provoking though is this that we have now two differing bounds, so which is better?
+
+To figure this out we note that $ a\le b $ and so $ -2b\le -2a $. In this case then we have
+$$ a^2-2b+1\le a^2-2a+1=(a-1)^2 $$
+similarly we also know
+$$ (b-1)^2=b^2-2b+1\le b^2-2a+1 $$
+and so it appears using the factored form $ (x-1)^2 $ gives tighter bounds than the expanded form $ x^2-2x+1 $.
+It's also worth noting that if we had instead wondered about $ (x+1)^2 $ our two methods would not have diverged in
+the bounds offered (subtraction makes the difference).
+
+What is the hidden pattern here? What are there larger patterns for \emph{best practice} inequality manipulation?
+Is there a logical mathematical system of it all? Something to think about\ldots
+
+\end{document}
+

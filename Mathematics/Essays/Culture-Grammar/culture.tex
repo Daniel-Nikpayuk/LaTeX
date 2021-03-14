@@ -1,0 +1,245 @@
+% Copyright 2019 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1cm,right=1cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{asymptote}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amsmath}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\newenvironment{proof}[1][Proof]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1:}]}{\end{trivlist}}
+\newenvironment{example}[1][Example]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{remark}[1][Remark]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+\newcommand{\qed}{\nobreak \ifvmode \relax \else
+      \ifdim\lastskip<1.5em \hskip-\lastskip
+      \hskip1.5em plus0em minus0.5em \fi \nobreak
+      \vrule height0.75em width0.5em depth0.25em\fi}
+
+\title{Culture Grammar}
+\author{Daniel Nikpayuk}
+\date{June 6, 2019}
+\pagestyle{empty}
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+\begin{asydef}
+unitsize(1cm);
+
+pair titleoffset = (-0.5, 0.5);
+pair labeloffset = (-0.25, 0.375);
+
+void drawcircle(pair scaler, pair shifter, string title, pair offset = titleoffset, pen color = black)
+{
+	draw(shift(shifter.x,shifter.y)*scale(scaler.x, scaler.y)*unitcircle, color);
+
+	label("{\bfseries " + title + "}:", shifter + (0, scaler.y) + offset, color);
+}
+
+void drawpoint(pair coordinate, string title, pair offset = labeloffset, pen color = black)
+{
+	dot(coordinate, color);
+
+	label(title, coordinate + offset, color);
+}
+
+pair Left(real angle, real height, path p)
+{
+	real width = height*Tan(angle);
+	pair last  = point(p, size(p)-1);
+
+	return last + (-width, -height);
+}
+
+pair Right(real angle, real height, path p)
+{
+	real width = height*Tan(angle);
+	pair last  = point(p, size(p)-1);
+
+	return last + (width, -height);
+}
+
+//
+
+void safeLabel(picture pic = currentpicture, Label L, pair position, real width, real height,
+		align align = NoAlign, pen p = currentpen, filltype filltype = NoFill)
+{
+	pair sw = position + (-width,-height);
+	pair se = position + (-width, height);
+	pair nw = position + ( width,-height);
+	pair ne = position + ( width, height);
+
+	filldraw(pic, sw--se--ne--nw--cycle, white, p);
+	label(pic, L, position, align, p, filltype);
+}
+
+\end{asydef}
+
+\section*{}
+
+\begin{center}
+\noindent\hspace*{-0.8cm}\begin{asy}
+// this comment prevents a compilation bug.
+
+//
+
+pair c           = (0, 0);
+
+pair d1          = (-3, 2);
+pair d2          = (-2, 0.75);
+pair d3          = (1.5, 1.5);
+pair d4          = (1, -1);
+pair d5          = (-0.2, -2.5);
+
+//
+
+drawcircle( (6.5, 4.5), c, "toolset");
+
+drawpoint(d1, "tool \#1", red);
+drawpoint(d2, "tool \#2", red);
+drawpoint(d3, "tool \#3", red);
+drawpoint(d4, "tool \#4", red);
+drawpoint(d5, "tool \#5", red);
+
+//
+
+\end{asy}
+\end{center}
+
+\begin{center}
+\noindent\hspace*{-0.8cm}\begin{asy}
+// this comment prevents a compilation bug.
+
+//
+
+pair c           = (0, 0);
+
+pair d1          = (-4, -1);
+pair d2          = (-2, 0.75);
+pair d3          = (0.5, -1.5);
+pair d4          = (1.75, 2);
+pair d5          = (3.2, -2.5);
+
+//
+
+drawcircle( (6.5, 4.5), c, "problem");
+
+drawpoint(d1, "solution \#1", blue);
+drawpoint(d2, "solution \#2", blue);
+drawpoint(d3, "solution \#3", blue);
+drawpoint(d4, "solution \#4", blue);
+drawpoint(d5, "solution \#5", blue);
+
+//
+
+\end{asy}
+\end{center}
+
+\newpage
+
+\begin{center}
+\noindent\hspace*{-0.8cm}\begin{asy}
+// this comment prevents a compilation bug.
+
+//
+
+pair c    = (0,0);
+
+pair c0   = Left(55, 1.5, c);
+pair c00  = Left(35, 1.5, c0);
+pair c01  = Right(35, 1.5, c0);
+pair c000 = Left(35, 1.5, c00);
+
+pair c1   = Right(55, 1.5, c);
+pair c10  = Left(35, 1.5, c1);
+pair c11  = Right(35, 1.5, c1);
+pair c100 = Right(35, 1.5, c10);
+
+//
+
+pen color = 0.5*green + 0.5*black;
+
+draw(c--c0, color);
+draw(c0--c00, color);
+draw(c0--c01, color);
+draw(c00--c000, color);
+
+draw(c--c1, color);
+draw(c1--c10, color);
+draw(c1--c11, color);
+draw(c10--c100, color);
+
+//
+
+real x = 0.90;
+real y = 0.29;
+
+safeLabel("value \#1", c, x, y, color);
+
+safeLabel("value \#2", c0, x, y, color);
+safeLabel("value \#4", c00, x, y, color);
+safeLabel("value \#6", c01, x, y, color);
+safeLabel("value \#9", c000, x, y, color);
+
+safeLabel("value \#3", c1, x, y, color);
+safeLabel("value \#5", c10, x, y, color);
+safeLabel("value \#7", c11, x, y, color);
+safeLabel("value \#8", c100, x, y, color);
+
+label("{\bfseries value-system}:", (0, 1.25), black);
+
+\end{asy}
+\end{center}
+
+\newpage
+
+\begin{center}
+\noindent\hspace*{-0.8cm}\begin{asy}
+// this comment prevents a compilation bug.
+
+//
+
+pair c           = (0, 0);
+
+pair d1          = (-4, -1);
+pair d2          = (-2, 0.75);
+pair d3          = (0.5, -1.5);
+pair d4          = (1.75, 2);
+pair d5          = (3.2, -2.5);
+
+//
+
+drawcircle( (6.5, 4.5), c, "social situation");
+
+drawpoint(d1, "behaviour \#1", blue);
+drawpoint(d2, "behaviour \#2", blue);
+drawpoint(d3, "behaviour \#3", blue);
+drawpoint(d4, "behaviour \#4", blue);
+drawpoint(d5, "behaviour \#5", blue);
+
+//
+
+\end{asy}
+\end{center}
+
+\end{document}
+

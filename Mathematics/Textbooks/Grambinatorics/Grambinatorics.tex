@@ -1,0 +1,1019 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% Copyright 2013 Daniel Nikpayuk
+%%
+%% This file is part of Grambinatorics.
+%%
+%% Grambinatorics is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+%% as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+%%
+%% Grambinatorics is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+%% of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License along with Grambinatorics. If not, see
+%% <http://www.gnu.org/licenses/>.
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[twoside]{book}
+\usepackage[letterpaper,left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[inline]{asymptote}
+\usepackage{hyperref}
+\hypersetup{
+	pdfstartview={FitH},
+	pdftitle={Reconstructing Combinatorics},
+	pdfauthor={Daniel Nikpayuk},
+	hyperfootnotes=false,
+	colorlinks,
+	citecolor=black,
+	filecolor=black,
+	linkcolor=blue,
+	urlcolor=blue
+}
+
+\newcommand{\st}{$ ^{\mbox{\scriptsize st}} $ }
+\newcommand{\nd}{$ ^{\mbox{\scriptsize nd}} $ }
+\newcommand{\rd}{$ ^{\mbox{\scriptsize rd}} $ }
+
+\renewcommand{\th}{$ ^{\mbox{\scriptsize th}} $ }
+%\th command exists, it gives the old english symbol used for `theta' IPA (voiceless)
+
+\newcommand{\pass}[1][\Diamond]{\ensuremath{{_{\!/{#1}}}}}
+\newcommand{\passes}[2][\Diamond]{\ensuremath{{_{\!/{#1}^{#2}}}}}
+\newcommand{\syntax}[1][\Diamond]{\ensuremath{1+{#1}}}
+\newcommand{\syntaxes}[1][\Diamond]{\ensuremath{1+{#1}+{#1}^2}}
+\newcommand{\coordinate}[1][1]{\ensuremath{{_{|{#1}|}}}}
+\renewcommand{\bold}[1][C]{\ensuremath{{\mathbf #1}}}
+\newcommand{\nCr}[1][C]{\ensuremath{{_n{\mathbf #1}_r}}}
+\newcommand{\nORr}[1][\vee]{\ensuremath{{{_n{\mathbf #1}_r}}}}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\newenvironment{proof}[1][Proof]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries Definition (#1):}]}{\end{trivlist}}
+\newenvironment{examples}[1][Examples]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries Example #1}]}{\end{trivlist}}
+\newenvironment{remark}[1][Remark]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{note}[1][Note]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+\newcommand{\qed}{\nobreak \ifvmode \relax \else
+      \ifdim\lastskip<1.5em \hskip-\lastskip
+      \hskip1.5em plus0em minus0.5em \fi \nobreak
+      \vrule height0.5em width0.5em depth0.25em\fi}
+
+\newlength{\hone}
+\newlength{\htwo}
+\newlength{\hthree}
+\setlength{\hone}{0.50cm}
+\setlength{\htwo}{1.0cm}
+\setlength{\hthree}{1.50cm}
+
+\title{\Huge\bfseries Reconstructing \\ Combinatorics}
+\author{Daniel Nikpayuk}
+\date{}
+\pagenumbering{alph}
+\pagestyle{empty}
+
+\begin{document}
+\maketitle\frontmatter
+
+\pagestyle{headings}\tableofcontents
+\markboth{Reconstructing Combinatorics}{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Preface}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This book was written for many reasons.  The first and main one being that doing so has brought the author
+some kind of contentment.  Why take up something of such a tedious nature afterall if you don't really enjoy it?
+The second and apparently more useful reason is to provide a standardization and axiomatization of the foundations
+of combinatorics---intending to hold the same level of rigor as observed by other branches of mathematics; this being
+something I do not currently see in other books on the topic.
+
+Regarding the nature of ``contemporary'' combinatorial pedagogy, I have seldom found a book on combinatorics
+that was as intuitive to understand for myself as it likely was for its author.  In no way or form do I say this as
+disrespect---there are many very eloquently and elegantly written books out there---rather I say it to expose my own
+deficiencies:  I am envious of those combinatorialists who can break down combinatorial problems with \emph{word
+associations} alone.  I, on the otherhand, have had to write an entire book so as to build an artificial intuitive
+framework just to solve some basic combinatorial problems, whilst the seamlessly talented mathmagicians could solve
+those and much harder naturally, and with much ease.
+
+With that said, the aim of this book is not to provide any new plot twists to the standard introduction, but
+instead to analyse the underlying assumptions that currently allow us to communicate these concepts and their
+\emph{theorems}.  Another way of saying this, and it might sound like a detraction of one's own
+text,\footnote{It is not.} is that the overall intention of this book is not as much to provide the reader with
+the ability to solve combinatorial problems, rather to provide the user with the ability to create and communicate
+a consistent language for the dialogue of their solutions.
+
+It is my own belief---and to use literary terms---that combinatorics studies the narratives of \emph{representation}
+and \emph{arrangement}.  As far as themes go, the story of combinatorics may be said to frequently focus its
+attention on matters of \emph{existence}, \emph{enumeration}, and \emph{optimization}.  Context stems from the
+standard axiomatic approach, though the plot is another matter (as one who delves deeper will come to understand);
+I am willing to say though that there are very few possible plots in which these main themes don't intersect.
+I will relegate such problematics to another discourse, and so with that said, it should be noted that given this
+is intended as an introduction to the subject, it largely aims at focusing more on matters of enumeration.
+
+The reader may be wondering why in the above paragraph I chose to put mathematical matters in the terms of literay
+language.  My claim for doing so is a personal one:  It has been my observation that the one area  of mathematics that
+even us math people have a hard time with is combinatorics; As mentioned above, I am no exception to this.  It is my own
+observational correlation then that the few math people who are good at combinatorial thinking are also good at various
+styles of literary thinking.  Without going into the long history that brought me to this conclusion I will say that it
+has been reinforced by my own studies of the humanities and thus I believe such ``inter-disciplinary'' borrowing will be
+fruitful in here and in the future.
+
+I will conclude by saying that to do what I've otherwise set out to accomplish, I feel it necessary to break from the
+traditional approach to the teachings of combinatorics.  The strategy is to introduce the following:
+\begin{itemize}
+\item syntax: the notation,
+\item semantics: the concept definitions, and most importantly
+\item grammar: the ability to navigate and translate combinatorial problems using bijective associations.
+\end{itemize}
+
+To elaborate:  The first part of this is to formally define the notions of a combinatorial \emph{sentence} as well as
+\emph{formula}.  A necessary part in doing this will be the construction of a notation not currently used in mainstream
+mathematics.  Following this, I will begin to \emph{reconstruct}\footnote{I am borrowing from the literary notion of
+\emph{deconstruction}.  I could have titled this book ``Deconstructing Combinatorics'' but I felt the related word and
+concept of \emph{reconstruction} held more inclusive and positive connotations.} the underlying concepts used in the
+expression of current combinatorial language.  All of this will follow axiomatically and will be embedded with many
+examples to show use of the grammar.  The main tool as it turns out is that of \emph{bijective associations}.
+
+\mainmatter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{\texorpdfstring{Contextualizing\\ Enumerative Media}{Contextualizing Enumerative Media}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Some Set Theory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+To maintain a certain level of formality, I will include some basic set theory as well as some basic graph theory.
+For those who know these two theories quite well---I say this to you:  Please skim over these two sections with
+some attention, I have made minor modifications to notation and definitions (though nothing that can't be equated
+to a logical equivalence towards any of the mainstream notations and definitions of the respective subjects).
+
+\section{Review}
+
+To begin, the \emph{difference} of two sets $ A, B $ written $ A\backslash B $
+is defined to be a set containing exactly those elements of $ A $ that are not in $ B $.
+
+An \emph{ordered pair} $ (a, b) $ is defined as the following set:
+$$ \{\{a\}, \{a, b\}\} $$
+
+A \emph{relation} $ R $ is a collection of ordered pairs.  The set of ``left-coordinates'' of the pairs of $ R $
+is called the the \emph{domain} of $ R $ and is written as Dom$ (R) $.  Symmetrically defined is the \emph{range}
+of $ R $, written Ran$ (R) $, being the set of ``right-coordinates'' of the pairs of $ R $.  A relation $ R $ is
+said to \emph{act on} (or ``be over'') a set $ X $ if $ \mbox{Dom}(R)\cup\mbox{Ran}(R)=X $.
+
+An \emph{equivalence relation} of a set is a relation acting on a set $ X $ that is: \emph{reflexive}, \emph{symmetric}
+and \emph{transitive}.  This is to say:
+\begin{enumerate}
+\item (reflexivity) For all $ r\in X $, $ (r, r) $ is in $ R $.
+\item (symmetry) If $ (r, s)\in R $, then $ (s, r)\in R $.
+\item (transitivity) If $ (r, s)\in R $ and $ (s, t)\in R $, then $ (r, t)\in R $.
+\end{enumerate}
+
+An ordering of a set is said to be \emph{partial} if some elements are not comparable, and is otherwise said to be
+\emph{total} or \emph{linear}.  A subset of a partially ordered set which is linearly ordered is called a \emph{chain}.
+Within the realm of ordered sets, the difference between a \emph{minimum} element and a \emph{minimal} element is
+that a minimum element is comparable to every other element (totally ordered set) and is still the \emph{least} element,
+whereas a minimal element is a least element but isn't necessarily comparable with the all of the remaining elements
+(applicable to partially ordered sets).
+
+A \emph{mapping} (or \emph{function}) from $ A $ to $ B $, written $ f:A\to B $ is a relation $ R_f $ such that
+Dom$ (R_f)=A $; Ran$ (R_f)=B $, and if $ (x, y_1), (x, y_2)\in R_f $, then $ y_1=y_2 $.
+
+Let $ \bold[x]:n\to X $ be a mapping from $ \{0, 1, \ldots, n-1\} $ to some range $ X $.  Then $ \bold[x] $ is
+called an $ n $-tuple over $ X $ and is written as $ \bold[x]=(x_1, x_2, \ldots, x_n) $ where the $ x_k $ is to
+mean $ \bold[x](k) $.  If the domain is not specified at a given time, $ \bold[x] $ will simply be called a
+\emph{tuple} (over $ X $).
+
+let $ \bold[x]=(x_1, x_2, \ldots, x_n) $ be some $ n $-tuple.  As a notational convention, in order
+to represent $ x_1 $ from the view point of $ \bold[x] $, I write $ \bold[x]\coordinate $ which indicates the
+\emph{first coordinate} of $ \bold[x] $.  Moreover, I write $ \bold[x]\coordinate[2] $ to represent $ x_2 $,
+the \emph{second coordinate} of $ \bold[x] $, and in general $ \bold[x]\coordinate[k] $ to represent $ x_k $,
+the \emph{$ k $\th coordinate} of $ \bold[x] $.\footnote{This notation is worth introducing here as
+it hints at a more important notation I will introduce later on and use throughout this book.}
+
+The \emph{product} of an \emph{indexed system of sets} $ \langle S_i\ |\ i\in I\rangle $ is the collection of all
+functions $ f:I\to\bigcup_{i\in I} S_i $ such that $ f(i)\in S_i $.  This is a way of defining an ``abstraction''
+of a cartesian product of sets.
+
+\begin{definition}[Well Ordered Set]
+
+A set $ S $ with an ordering imposed on it is said to be well ordered if:
+
+\begin{enumerate}
+
+\item the ordering is linear.
+
+\item every nonempty subset $ R\subseteq S $ has a least element.
+
+\end{enumerate}
+\end{definition}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Some Graph Theory}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As stated earlier, I will here modify the better known graph theoretic definitions slightly to suit my needs,
+the semantics are the same, it's simply the wording that is different.  Again, for the reader better experienced
+in these matters, it is still worthwhile to at least quickly look over.
+
+\begin{definition}[Graph]
+
+A graph $ G $ is a pair of sets $ (V, E) $ where $ V $ is called the vertex set (of vertices of $ G $), and $ E $ is
+called the edge set of $ G $, and is such that it consists of unordered pairs of vertices from $ V $.
+
+\end{definition}
+When two graphs $ G, H $ (or possibly more) are in a given context, to distinguish between their vertex and edge sets one
+writes $ V_G $, $ E_G $ and $ V_H $, $ E_H $.
+
+I'm not going to worry or bother with ``multisets,'' or related concepts, which would entail an explanation about loops
+and multiple edges, the graphs I'm interested in are \emph{simple}.
+
+Given an edge $ e=\{v_1, v_2\}\in E_G $ of some graph $ G $, the vertices $ v_1, v_2\in V_G $ that compose it are said to
+be \emph{incident} to $ e $.  Moreover, with respect to each other, the vertices $ v_1, v_2 $ are said to \emph{adjacent}.
+
+If $ G $ is some graph with $ v\in V_G $, then the \emph{degree} of the vertex $ v $, written as deg$ (v) $ is
+equal to the number of edges $ e\in E_G $ which are incident to it.
+
+\begin{definition}[Subgraph]
+
+Let $ G $ be a graph, a graph $ H $ is said to be a subgraph of $ G $ if $ V_H\subseteq V_G $ and $ E_H\subseteq E_G $.
+
+\end{definition}
+
+Reader beware, here is where I have altered the definitions just a little.  I have gone about the definition of
+a ``path'' in a slightly different way, and although it might appear to be more complicated, it is intended to
+payoff later on. 
+
+\begin{definition}[Ordering of a Graph]
+
+Let $ G $ be a graph, the ordering Ord$ (G) $ is the set such that for every edge
+$ \{v_1, v_2\}\in E_G $ (with $ v_1, v_2\in V_G $), the \emph{ordered} pairs
+$ (v_1, v_2) $ and $ (v_2, v_1) $ are exactly those elements in Ord$ (G) $.
+
+\end{definition}
+The members of Ord$ (G) $ are called \emph{directed edges}.
+
+\begin{definition}[Path]
+
+Let $ G $ be a graph, let $ v_1, v_2\in V_G $.  A sequence $ (p_1, p_2,\ldots, p_n ) $
+with $ p_1, p_2,\ldots p_n\in\mbox{Ord}(G) $ such that $ (p_s)\coordinate[2]\neq (p_t)\coordinate[2] $
+for any $ s\neq t $ is called a path from $ v_1 $ to $ v_2 $ if the following conditions
+are satisfied: 
+
+\begin{enumerate}
+
+\item $ (p_1)\coordinate=v_1 $
+
+\item $ (p_i)\coordinate[2]=(p_{i+1})\coordinate $ \quad for\quad $ 1\le i < n $
+
+\item $ (p_n)\coordinate[2]=v_2 $
+
+\end{enumerate}
+
+In particular, a path is called \emph{closed} if $ v_2=v_1 $ and is otherwise called \emph{open}.
+
+\end{definition}
+
+\begin{definition}[Connected Graph]
+
+A graph $ G $ is called connected if given any two vertices $ v_1, v_2\in V_G $ with $ v_1\neq v_2 $,
+there exists a path from $ v_1 $ to $ v_2 $.  A graph $ G $ that is not connected is called disconnected.
+
+\end{definition}
+The removal of a vertex $ v $ from a graph $ G $, written as $ G-v $, is defined as the removal of $ v $ from
+the vertex set $ V_G $ and any incident edges of $ v $ from $ E_G $.  Similarily, the removal of an edge $ e $
+from $ E_G $ (but not the vertices incident to it) will be written as $ G-e $.
+
+\begin{definition}[Disconnect Vertex]
+
+Let $ G $ be a graph and $ v $ a vertex.  If there exists some connected subgraph $ H $ with $ v\in V_H $ such that
+$ H-v $ is disconnected, then $ v $ is called a disconnect vertex of $ G $.
+
+\end{definition}
+Similarily, an edge $ e $ of $ G $ is called a \emph{bridge} if its removal causes some connected subgraph
+$ H $---to which it belongs---to become disconnected.
+
+Here I introduce a two part ``process'' definition which is (as above) intended to be useful later on:
+
+\begin{definition}[Open Partition]
+
+Let $ G $ be a connected graph possessing a disconnect vertex $ v $.  Let $ \{H_i\}_{i\in I} $ be the collection
+of subgraphs obtained by the removal of $ v $, then $ \{H_i\}_{i\in I} $ is called an open partition of $ G $.
+
+\end{definition}
+
+\begin{definition}[Closed Partition]
+
+Let $ G $ be a connected graph possessing a disconnect vertex $ v $.  Let $ \{H_i\}_{i\in I} $ be an open partition
+of $ G $ using $ v $.  If one were to unite $ v $ and its appropriate edge(s) back onto to each individual subgraph
+$ H_i $ written as $ H'_i $, then the collection $ \{H'_i\}_{i\in I} $ is called a closed partition of $ G $.
+
+\end{definition}
+
+It's worth noting a closed partition is also a collection of subgraphs of the original.  Both types of graph
+partitions aren't partitions in the set-theoretic sense, but they're pretty close; one being disjoint whose union
+is almost the full graph, and the other who's union is the whole, but isn't exactly disjoint\ldots but close.
+
+\begin{definition}[Cyclic Graph]
+
+A graph $ G $ is said to be cyclic if it contains a closed path, in which case, such a path is also called a cycle.
+Furthermore, a graph $ G $ is said to be acyclic if it contains no cycles.
+
+\end{definition}
+
+\begin{definition}[Tree]
+
+A tree $ T $ is a connected acyclic graph.
+
+\end{definition}
+A vertex $ l $ of a tree $ T $ is called a \emph{leaf} if deg$ (l)=1 $,
+all vertices of $ T $ that are not leaves are called \emph{nodes}.
+
+The reader will see later on that I am only interested in trees possessing at least one node.
+
+Here ends the review.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Mathematical Grammar}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Currently in the literature, combinatorial arguements are constructed as interrogative statements:
+``Does \emph{such-and-such} structure exist?'' ``How many ways are there to\ldots?'' etc.  In my
+experience---and certainly I am loading this claim with a lot of individual bias---such free-form wordplay is often
+confusing and occasionally unstable.  To successfully address such issues arising from these casual or ``intuitive''
+combinatorial arguments, we will need a shift in perspective.
+
+The problem generally arises by \emph{procedurally} constructing the question before the knowledge of a solution.
+One of the more successful and well documented ways to avoid such pitfalls of procedural arguments is to
+\emph{avoid them altogether.} Just kidding.  Rather, if one relies on ``existential'' arguments assuming the existence
+of a structure based on some known criteria beforehand, rather than assuming the construction of a structure based on
+some other known criteria after the fact, the shift in perspective is often enough to establish one is making claims
+spanning more than just a void.  Such safeguards are sometimes a bit more tedious but are worthwhile in that they
+tend to reduce contradictions and circular arguments.
+
+In order to change the perspective from that of an interrogative or imperative statement to a declarative one,
+we must break down a few assumptions about what notation is and can be.
+
+\section{deconstruction}
+
+First consider the following:
+$$  \mbox{`}2+3\mbox{'} $$
+This is all too common notation read as ``two plus three.''  This is what I would call \emph{object-oriented}
+notation.\footnote{not to confuse it with ``object-oriented'' programming languages such as (of this date) C$ ++ $
+or Java.}  I will break down what I mean in parts.  First, if one was prompted with this statement, they may
+evaluate it computationally; in the closest sense possible, it could in such a context be considered an imperative
+statement---a command (the evaluation resulting as `$ 5 $').  This is not the perspective we are aiming for.
+Next, if again prompted, we may consider it an interrogative statement.  Someone has questioned what this means,
+and if we are good literary analysts, we may wonder under what context this question has been posed, so as to
+interpret and devise a response.  In the worst-case scenario, without further context we may reduce the question
+again to evaluating (the answer of course being `$ 5 $').  Again, even in the best case-scenario with full context,
+this style of perspective is not the aim here.
+
+The aim here then is to take a statement such as `$ 2+3 $' and to interpret it as nothing more than a declarative
+statement; one that simply records what has transgressed.  Here is where the perspective begins to develop,
+but we need to digress just a little further\ldots just a little further into the realm of linguistics:
+
+To build my case and my claim, it will be helpful to analyse this declarative statement `$ 2+3 $' using some
+additional linguistic tools.  In particular, we are interested in the syntactic relationships within, but
+to go any further we will need to look more closely at the statement itself.  
+
+To start us off, it would help to ask a question:  Why have we left out the answer `$ 5 $'?
+
+Since we are more interested in the subtleties of syntax than the subtleties of semantics, and given this
+statement is to be interpreted as a \emph{data structure}, the answer can be nothing more than:
+``the information is there, it's just implied.''  Thus, we could expand the statement out in words to be:
+``Five is computed, by addition, from two using three.''  Admittedly, this is a big jump from ``two plus
+three'' but the translation is not unreasonable given what we are interested in, and this particular form
+makes clearer the syntactic relationships within.  ``Five'' is the \emph{subject}, ``is computed, by addition''
+is the \emph{verb} (with an adverbial modifier), ``two'' is the \emph{direct object}, and (to keep things simple)
+``three'' is the \emph{indirect object}.
+
+It is from this perspective I am willing to claim that `$ 2+3 $' is object-oriented; if one were to read this
+statement this way, then this message---this \emph{container of information}---can be said to favor the objects
+of this linguistic sentence.
+
+This concludes the deconstruction portion of the notation.  On to the reconstruction.
+
+\section{reconstruction}
+
+Now that we know what we're working with, let's look at this information in another way.  It will be of more
+interest and use to consider notation that favors the verb---\emph{verb-oriented} notation.  In an
+object-oriented sentence, the objects are considered to exist first and so privilege is given to them; they
+are at the forefront of retrieval within the message.  If the object is given first, then the relationships
+between the objects is communicated afterwards, the \emph{structure} is communicated afterwards.  With
+verb-oriented notation, it is the other way around, the structure is communicated first, and then the
+objects within.
+
+As far as translation goes, such a notation is the destination, and the current object-oriented notation is
+the origin, and so we are only missing the steps in-between.  As far as this goes, there are different
+possible approaches, but the one I have taken relies on graph theory.  As best I can tell, Combinatorics
+and Graph Theory are largely inseperable, and so I would have introduced it at some point within this book.
+It is of course for the purposes of this notation I have introduced it so early on.
+
+\section{The Notation}
+
+\begin{definition}[Clause]
+
+A clause $ C $ is a pair of sets $ (G, M) $ such that $ G $ is a graph, and $ M:S\to A $ is a mapping where its domain
+is a subset of the vertex set of $ G $, which is to say $ S\subseteq V_G $.
+
+\end{definition}
+I extend the notions of \emph{subgraphs}, \emph{open} and \emph{closed partitions} from graphs to clauses,
+the definitions themselves should be apparent.
+
+\begin{definition}[Sentence]
+
+A clause $ U=(T, M) $ is called a sentence if its graph $ T $ is a tree containing a node $ n\in V_T $ such that:
+
+$$ \mbox{Dom}(M)=V_T-\{n\} $$
+
+In such a case, $ n $ is called the \emph{root} of the sentence, and is given the special character $ r_U $.
+
+\end{definition}
+If the context is clear the root $ r_U $ may be written without its subscript: $ r $.
+It is worth noting that although the root does not belong to the domain, there exists
+a unique path from the root to every other vertex that does belong (which is infact
+every other vertex of the tree).  This motivates the following notation:
+
+With the verb as the foundation of the notation, we need to navigate our access to the elements of this structure.
+It is this approach that leads us additionally towards a ``path-oriented'' supplimentary notation.
+
+Given a sentence $ U=(T, M) $ and a path $ p $ from its root $ r $ to some vertex $ b $, I write
+$$ U\pass[{p[b]}] $$
+to mean
+$$ M(b) $$
+though considering that $ b $ is implied within $ p $ already,
+I may---depending on the purpose---simply write it as:
+$$ U\pass[p] $$
+which is to say that $ U\pass[p] $ is the image of $ b $ under $ M $.
+Such an image $ U\pass[p] $ of a sentence will be called an \emph{arguement} of $ U $.
+As well, the vertex $ b $ that is ``incident'' to the path $ p $ will be called the
+\emph{branch} of $ p $.  Finally, the set of such paths $ p_i $ from the root to a branch
+will be called the \emph{syntax} of $ U $ and denoted as Syn$ (U) $.
+When the context is clear, it will more often be written in the following way:
+$$ U:\Sigma_{i\in\mbox{\scriptsize Syn}(U)}p_i $$
+and especially when the order of syntax is small I will most assuredly write it as:
+$$ U:p_0+p_1+\ldots+p_n $$
+As to why, this will be discussed further below.
+ 
+I am not finished here though, if one inverts the order of the edges within
+the path $ p $ to obtain $ \bar{p} $, one may write
+$$ _{[b]\bar{p}\,\backslash}U $$
+to mean the same thing as
+$$ U\pass[{p[b]}] $$
+the difference here is a subtle change from \emph{verb-orientation} to \emph{object-orientation},
+which is conceptually more useful for formula manipulations---more will be explained later.  Finally,
+if the context is clear, I will ``hide'' the reference $ U $ and subscript the path $ p $ resulting in:
+$$ _p[b] \qquad\mbox{ or }\qquad [b]_{\bar{p}} $$
+such notational definitions will be particularily important throughout the remainder of this article: don't worry
+yet about how they're applied, this is what much of the article is about.
+
+A sentence $ S $ is called \emph{simple} if the root $ r_S $ is its only node.
+
+\begin{definition}[Base]
+
+Let $ B $ be a sentence satisfying the following conditions:
+
+\begin{enumerate}
+
+\item B is simple.
+
+\item the syntax $ \mbox{Syn}(B) $ is well ordered.
+
+\end{enumerate}
+then $ B $ is called a base.
+
+\end{definition}
+I take advantage of the fact that the syntax of a base is well ordered by representing
+the paths of it as $ r^k $---which is to say $ r^k\in\mbox{Syn}(B) $---where $ r $ is its root (and
+only node), and $ k $ is the $ k $\th path within the well ordering.
+
+\subsubsection{factorization of Syn$ (U) $}
+
+In the case that Syn$ (U) $ is factorizable, I will write:
+
+\subsection{an example}
+
+I'll add an example for clarity (because examples are good):
+
+The clause or formula $ g $ being informationally equivalent to:
+$$ (b+(cd))e $$
+would be translated to have its syntax as:
+$$ g:1+\mu(\syntaxes[\sigma](\syntaxes[\mu]))+\mu^2 $$
+which I must admit is comparatively long to convey the same structural information (about $ 3 $ times the length),
+but as with anything in language, frequently used ``phrases'' tend to evolve shorter forms; once the ``whole'' is
+established, the context is set and shortforms may be invoked, but I'll get to that later.
+
+In anycase, the components broken down are:
+\begin{eqnarray*}
+g\pass[1] & = & (b+(cd))e\\
+g\pass[\mu] & = & b+(cd)\\
+g\passes[\mu]{2} & = & e\\
+ &   & \\
+g\pass[\mu\sigma] & = & b\\
+g\pass[\mu\sigma^2] & = & cd\\
+ &   & \\
+g\pass[\mu\sigma^2\mu] & = & c\\
+g\pass[\mu\sigma^2\mu^2] & = & d
+\end{eqnarray*}
+The strength does not entirely show itself here, because this formula is not informatically dense, but other examples
+with info-dense data environments (jungles) like ``sums of sums of products'' can better demonstrate.
+
+The analogy is with algorithmics.  Powerful algorithims that can do the same work as simpler ones tend to use more
+resources and are less efficient than their counterparts when computing small values; they only really show their true
+strength when heavier computations are required.
+
+Finally, one may have noticed already I tend to use $ \sigma $ as the root of any formula of addition and $ \mu $ as the
+root for any formula having to do with multiplication.  I will use such conventions through the remainder.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{\texorpdfstring{Narrating\\ Enumerative Media}{Narrating Enumerative Media}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Choices}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Grammar}
+
+\indent\hspace{\hone}\hypertarget{oChoice}{\hyperlink{Choice}{Choice}}
+
+\hspace{\htwo}\hypertarget{oChoiceInventory}{\hyperlink{ChoiceInventory}{Choice Inventory}}
+
+\hspace{\hthree}\hypertarget{oCardinalChoiceInventory}{\hyperlink{CardinalChoiceInventory}{Cardinal Choice Inventory}}
+
+\hspace{\hone}\hypertarget{oCombination}{\hyperlink{Combination}{Combination}}
+
+\hspace{\htwo}\hypertarget{oConjunctiveChoice}{\hyperlink{ConjunctiveChoice}{Conjunctive Choice}}
+
+\hspace{\hthree}\hypertarget{oConjunctiveInventory}{\hyperlink{ConjunctiveInventory}{Conjunctive Inventory}}
+
+\hspace{\htwo}\hypertarget{oDisjunctiveChoice}{\hyperlink{DisjunctiveChoice}{Disjunctive Choice}}
+
+\hspace{\hthree}\hypertarget{oDisjunctiveInventory}{\hyperlink{DisjunctiveInventory}{Disjunctive Inventory}}
+
+\hspace{\hone}\hypertarget{oAntipassiveChoice}{\hyperlink{AntipassiveChoice}{Antipassive Choice}}
+
+\hspace{\hone}\hypertarget{oReconciliation}{\hyperlink{Reconciliation}{Reconciliation}}
+
+\hspace{\htwo}\hypertarget{oReconciliationInventory}{\hyperlink{ReconciliationInventory}{Reconciliation Inventory}}
+
+\section{Declarations}
+
+All \emph{sentences} referred to here are \emph{grammatical} ones unless stated otherwise.  For my
+exposition of \emph{grammar theory} see my other article.
+
+Here \emph{sets} are left intuitive, for an exposition on axiomatic set theory refer to some other book.
+If $ X $ is some set then $ |X| $ is its \emph{cardinality}, if $ X $ is a finite set then I will refer
+to $ |X| $ as its \emph{size}.  Given this to be a very common property, a more convenient notation is
+desired to say two sets have the same cardinality.  Since this is the case, I will write $ X\simeq Y $.
+
+The declarations section of this and any other chapter is largely about defining various points of grammar.
+It is best to glance over it when reading the first time around; to get a better feel for what tools this book
+makes available to the user.
+
+\subsection{General Choice}
+
+\begin{definition}[\hypertarget{Choice}{\hyperlink{oChoice}{Choice}}]
+
+Given the sentence
+$$ C:\syntax $$
+if $ C\pass[1]\subseteq C\pass $ then $ C $ is called a \emph{choice}
+and is expressed in words as ``$ C\pass[1] $ \emph{is chosen from} $ C\pass $.''
+
+\end{definition}
+
+\begin{definition}[\hypertarget{ChoiceInventory}{\hyperlink{oChoiceInventory}{Choice Inventory}}]
+
+Let
+$$ \bold[C:\syntax] $$
+be an operator of choices such that for any $ C_1, C_2\in\bold $ and some set $ X $ we have
+$$ C_1\pass=X=C_2\pass $$
+then $ \bold $ is called a \emph{choice inventory} over $ X $.
+
+\end{definition}
+
+Notice here the subtle uses of the subscript notation.  Any label to the left of the first slash
+`$ / $' indicates a regular \emph{subscript as label} in the traditional use of the notation.
+Here though the notations combine, which is possible since no ambiguity is introduced.  One
+may think of it as similar to the \emph{namespace} concept in the Xml markup language.
+
+ A choice inventory is said to be \emph{full} if for every subset $ A\subseteq X $ there is a corresponding
+choice $ C\in\bold $ with $ C\pass=A $.  This is to say that $ \bold $ is full if it contains every possible
+choice of its kind.
+
+It is very common in practice to \emph{modify} a choice or an inventory.  In natural language
+this is equivalent to applying an adverb.  Given these particular definitions, the only real option
+is to restrict the type of subsets being chosen.  Such thinking leads to the following:
+
+\begin{definition}[\hypertarget{CardinalChoiceInventory}{\hyperlink{oCardinalChoiceInventory}{Cardinal Choice Inventory}}]
+
+Let $ \bold $ be a choice inventory.  For all $ C_1,C_2\in\bold $, if $ C_1\pass[1]\simeq C_2\pass[1] $,
+then $ \bold $ is called a \emph{cardinal choice inventory}.
+
+\end{definition}
+
+One thing the reader might notice is the naming scheme of the definitions so far; ``choice''
+is nice and simple, yet ``cardinal choice inventory'' is not so nice and simple.  The general
+pattern is that the more elegant definition names are (ideally) left for the more important concepts.
+With that said, we may introduce the all important notion of a \emph{combination}:
+
+\begin{definition}[\hypertarget{Combination}{\hyperlink{oCombination}{Combination}}]
+
+Let $ \bold $ be a cardinal choice inventory over a finite set; in particular let $ \bold\pass\simeq n $
+and $ \bold\pass[1]\simeq r $, then $ \bold $ is said to be an \emph{$ n $ choose $ r $ combination}.
+Such an inventory is denoted as $ \nCr $.
+
+\end{definition}
+
+In the special case where $ r=1 $ we have what is called a \emph{selection}.
+
+\subsection{Extending Choice}
+
+The next grammar points worth iterating here, are natural extensions of the concept of choice:
+
+\begin{definition}[\hypertarget{ConjunctiveChoice}{\hyperlink{oConjunctiveChoice}{Conjunctive Choice}}]
+
+Given the sentence
+$$ C:\syntaxes $$
+If $ C\pass[1]\subseteq C\pass\cup C\passes{2} $
+then $ C $ is called a \emph{conjunctive choice} and is expressed as ``$ C\pass[1] $
+\emph{is chosen from} $ C\pass $ \emph{and} $ C\passes{2} $.''
+
+\end{definition}
+
+It's worth mentioning that nothing is said regarding whether or not $ C\pass\cap C\passes{2}=\emptyset $.
+As with the general choice, we broaden this to an inventory:
+
+\begin{definition}[\hypertarget{ConjunctiveInventory}{\hyperlink{oConjunctiveInventory}{Conjunctive Inventory}}]
+
+Let
+$$ \bold[C:\syntaxes] $$
+be an operator of conjunctive choices such that for any $ C_1, C_2\in\bold $ and some sets $ X, Y $ we have
+$$ C_1\pass=X=C_2\pass\qquad\mbox{and}\qquad C_1\passes{2}=Y=C_2\passes{2} $$
+then $ \bold $ is called a \emph{conjunctive inventory} over $ X $ and $ Y $.
+
+\end{definition}
+
+There is a special case of the conjunctive choice worth considering.  It is when the subject is chosen from only
+one of the choice sets:
+
+\begin{definition}[\hypertarget{DisjunctiveChoice}{\hyperlink{oDisjunctiveChoice}{Disjunctive Choice}}]
+
+Given the sentence
+$$ C:\syntaxes $$
+If $ C\pass[1]\subseteq C\pass $ or $ C\pass[1]\subseteq C\passes{2} $ but not both,
+then $ C $ is called a \emph{disjunctive choice} and is expressed as ``$ C\pass[1] $
+\emph{is chosen from} $ C\pass $ \emph{or} $ C\passes{2} $.''
+
+\end{definition}
+
+\begin{definition}[\hypertarget{DisjunctiveInventory}{\hyperlink{oDisjunctiveInventory}{Disjunctive Inventory}}]
+
+Let
+$$ \bold[C:\syntaxes] $$
+be an operator of disjunctive choices such that for any $ C_1, C_2\in\bold $ and some sets $ X, Y $ we have
+$$ C_1\pass=X=C_2\pass\qquad\mbox{and}\qquad C_1\passes{2}=Y=C_2\passes{2} $$
+then $ \bold $ is called a \emph{disjunctive inventory} over $ X $ or $ Y $.
+
+\end{definition}
+
+Let $ \bold[C:\syntaxes] $ be an .  If given any $ W\subseteq\bold\pass $ there exists a unique choice $ C\in\bold $ with
+$ C\pass[1]=W $, then $ \bold $ is called a \emph{full combination}.
+
+Let $ \bold[C:\syntaxes] $ be a disjunctive inventory with $ \bold\pass[1] $ a singleton.
+is called a \emph{}.
+
+Does the commutative law hold?
+
+\subsection{Composing Choice}
+
+Before we can compose choice, we must first revisit general choice.  By its very definition it is used in a
+passive way.  This has to do with the general approach to set theory in that all things are declarative and
+not procedural.  Keeping in line with this, rather than an \emph{active} version of ``choice'' we take a
+\emph{antipassive} strategy.  This is to say, we indirectly describe an active form:
+
+\begin{definition}[\hypertarget{AntipassiveChoice}{\hyperlink{oAntipassiveChoice}{Antipassive Choice}}]
+
+Given the sentence
+$$ C:\syntaxes $$
+if $ C\pass[1]\subseteq C\passes{2} $ and  $ C\pass\subseteq C\passes{2} $ with
+$$ C\pass[1]\cap C\pass=\emptyset\qquad\mbox{and}\qquad C\pass[1]\cup C\pass=C\passes{2} $$
+then $ C $ is called a \emph{antipassive choice} and is expressed in words as
+``$ C\pass[1] $ \emph{chooses} $ C\pass $ \emph{from} $ C\passes{2} $.''
+
+\end{definition}
+
+Notice here that $ C\pass[1] $ and $ C\pass $ form a partition of $ C\passes{2} $.
+The trick of words and logic is that by directly choosing $ C\pass[1] $ we are in fact
+indirectly choosing $ C\pass $ from $ C\passes{2} $.  It is in this
+form we are able to readily take compositions:
+
+$$ C':\syntaxes(\syntaxes) $$
+
+\subsection{Reconciling Choice}
+
+\begin{definition}[\hypertarget{Reconciliation}{\hyperlink{oReconciliation}{Reconciliation}}]
+
+A choice
+$$ \tilde{C}:\syntax $$
+is said to be a \emph{reconciliation} over $ \mathcal{H} $ if $ \mathcal{H} $ is an
+equivalence relation on $ C\pass $ such that $ C\pass[1] $ is one of its equivalence classes.
+It is read as: ``$ C\pass[1] $ is a reconciliation of $ C\pass $ over $ \mathcal{H} $.''
+
+\end{definition}
+
+\begin{definition}[\hypertarget{ReconciliationInventory}{\hyperlink{oReconciliationInventory}{Reconciliation Inventory}}]
+
+Let
+$$ \tilde{\bold}:\syntax $$
+be an operator of reconciliations all over some $ \mathcal{H} $, then
+$ \tilde{\bold} $ is called a \emph{reconciliation inventory} over $ \mathcal{H} $.
+
+\end{definition}
+
+Such general compositions are the motivation for a more direct process called \emph{ranking} which is the
+subject of the next chapter.  We now move on to counting theorems.
+
+\section{Enumerations}
+
+From a pedagogical point of view, it is a tempting strategy to resolve the issue of counting the value of the
+binomial coefficients by means of breaking the problem up into several lemmas.  The thing is, the postulations
+in mind are worthy tools on their own and will thus be studied here with equal respect.
+
+\begin{theorem}[Binomial Coefficients]
+
+Given counting numbers $ n, r\in\mathbb{N} $, let $ \nCr $ and $ \nCr[D] $ be combinations, then
+$$ \nCr\simeq\nCr[D] $$
+
+\end{theorem}
+
+\begin{proof}
+
+Given $ n\in\mathbb{N} $ and the definition of a combination, we have $ \bold\pass\simeq n\simeq\bold[D]\pass $.
+There necessarily exists a bijective mapping $ \phi:\bold\pass\to\bold[D]\pass $.  Given any choice $ C_1\in\bold $,
+we restrict $ \phi $ to $ C\pass[1] $:
+$$ \phi|_{C\pass[1]} $$
+by way of bijection there is a cooresponding (and unique) $ D\pass[1]\in\bold[D] $ with $ \phi(C\pass[1])=D\pass[1] $.
+Such correspondences define a bijective mapping from $ \bold $ to $ \bold[D] $, which is to say, a bijection between
+the combinations $ \nCr $ and $ \nCr[D] $.\qed
+
+\end{proof}
+
+Notice the main arguement of this proof was that of showing ``equality of size.''  This is the most fundamental
+tactic of a combinatorialist, and so this reader is reminded the test consists of proving bijectivity, which
+is to say injectivity and surjectivity.
+
+In light of this theorem, the following notation is the standard way to represent the common size to all $ \nCr $
+combinations:
+$$ {n\choose r} $$
+It belongs to an important class of numbers called \emph{binomial coefficients}.
+
+The next step would be to be able to numerically compute this value in an efficient way.  As it turns out, it
+is best to start simpler when the actual counting is involved.
+
+\begin{theorem}[Sum Rule]
+
+Let $ \nCr[A] $ and $ \nCr[B] $ be full.  If $ \nORr $ is full, then:
+$$ |\nORr|=|\nCr[A]|+|\nCr[B]| $$
+
+\end{theorem}
+
+\begin{proof}
+
+\qed
+
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Rankings}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Grammar}
+
+\indent\hypertarget{oRanking}{\hyperlink{Ranking}{Ranking}}
+\indent\hypertarget{oPermutation}{\hyperlink{Permutation}{Permutation}}
+\indent\hypertarget{oSifting}{\hyperlink{Sifting}{Sifting}}
+
+\section{Declarations}
+
+\subsection{General Ranking}
+
+\begin{definition}[\hypertarget{Ranking}{\hyperlink{oRanking}{Ranking}}]
+
+Given the sentence
+$$ R:\syntax[\lhd] $$
+if $ R\pass[1] $ is an injective tuple over $ R\pass[\lhd] $ then $ R $ is called a \emph{ranking}
+and is expressed in words as ``$ R\pass[1] $ \emph{is ranked from} $ R\pass[\lhd] $.''
+
+\end{definition}
+
+\begin{definition}[\hypertarget{Permutation}{\hyperlink{oPermutation}{Permutation}}]
+\end{definition}
+
+\begin{definition}[\hypertarget{Sifting}{\hyperlink{oSifting}{Sifting}}]
+
+Given a tuple $ \bold[x] $ and the sentence
+$$ S:\syntax[\lhd] $$
+if $ S\pass[\lhd]=\bold[x] $ and $ S\pass[1]\subseteq\mbox{Ran}(\bold[x]) $,
+then $ S $ is called a \emph{sifting} of $ \bold[x] $ and is expressed
+in words as ``$ S\pass[1] $ \emph{is sifted from} $ S\pass[\lhd] $.''
+
+\end{definition}
+
+As stated in the previous chapter, the motivation for this definition is that of iteratively
+composing several antipassive choices.  Given the antipassive choice
+$$ \mathring{C}:\syntaxes $$
+as one continues to compose it
+$$ \mathring{C}':\syntaxes(\syntaxes) $$
+
+``possibility space''\ldots worthwhile definition?
+
+\begin{theorem}[Binomial Coefficients Again]
+
+Given counting numbers $ n, r\in\mathbb{N} $, we have
+$$ {n\choose r}={\frac{n^{\underline{r}}}{r!}} $$
+
+\end{theorem}
+
+\begin{proof}
+
+The proof follows by analysing the process of choice.  If we wish to choose $ k $ elements from $ n $,
+The simplest way to conceptually construct a translation of mappings to evaluate size of the possibility space
+is to choose one element at a time.  When this happens though, we are left with an ``n rank r'' permutation.
+Where do we go from here?  we will have to deconstruct the situation.
+
+\centering
+\begin{asy}
+size(5cm);
+
+pair A, B, C, D;
+A=(0.5,0.5);
+B=(0,0);
+C=(1,0);
+D=(0,-1);
+
+draw(A--B, Arrow);
+draw(A--C, Arrow);
+draw(B--C, Arrow);
+draw(B--D, Arrow);
+draw((D--C), Arrows);
+
+label("$ X $", A, N);
+label("\nCr[P]", B, NW);
+label("\nCr", C, NE);
+label("\nCr[P]$ /\!\!\sim $", D, SW);
+
+\end{asy}
+\vspace{1cm}
+
+Things begin falling together when we observe that for our interests, a different ranking of the same
+elements has no consequence on our final choice.  This is to say these rankings for our purposes are equivalent.
+We may thus build an equivalence relation using a sifting criterion to determine equivalence.
+Extending this, we consider all possible rankings that would result in the same end-choice when sifted.
+
+We should frame things then in the context of a reconciliation.  When we do this we broaden our perspective
+and look at the full permutation inventory.  From this we form the reconciliation inventory for we would have
+a bijection from this inventory to the combination inventory of interest.
+\qed
+
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{\texorpdfstring{Deconstructing\\ Enumerative Media}{Deconstructing Enumerative Media}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Part II focused on introducing the idea of choice and exploring it's non-problematic extensions.
+This part begins to analyse the variety of choices which produce problematic enumerations.
+
+In the previous part, both the syntax and semantics of grammar were of a tree-sentence nature.
+We begin to decouple this pairing by looking at enumerations which maintain tree-structure
+syntax but produce non-tree semantics.  This is to say there begins to be some overlap.
+
+This effects the enumeration, especially in its representation which must now parse a more general graph-structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Inclusion-Exclusion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In literary analysis, the notion of \emph{identity} is very much interwined with the notion of an \emph{insider}.
+Just as well, and unfortunately it being more readily or easily defined is the notion of an \emph{outsider}.
+
+In a pluralistic or collectivistic world though, one's identity often more complicated than a simple duality;
+it generally consists of being included in some groups, and excluded from others.  In the context of set-theory,
+we would say, given some object $ x $ that some set $ X $ is an \emph{in-set} if $ x\in X $ and otherwise would
+be called an \emph{out-set} of $ x $.
+
+The problematics of plurality I might return to with the concept of a color-model \emph{gamut}.
+
+In the previous chapter our definition of a ranking was motivated by the need to (for a current lack of a better
+way to put it) economize the process of repeated choice generated from non-overlapping sets.  This chapter then
+could be said to be motivated by the need to economize the same process but this time being generated from
+overlapping sets.
+
+If we were to translate the syntax of the semantics itself, I suspect in this case it would look like a bipartite
+graph.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Pigeonholes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The analysis of inclusion-exclusion was the start-off in breaking down our assumptions when enumerating cardinality.
+The choice of it as the start-off was strategic in that it still is intimately tied in with choice as our enumerative
+media.
+
+In this chapter it is the intention to now make a clear break from ``choice'' and analysis another collection of
+structures that will aid us in understanding what assumptions we've been using thus far in our communications.
+
+A pigeonhole is a situation demonstrating the limitations of choice and such enumerative consequences.
+Intuitively it arises when one has to make more choices than there are objects to be chosen.  The limitation
+is one of \emph{distribution} and comes in realizing that any given choice inventory will have at least one
+pair of non-disjoint choices.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{\texorpdfstring{Reconstructing\\ Enumerative Media}{Reconstructing Enumerative Media}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In this part, we begin to look at alternative frameworks for enumerating the various inventories of interest.
+We are now ready to look a broader graph-clause structures as means of enumeration.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Generating Structors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+``Structor Grammar?''
+
+We begin to look at enumeration from a global perspective.
+
+\section{Formal Power Series}
+
+\section{Generating Functions}
+
+The first thing to note is that such a syntax $ \mbox{Syn}(B) $ is finite, which holds since we are intending to define
+polynomials which are themselves finite in degree within rings.  Using the notation defined as above, the paths of a base
+are represented as $ x^0, x^1,\ldots, x^n $ for some finite $ n $, where $ x $ is the root.  I should add I'm using
+the natural numbers $ \mathbb{N} $ to ``notate'' the well ordering.
+
+To get the big picture of ``all at once'' though, I \emph{concatenate} these paths using the plus ($ + $) sign:
+$$ \mbox{Syn}(B):=1+x+x^2+\ldots+x^n $$
+Now I cheated a little here, so I will explain: the `$ 1 $' is shortform for $ x^0 $, as well, the $ x $ is shortform
+for $ x^1 $.  Also, as stated before, if I want to display any of the arguements of $ B $, I simply write them as:
+$$ B/x^k\qquad\mbox{ or }\qquad x^k\,\backslash B $$
+where $ k $ is some natural number from $ 0 $ to $ n $.
+
+With this I have enough for our definition.
+
+Let $ R $ be some ring, we wish to define a collection of bases $ \mathcal{B} $ possessing the same
+cardinality (size) as $ R $ such that they all contain the same syntax, one with the following form:
+$$ \mbox{Syn}(B):=1+x+x^2+\ldots+x^n $$
+for $ B\in\mathcal{B} $ and some fixed $ n $.  In particular define their arguements as:
+$$ B/x^k=a^k\quad\mbox{for some } a\in R\mbox{ with } 0\le k\le n $$
+and do this for each $ B\in\mathcal{B} $ such that they span all $ a $ in $ R $.
+
+This is $ \frac{1}{2} $ of the picture though, we still need coefficients.  How does one obtain these you ask?\ldots
+through algebra's favorite trick\ldots an equivalence relation of course.
+
+The thing to note is that the bases $ B\in\mathcal{B} $ possess mappings $ m:\mbox{Dom}(B)\to R $ all with the same range,
+so given some other mapping $ g:R\to R $, one may ``act'' on these bases by defining compositions:
+$$ g\circ m:\mbox{Dom}(B)\to R $$
+Thus we define an ``action map'' to create our equivalence relation, where our definition of two bases
+$ B, B'\in\mathcal{B} $ being equivalent is:
+$$ B\equiv B'\Longleftrightarrow g\circ m=g\circ m' $$
+where $ m $ is the map of $ B $ and $ m' $ is the map of $ B' $.  In such a case, to represent an equivalence class,
+one writes:
+$$ [B]=c_0+c_1x+c_2x^2+\ldots+c_nx^n $$
+where the $ c_k $ are called coefficients, possessing the following property:
+$$ c_k=g([B]/x^k)\quad\mbox{given } 0\le k\le n $$
+This is possible because each base in a class has by definition the same syntax and the same coefficients.
+In such a case this equivalence class is called a polynomial.
+
+Finally, if one has many such polynomials of various ``degrees'', it is easy then to define addition
+and multiplication to obtain a polynomial ring $ R[x] $\ldots and the rest they say is history.
+
+\section{Reencoding Choice}
+
+\section{The Binomial Theorem}
+
+$$ (x+y)^n=\sum_{0\le r\le n}{n \choose r}x^{n-r}y^r $$
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Recurrence Relations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
+
+\begin{definition}[Power Choice Inventory]%\hypertarget{PowerChoiceInventory}{Power Choice Inventory}]
+
+A choice inventory $ \bold:1+\Diamond $ is said to be a \emph{power choice inventory} and denoted $ \bar{\bold} $
+if given any $ W\subseteq\bold\pass $ there exists a unique choice $ C\in\bold $ with $ C\pass[1]=W $.
+
+\end{definition}
+

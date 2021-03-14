@@ -1,0 +1,382 @@
+% Copyright 2014 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1in,right=1in,top=0.7in,bottom=0.7in]{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\newcommand{\powerset}[2][P]{\ensuremath{\mathbb{#1}(#2)}}
+\newcommand{\nthps}[2][P]{\ensuremath{\mathbb{#1}^{#2}}}
+\newcommand{\nthus}[2][U]{\ensuremath{\mathbb{#1}^{#2}}}
+\newcommand{\psunion}[2][P]{\ensuremath{\bigcup_{#2\ge 0}\mathbb{#1}^{#2}}}
+\newcommand{\opsunion}[3][P]{\ensuremath{\bigcup_{#2\ge #3}\mathbb{#1}^{#2}}}
+\newcommand{\usunion}[2][U]{\ensuremath{\bigcup_{#2\ge 0}\mathbb{#1}^{#2}}}
+\newcommand{\ousunion}[3][U]{\ensuremath{\bigcup_{#2\ge #3}\mathbb{#1}^{#2}}}
+\newcommand{\stratified}{\ensuremath{\mathbb{U}^\infty}}
+\newcommand{\of}[1]{\ensuremath{(\mathcal{#1})}}
+
+\newcommand{\then}{\ensuremath{\quad\Longrightarrow\quad}}
+\newcommand{\equals}{\ensuremath{\quad =\quad}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\newenvironment{proof}[1][Proof]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1:}]}{\end{trivlist}}
+\newenvironment{example}[1][Example]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{remark}[1][Remark]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+\newcommand{\qed}{\nobreak \ifvmode \relax \else
+      \ifdim\lastskip<1.5em \hskip-\lastskip
+      \hskip1.5em plus0em minus0.5em \fi \nobreak
+      \vrule height0.75em width0.5em depth0.25em\fi}
+
+\title{A Computational Model of Reference by means of Stratified Powersets (Part One)}
+\author{Daniel Nikpayuk}
+\date{June 14, 2014}
+
+\pagestyle{empty}
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+\begin{abstract}
+Here I introduce a set theoretic model of \emph{data structures} intended to be used within the theory of computation.
+I aim to provide a \emph{context space} for which to validate other related specifications of computational design such
+as semiotic filters. I further intend to use this contextualization to define and implement a \emph{model of reference}
+as an alternative to the standard environment model (frames and bindings) used by interpreters. As this is a three part
+article, the second and third will focus on the implementation.
+
+Finally, I will note that there are many computing science situations where a category theoretic lens is more suitable.
+I have chosen a set theoretic framework as the focus here because emphasis in this design is placed on context and structure
+rather than representation and function.
+\end{abstract}
+
+\section*{Motivation}
+
+We start at the beginning.\\[0.1cm]
+
+We start at the beginning and philosophically interrogate what a \emph{data structure} even is, and yet before we can talk about
+the structure, we must begin with the data. But for sake of clarity, let's use the word \emph{content}.
+
+So we start from nothing except the content we wish to structure. As it stands, if you give it some
+thought, we already have a structure---the content itself. The very idea of ``content'' implies we have grouped together
+objects of interest. We might not know how or why they are grouped together, but that they are grouped together. This though,
+is exactly already the idea of a \emph{set}. We will be using set theory as our foundation in this article.
+
+In a general sense, how does one represent data structures using set theory?  The nature of the word ``structure''
+in a conceptual sense is that of creating \emph{divisions}. Our initial content is a division between what's in this set
+and what's \emph{not} in this set---which is to say everything else in the universe. Beyond that, the most basic data
+structure is anything that creates a single additional division built on top of our initial division.
+
+Though it is always debatable, I would claim in a general sense the most
+basic data structure beyond that of a set is an \emph{ordered pair}:
+$$ (a,b) $$
+Let's give this a little thought: The ordered pair as an intuitive specification has three properties: First, two objects `$ a $'
+and `$ b $' are collected together. Second, one of these objects is by convention assigned the connotation of being ``first''
+and the other as being ``last'' (this being the next basic division built upon our initial division). So to start with set theory,
+we would first collect together the objects of interest:
+$$ \{a,b\} $$
+Here we've already run into our first problem: We have a pair, but it's not ordered. How do we add additional structure which
+provides enough information that we can infer which is first and which is last? As it turns out there are many different ways
+to do this, and what's more there's no reason to say in a general sense that any way is better than any other---so long as they
+effectively communicate their intent, they have equivalent potential---they are \emph{equipotent}.
+
+We do have an additional guideline to help us narrow down our design though: Whatever structure we use, it should have the highest
+entropy (least possible constraints). In this context it should be as simple as possible (minimalistic)---so as to prevent
+additional semantic content being implicitly interpreted which would otherwise have nothing to do with the intuitive idea
+of an ordered pair. Here is the classical definition:
+$$ (a,b):=\{a,\{a,b\}\} $$
+It is worth noting that in our \emph{culture's} value system\ \footnote{As of the time and place this article
+was written of course.} we tend to privilege ``first'' over ``last''. Thus, regarding an ordered pair, we can use
+the knowledge of this cultural privilege as a convention to remind ourselves of which element is to be interpreted
+as ``first'' by including it along with the unordered pair (hence the above definition).  Furthermore, by collecting
+'$ a $' together with $ \{a,b\} $ we in fact provide just enough information to represent our data structure, and no more.
+
+It's also worth noting that if in our value system we valued ``last''
+before ``first'' we could've implemented an ordered pair equivalently as:
+$$ (a,b):=\{b,\{a,b\}\} $$
+The main point is not a matter of universal \emph{right} or \emph{wrong}, but a matter of \emph{consistency}.
+If we use one implementation within a given context, we either stick to that implementation or have clear
+rules as to when to switch---so as to not provide confusion.
+
+So what about a triple? As an example we could implement it like this:
+$$ (a,b,c):=(a,(b,c)) $$
+which is a pair whose last element is itself a pair. Translating this further into set theoretic terms:
+$$ (a,(b,c))=\{a,\{a,\{b,\{b,c\}\}\}\} $$
+Or, we might want to define a tree-like structure using ordered pairs:
+$$ ((a,b),(c,d))=\{\{a,\{a,b\}\},\{\{a,\{a,b\}\},\{c,\{c,d\}\}\}\} $$
+At this level it is easy for critics to attack: Too confusing! Too many left/right curly braces!
+Too much repeated use of the symbols `$ a $', `$ b $' , `$ c $', `$ d $' on the right hand side
+(especially because they occur only once on the left)! \ldots
+
+All of this is true of course, but such considerations will be explicated upon later in the theory (in part three).
+Let's for now focus on \emph{constructive} pattern recognition.
+
+To help simplifiy our discussions, the intuitive concept of \emph{nesting depth} might be of use. For example `$ a $' has
+a nesting depth of \emph{zero} while `$ \{a\} $' has a nesting depth of \emph{one} and `$ \{\{a\}\} $' has a nesting depth
+of \emph{two}. We could keep going ad infinitum, as such nested sets of the original content would likely be useful
+in constructing arbitrary data structures.
+
+This then, is the first motivation in defining a context for data structures: If we have an initial content set $ \mathcal{S} $,
+we will need access to its powers of powersets:\ \footnote{The powerset of course being the set of all subsets of $ \mathcal{S} $,
+denoted as $ \powerset{S} $.}
+\begin{eqnarray*}
+\nthps{0}\of{S} & := & \mathcal{S} \\
+\nthps{1}\of{S} & := & \powerset{S} \\
+\nthps{2}\of{S} & := & \powerset{\powerset{S}} \\
+\ldots & := & \ldots \\
+\nthps{k}\of{S} & := & \powerset{\nthps{k-1}\of{S}},\quad k\ge 1
+\end{eqnarray*}
+
+\newpage
+
+On the other hand, having access to even the full recursive range of a given contents' powersets it turns out is not
+sufficient.  For example, to informally construct our ordered pair $ (a,b) $ from set theoretic operations, we would have:
+\begin{eqnarray*}
+\{a\}\subseteq \mathcal{S} & \mbox{and} & \{\{a,b\}\}\subseteq\powerset{S} \\
+ & & \\
+(a,b) & = & \{a,\{a,b\}\} \\
+ & = & \{a\}\cup\{\{a,b\}\} \\
+ & \Longrightarrow & (a,b)\subseteq S\cup\powerset{S} \\
+\end{eqnarray*}
+
+A question arises, what if:
+$$ (a,b)\not\subseteq\mathcal{S}\mbox{ and }(a,b)\not\subseteq\powerset{S}\quad ? $$
+This is to say, what if our ordered pair as a set is inaccessible by means of single powers of powersets alone?
+It should be mentioned that although it's possible for $ \nthps{n}, \nthps{n+1} $ to share members for arbitrary
+$ n $, in the general case this does not hold. There is a well known proof that a powerset will always have an
+element which does not belong to the
+original:\ \footnote{The cardinality of a powerset is greater than that of the cardinality of the original.}
+$$ \powerset{S}-\mathcal{S}\neq\emptyset $$
+The point of all this is that there will always exist---even with our second simplest data structure---ordered
+pairs $ (a,b) $, $ a,b\in\mathcal{S} $ that are not subsets or members of any individual $ \nthps{k}\of{S} $ for arbitrary
+$ k\ge 1 $. For our interests then, we will need a wider scope.
+
+This provides our second motivation: Not only do we need access to $ \nthps{k}\of{S} $ for arbitrary $ k $
+within our context of discourse, but we need to be able to mix and match nesting depths. One might say
+$$ \psunion{k}\of{S} $$
+is our ideal definition of context, but as it turns out it even it is not large enough to preserve some preferred
+set theoretic operations when working with data structures as sets. Such is our final motivation, in what now follows.
+
+\section*{Definitions}
+
+We extend our intuitive motivations to a class of similar structures:
+\begin{definition}[Unified Powersets]
+\begin{eqnarray*}
+\nthus{0}\of{S} & := & \mathcal{S} \\
+\nthus{n}\of{S} & := & \psunion{k}(\nthus{n-1}\of{S}),\quad n\ge 1 \\
+\end{eqnarray*}
+\end{definition}
+Even here, for each $ \nthus{n} $ all it takes is its powerset $ \powerset{\nthus{n}} $ to generate never before seen
+data structures---likely of interest---which do not belong to our current universe. Individual $ \nthus{n} $ will not suffice
+themselves as our universal context.
+
+At this point then we are ready to introduce our discourse for data structures:
+\begin{definition}[Stratified Powerset]
+$$ \stratified\of{S} := \usunion{n}\of{S} $$
+\end{definition}
+
+Oh, by the way---you may have already noticed, but---if it is clear from the context or otherwise no confusion will arise,
+we will omit $ \mathcal{S} $ from any of the below notation.
+
+\section*{Lemmata}
+
+This article will pretty much end in a few basic but important theorems, and in order to get us there and to simplify
+their proofs a handful of lemmas will be of use:
+
+\begin{lemma}[Monotonicity]
+$$ 0\le m\le n\then\nthus{m}\subseteq\nthus{n} $$
+\end{lemma}
+
+\begin{proof}
+
+Equivalently
+$$ 0\le\ell, m\then\nthus{m}\subseteq\nthus{m+\ell} $$
+Our proof then is by induction:
+\begin{itemize}
+\item case $ \ell=0 $: trivial.
+\item case $ \ell\Longrightarrow\ell+1 $:
+\begin{eqnarray*}
+\nthus{m+(\ell+1)} & = & \psunion{k}(\nthus{m+\ell})=\nthus{m+\ell}\cup\opsunion{k}{1}(\nthus{m+\ell}) \\
+& \Longrightarrow & \nthus{m+\ell}\subseteq\nthus{m+(\ell+1)}\qed
+\end{eqnarray*}
+\end{itemize}
+\end{proof}
+This lemma shows up in the latter, but is also of interest in that it justifies our notation `$ \stratified $'.
+Note also that $ \nthus{n}\subseteq\stratified, n\ge 0 $.
+
+\begin{corollary}[Mobility]
+$$ 0\le m\le n,\qquad A\in\nthus{m}\then A\in\nthus{n} $$
+\end{corollary}
+
+\begin{proof}
+Trivial, by the very definition of a subset and a bit of transitivity.\qed
+\end{proof}
+
+\begin{lemma}[Subset to Member]
+$$ A\subseteq\nthus{n}\then A\in\nthus{n+1},\quad n\ge 0 $$
+\end{lemma}
+
+\begin{proof}
+$$ A\subseteq\nthus{n}\then A\in\powerset{\nthus{n}}\subseteq\psunion{k}(\nthus{n})=\nthus{n+1}\qed $$
+\end{proof}
+
+\begin{lemma}[Reduction]
+$$ A,B\in\stratified\then\exists m\ge 0,\quad A,B\in\nthus{m} $$
+\end{lemma}
+
+\begin{proof}
+$$ A,B\in\stratified=\usunion{n}\then\exists \ell\ge 0, A\in\nthus{\ell}\quad\mbox{and}\quad\exists m\ge 0, B\in\nthus{m} $$
+Without loss of generality, let $ \ell\le m $, then $ \nthus{\ell}\subseteq\nthus{m} $, hence $ A,B\in\nthus{m} $.\qed
+\end{proof}
+
+\begin{lemma}[Stratification]
+$$ \nthus{n}\equals\nthus{0}\cup\bigcup_{\substack{k\ge 1 \\ 0\le m < n}}\nthps{k}(\nthus{m}),\quad n\ge 1 $$
+\end{lemma}
+
+\begin{proof}
+First notice our claim is equivalent to:
+$$ \nthus{n}\equals\nthus{0}\cup\bigcup_{k\ge 1}\left(\bigcup_{0\le m < n}\nthps{k}(\nthus{m})\right) $$
+We use induction.
+\begin{itemize}
+\item case $ n=1 $:
+\begin{eqnarray*}
+\nthus{1}\equals\psunion{k}(\nthus{0}) & = & \nthus{0}\cup\opsunion{k}{1}(\nthus{0}) \\
+ & = & \nthus{0}\cup\bigcup_{k\ge 1}\left(\bigcup_{0\le m < 1}\nthps{k}(\nthus{m})\right)
+\end{eqnarray*}
+\item case $ n\Longrightarrow n+1 $:
+\begin{eqnarray*}
+\nthus{n+1} & = & \psunion{k}(\nthus{n})\equals\nthus{n}\cup\opsunion{k}{1}(\nthus{n}) \\
+ & & \\
+ & & \mbox{by the inductive step, we have} \\
+ & & \\
+ & = & \nthus{0}\cup\bigcup_{k\ge 1}\left(\bigcup_{0\le m < n}\nthps{k}(\nthus{m})\right)\cup\opsunion{k}{1}(\nthus{n}) \\
+ & = & \nthus{0}\cup\bigcup_{k\ge 1}\left(\bigcup_{0\le m < n+1}\nthps{k}(\nthus{m})\right)\qed
+\end{eqnarray*}
+\end{itemize}
+\end{proof}
+With this lemma at hand, we have use for a definition:
+
+\begin{definition}[Collectibles]
+Let $ A\in\stratified $, $ A $ is said to be \emph{collectible} if
+$$ \exists j\ge 0, \mbox{ and }\exists k\ge 1,\quad\mbox{such that}\quad A\in\nthps{k}(\nthus{j}) $$
+\end{definition}
+Note that the vast majority\ \footnote{Informally speaking of course.} of $ \stratified $ is collectible, which is to
+say for $ A\not\in\nthus{0} $ we have that $ A $ satisfies collectibility.  One might be tempted to redefine collectible
+as $ \stratified-\nthus{0} $ but our intention is to define ``collectible'' as a member of $ \stratified $ which acts
+like a non-trivial data structure, and all such members tend to belong to the powersets (of powers greater than or equal
+to one).  Let's say for example $ A\in\nthps{3}\of{S} $ but also $ A\in\mathcal{S} $. This may just be a coincidence,
+but because it belongs to $ \nthps{3}\of{S} $ we have interest in it as a data structure. From the point of view of
+it belonging to $ \mathcal{S} $ we have no interest in it, but if we were to use its presence in $ \nthus{0} $ to remove
+it from $ \stratified $ we'd lose access to it altogether, even when we're interested in it only from the perspective of
+a data structure.
+
+This ends the list of lemmas to be used in our theorems. What remains are ones I've catalogued in my research
+which may or may not be of use in further studies of our stratified powerset. I provide these lemmas here in case
+they turn out to be useful---it might save others time and effort in reinventing wheels.
+
+\subsection*{Other Lemmas}
+
+As these all have simple proofs, I will leave them as an exercise.
+\begin{lemma}\
+\begin{eqnarray}
+A\subseteq B & \then & \powerset{A}\subseteq\powerset{B} \\[0.5cm]
+\nthus{n} & \subseteq & \nthus{n-1}\cup\powerset{\nthus{n}},\quad n\ge 1 \\[0.2cm]
+\nthus{n} & \equals & \bigcup_{k\ge 0}\left(\bigcup_{0\le m < n}\nthps{k}(\nthus{m})\right),\quad n\ge 1 \\[0.2cm]
+\stratified & \equals & \bigcup_{k,m\ge 0}\nthps{k}(\nthus{m})
+\end{eqnarray}
+\end{lemma}
+
+\newpage
+
+\section*{Theorems}
+
+The emphasis on the theorems here is that of closure properties:
+
+\begin{theorem}[Closure of Pair]
+$$ A,B\in\stratified\then\{A,B\}\in\stratified $$
+\end{theorem}
+
+\begin{proof}
+Since $ A,B\in\stratified $ we know there exists $ m\ge 0 $:
+\begin{eqnarray*}
+A,B\in\nthus{m} & \Longrightarrow & \{A\},\{B\}\subseteq\nthus{m} \\
+ & \Longrightarrow & \{A\}\cup\{B\}\subseteq\nthus{m}\cup\nthus{m} \\
+ & \Longrightarrow & \{A,B\}\subseteq\nthus{m} \\
+ & \Longrightarrow & \{A,B\}\in\nthus{m+1}\subseteq\stratified\qed
+\end{eqnarray*}
+\end{proof}
+
+\begin{theorem}[Near Algebra of Sets]
+Let $ A,B\in\stratified $ with $ A,B $ as collectibles:
+\begin{enumerate}
+\item $ A\cup B\in\stratified $
+\item $ A\cap B\in\stratified $
+\item $ A-B\in\stratified $
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}\
+Since $ A,B $ are collectible, there exist $ j_1,j_2\ge 0 $ and $ k_1,k_2\ge 1 $ such that
+$ A\in\nthps{k_1}(\nthus{j_1}),\ B\in\nthps{k_2}(\nthus{j_2}) $, thus
+\begin{eqnarray*}
+A\subseteq\nthps{k_1-1}(\nthus{j_1}) & \mbox{and} & B\subseteq\nthps{k_2-1}(\nthus{j_2}) \\
+ & & \\
+A\subseteq\nthus{j_1+1} & \mbox{and} & B\subseteq\nthus{j_2+1} \\
+\end{eqnarray*}
+\setcounter{equation}{0}
+Let $ j_0:=\mbox{max}(j_1,j_2) $. For our three theorem properties, we then have:
+\begin{align}
+A\cup B\subseteq\nthus{j_0+1} & \then A\cup B\in\nthus{j_0+2}\subseteq\stratified \\
+A\cap B\subseteq A\subseteq\nthus{j_1+1} & \then A\cap B\in\nthus{j_1+2}\subseteq\stratified \\
+A-B\subseteq A\subseteq\nthus{j_1+1} & \then A-B\in\nthus{j_1+2}\subseteq\stratified\qed
+\end{align}
+\end{proof}
+With these theorems complete I will comment that for any mathematician who might still be aesthetically
+dissatisfied---notably with our ad-hoc inelegant ``collectibles'' concept---I recommend taking
+$ \mathcal{S}=\emptyset $, which is to say $ \stratified\of{\emptyset} $. \emph{Why?}
+
+\section*{Conclusion}
+
+Now that we have our theoretical stratified powerset, how do we translate it into a computational model of reference?
+That will be the topic of \emph{part two}.
+
+I will leave the reader with a few additional philosophical thoughts on the general nature of sets. Notably:
+
+From an implementation point of view, how does one navigate an arbitrary set? When working with a set, since it is the most
+fundamental data structure, it does not provide you ways of navigating elements with respect to other elements. In order to do
+that you need known semantic relationships between those elements, for example a ``first'' or ``last'' or ``next'' element
+relative to the one at hand, but given an arbitrary set of unknown type you can only know if a given object belongs or not.
+Semiotic signifiers such as ``next'' only have meaning if you know that the set in question has additional structure
+which supports the idea of ``next''.
+\begin{quote}
+\emph{If one cannot rely on signifiers to access the elements of a set, how does one traverse the territory carved out by a set?}
+\end{quote}
+I mention this as a philosophical question because it is one I find too many take for granted. My own opinion is that
+in terms of implementation, one needs to privilege a single \emph{identity} data structure---likely an ordering relation---which
+otherwise possesses the same content as the set; one which provides just enough information (and no more) in order to access
+that content. This is to say, it is taken for granted that in practice, without realizing it, there is already bias in
+the system. This area of analysis by the way is centered around one additional concept for which we shall not introduce here:
+\emph{the media space}.
+
+Pijariiqpunga.
+
+\end{document}
+

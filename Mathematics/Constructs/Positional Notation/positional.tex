@@ -1,0 +1,167 @@
+% Copyright 2015 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1cm,right=1cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{bm}
+
+\newcommand{\st}{$ ^{\mbox{\scriptsize st}} $ }
+\newcommand{\nd}{$ ^{\mbox{\scriptsize nd}} $ }
+\newcommand{\rd}{$ ^{\mbox{\scriptsize rd}} $ }
+
+\renewcommand{\th}{$ ^{\mbox{\scriptsize th}} $ }
+%\th command exists, it gives the old english symbol used for `theta' IPA (voiceless)
+
+\newcommand{\seq}[1][u]{\ensuremath{<\!#1\!>}}
+\newcommand{\bseq}[1][u]{\ensuremath{<\!\!\bm{#1}\!\!>}}
+\newcommand{\underseq}[2][u]{\ensuremath{\underset{#2}{<\!#1\!>}}}
+\newcommand{\bunderseq}[2][u]{\ensuremath{\underset{#2}{<\!\!\bm{#1}\!\!>}}}
+
+\newcommand{\radix}[2][u]{\ensuremath{\underset{#2}{(#1)}}}
+\newcommand{\radixp}[3][u]{\ensuremath{\underset{#2}{(#1)^{#3}}}}
+\newcommand{\bradix}[2][u]{\ensuremath{\underset{#2}{(\bm{#1})}}}
+\newcommand{\bradixp}[3][u]{\ensuremath{\underset{#2}{(\bm{#1})^{#3}}}}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+
+\newenvironment{proof}[1][Proof]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries Definition (#1):}]}{\end{trivlist}}
+
+\newcommand{\qed}{\nobreak \ifvmode \relax \else
+      \ifdim\lastskip<1.5em \hskip-\lastskip
+      \hskip1.5em plus0em minus0.5em \fi \nobreak
+      \vrule height0.5em width0.5em depth0.25em\fi}
+
+\pagestyle{empty}
+\begin{document}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+This short article provides a notation for the positional (radix) representation of natural numbers with the intention
+of formula manipulation regarding numeric analytic as well as number theoretic proofs.
+
+I'll get straight to it. Let $ \mathbb{N}^\mathbb{Z} $ be the bidirectional sequences of natural numbers:
+$$ \bm{u}:=<\ldots, u_{-2}, u_{-1}, u_0, u_{1}, u_{2},\ldots> $$
+Given we're working with sequences as our data structures, we will want to be able to \emph{filter} as means
+of navigating and accessing the data. As such, we begin with subsequences:
+$$ \underset{\mathbb{P}_2(k)}{\seq[\mathbb{P}_1(\bm{u})]},\quad k\in\mathbb{Z} $$
+Currently this notation is too vague and might not make much sense. As an example to help clarify, take the property:
+$$ \seq[a\le\bm{u}\le b]\qquad:\Longleftrightarrow\qquad <u_k\ |\ a\le u_k\le b,\ k\in\mathbb{Z}> $$
+to mean the subsequence of $ \bm{u} $ satisfying the given bounds.  With such a property $ \mathbb{P}_1(\bm{u})=a\le\bm{u}\le b $,
+we've constrained and thus \emph{filtered} the possible sequences in a \emph{weak} sense, meaning we haven't isolated a
+unique case but still have many sequences satisfying the filtering condition.\footnote{As a way of thinking, weak specifications
+are in fact just fine---and used all the time. This relates to a way of thinking called concurrent logic.}
+In addition to this type of filtering, we can further constrain possible sequences by filtering on the index set instead:
+$$ \underset{c\le k\le d}{\bseq},\quad k\in\mathbb{Z} $$
+which means the subsequence of $ \bm{u} $ with indices $ [c\ldots d] $.
+
+It is also possible to filter sequences using both filtering styles:
+$$ \underset{c\le k\le d}{\seq[a\le\bm{u}\le b]},\quad k\in\mathbb{Z} $$
+though in practice this exact notation will seldom be used---it is powerful, but a bit ugly.
+In the very special but important case where $ c\le k\le c $ (or $ k=c $), we simplify our notation:
+$$ \bseq_c\quad:=\quad u_c,\quad c\in\mathbb{Z} $$
+to mean the $ c $\th ordered/indexed element of the sequence $ \bm{u} $.
+
+As the filtering properties can be anything, they can also be constructive in nature:
+$$ \underset{c\le k\le d}{\seq[b^k]} $$
+which would be interpreted as:
+$$ <b^c,b^{c+1},\ldots,b^d> $$
+the finite subsequence of powers of $ b $ between $ c,d $.
+
+You can also have constants:
+$$ \bseq[1]:=<\ldots,1,1,1,\ldots> $$
+
+Given our sequences can be interpreted as \emph{vectors}, we also have \emph{componentwise operators} and the \emph{dot-product}.
+
+Finally, as our \emph{stream} sequence is infinite in both directions, we are also able to \emph{shift}:
+
+$$ \begin{array}{rcl}
+\seq[(\bm{u}\ll s)] & := & <u_{k-s}\ |\ k\in\mathbb{Z}> \\
+\seq[(\bm{u}\gg s)] & := & <u_{k+s}\ |\ k\in\mathbb{Z}> \\
+\end{array} $$
+
+\newpage
+
+This brings us to our main notation:
+
+$$ \bradixp{0\le k\le n}{b}\quad:=\quad\underseq[0\le\bm{u} < b]{0\le k\le n}\cdot\underseq[b^k]{0\le k\le n} $$
+where $ (\cdot) $ is the dot-product. Note, when expanded out this is our positional notation:
+$$ \bradixp{0\le k\le n}{b}\quad =\quad u_0+u_1b+u_2b^2+\ldots+u_nb^n $$
+when the context is clear (and frankly it often is), we will omit the base $ b $:
+$$ \bradix{0\le k\le n} $$
+Finally, keep in mind it is implicit in the above definition that $ b > 0 $.
+
+We will prove a few basic manipulation properties of this notation.
+The first thing to realize is our notation holds true under weaker constraints:
+$$ \bradixp{m\le k\le n}{b}\quad:=\quad\underseq[0\le\bm{u} < b]{m\le k\le n}\cdot\underseq[b^k]{m\le k\le n} $$
+which follows simply from the notational expansion above.
+
+\begin{lemma}
+\color{blue}
+$$ \bradixp{j\le k\le\ell}{b}\quad =\quad \radixp[\bm{u}\ll j]{\!\!0\le k\le\ell-j}{b}\, b^j $$
+\end{lemma}
+
+\begin{proof}
+$$ \begin{array}{rrrcl}
+\bradixp{j\le k\le\ell}{b}
+	& = &	\bunderseq{j\le k\le\ell}		& \cdot & \underseq[b^k]{j\le k\le\ell}			\\
+														\\
+	& = &	\underseq[\bm{u}\ll j]{0\le k\le\ell-j} & \cdot & \underseq[b^{k+j}]{\!\!0\le k\le\ell-j}	\\
+														\\
+	& = &	\underseq[\bm{u}\ll j]{0\le k\le\ell-j} & \cdot & \underseq[b^k]{\!\!0\le k\le\ell-j}\, b^j	\\
+														\\
+	& = &	\radixp[\bm{u}\ll j]{0\le k\le\ell-j}{b}\, b^j	& \qed	\\
+\end{array} $$
+\end{proof}
+
+\begin{lemma}
+\color{blue}
+$$ \bradixp{0\le k\le\ell}{b}\quad <\quad b^{\ell+1} $$
+\end{lemma}
+
+\begin{proof}
+$$ \begin{array}{rcl}
+\bradixp{0\le k\le\ell}{b}
+	& = &	\underseq[0\le\bm{u}\le b-1]{0\le k\le\ell}\cdot\underseq[b^k]{0\le k\le\ell}	\\
+												\\
+	& \le &	(b-1)\underseq[b^k]{0\le k\le\ell}						\\
+												\\
+	& = &	(b-1)\frac{b^{\ell+1}-1}{b-1}							\\
+												\\
+	& = &	b^{\ell+1}-1									\\
+	& < &	b^{\ell+1}\quad\qed								\\
+\end{array} $$
+\end{proof}
+
+\newpage
+
+\begin{lemma}
+\color{blue}
+$$ \bradixp{j\le k\le\ell}{b}\quad\le\quad\bradixp{0\le k\le\ell}{b}\quad <\quad \bradixp{j\le k\le\ell}{b}+b^j $$
+\end{lemma}
+
+\begin{proof}
+From the lemma above, the fact that $ b > 0 $ as well as the constraint that $ 0\le\bm{u} < b $, we have:
+$$ 0\quad\le\quad\bradixp{0\le k < j}{b}\quad <\quad b^j $$
+Adding $ \bradixp{j\le k\le\ell}{b} $ componentwise to all three sides leaves us with:
+$$ \begin{array}{rrcrl}
+\bradixp{j\le k\le\ell}{b} & \le & \bradixp{0\le k < j}{b}+\bradixp{j\le k\le\ell}{b} & < & \bradixp{j\le k\le\ell}{b}+b^j	\\
+																\\
+\bradixp{j\le k\le\ell}{b} & \le & \bradixp{0\le k\le\ell}{b} & < & \bradixp{j\le k\le\ell}{b}+b^j\quad\qed			\\
+\end{array} $$
+\end{proof}
+
+\end{document}
+

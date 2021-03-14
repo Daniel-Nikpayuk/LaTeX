@@ -1,0 +1,332 @@
+% Copyright 2019 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=2.5cm,right=2.5cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{amsfonts}
+\usepackage{asymptote}
+
+\newcommand{\then}{\ensuremath{\quad\Longrightarrow\quad}}
+\newcommand{\equals}{\ensuremath{\quad =\quad}}
+
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries Definition (#1):}]}{\end{trivlist}}
+
+\newcommand{\fourqquad}{\ensuremath{\qquad\qquad\qquad\qquad}}
+
+\begin{asydef}
+// this comment prevents a compilation bug.
+
+void safeLabel(picture pic = currentpicture, Label L, pair position, real width, real height,
+		align align = NoAlign, pen p = currentpen, filltype filltype = NoFill)
+{
+	pair sw = position + (-width,-height);
+	pair se = position + (-width, height);
+	pair nw = position + ( width,-height);
+	pair ne = position + ( width, height);
+
+	filldraw(pic, sw--se--ne--nw--cycle, white, white);
+	label(pic, L, position, align, p, filltype);
+}
+
+\end{asydef}
+
+\title{Nik Symbolic}
+\author{Daniel Nikpayuk}
+\date{December 2nd, 2019}
+\pagestyle{empty}
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\vspace{0.5cm}
+
+\begin{center}
+\bf Infinity Language (Scalable Library)
+\end{center}
+
+$$ \begin{array}{lr}
+ & \quad\begin{array}{c}
+ \vdots								\\
+								\\
+ n\mbox{-lang}							\\
+								\\
+ \vdots								\\
+ \end{array}							\\
+								\\
+2'\mbox{-lang} & \left\{\quad\begin{array}{c}
+ 6\mbox{-lang}							\\
+								\\
+ 5\mbox{-lang}							\\
+								\\
+ 4\mbox{-lang}							\\
+ \end{array}\right.						\\
+								\\
+1'\mbox{-lang} & \left\{\quad\begin{array}{c}
+ 3\mbox{-lang}							\\
+								\\
+ 2\mbox{-lang}							\\
+								\\
+ 1\mbox{-lang}							\\
+ \end{array}\right.						\\
+								\\
+ & \quad\begin{array}{c}
+ 0\mbox{-lang}							\\
+ \end{array}
+\end{array} $$
+
+\vspace{0.5cm}
+
+$$ \begin{array}{c}
+				\\
+\vdots				\\
+				\\
+\mbox{\bf language\,-\,n}	\\
+				\\
+\vdots				\\
+				\\
+\mbox{\bf language\,-\,3}	\\
+				\\
+\mbox{\bf language\,-\,2}	\\
+				\\
+\mbox{\bf language\,-\,1}	\\
+				\\
+\mbox{\bf language\,-\,0}	\\
+\end{array} $$
+
+\vspace{0.5cm}
+
+\begin{center}
+\bf Infinity Language (Scalable Library)
+\end{center}
+
+$$ \begin{array}{lcr}
+\infty\mbox{-lang} & := & \left\{\begin{array}{c}
+ \vdots								\\
+								\\
+\quad n\mbox{-lang} \quad					\\
+								\\
+ \vdots								\\
+								\\
+ 3\mbox{-lang}							\\
+								\\
+ 2\mbox{-lang}							\\
+								\\
+ 1\mbox{-lang}							\\
+								\\
+ 0\mbox{-lang}							\\
+ \end{array}\right\}_{n\ge 0}
+\end{array} $$
+
+\vspace{0.5cm}
+
+\begin{center}
+\bf Infinity Language (Topology?)
+\end{center}
+
+$$ \hspace{-1.5cm}\begin{array}{rcl}
+\infty\mbox{-lang} & := & \left\{\begin{array}{ccl}
+ \vdots																	\\
+																	\\
+ \quad n\mbox{-lang}	& := & \{\mbox{``tools to talk about }(n-1)\mbox{-lang''}\}
+				\times \{\mbox{``things (subsets) said about }(n-1)\mbox{-lang''}\} \quad				\\
+																	\\
+ \vdots																	\\
+																	\\
+ 3\mbox{-lang}	& := & \{\mbox{``tools to talk about 2-lang''}\} \times \{\mbox{``things (subsets) said about 2-lang''}\}		\\
+																	\\
+ 2\mbox{-lang}	& := & \{\mbox{``tools to talk about 1-lang''}\} \times \{\mbox{``things (subsets) said about 1-lang''}\}		\\
+																	\\
+ 1\mbox{-lang}	& := & \{\mbox{``tools to talk about 0-lang''}\} \times \{\mbox{``things (subsets) said about 0-lang''}\}		\\
+																	\\
+ 0\mbox{-lang}																\\
+ \end{array}\right\}_{n\ge 0}
+\end{array} $$
+
+\vspace{0.5cm}
+
+\begin{center}
+\bf Nik Higher Order Module Design
+\end{center}
+
+$$ \begin{array}{llcl}
+\mbox{\bf languages}															\\
+																	\\
+3\mbox{-lang}	& \{\ \mbox{assemblic-lens-modules}	& , & \mbox{symbolic-branch-modules}\ \}					\\
+																	\\
+2\mbox{-lang}	& \{\ \mbox{assemblic-branch-modules}	& , & \mbox{symbolic-space-modules}\ \}						\\
+																	\\
+1\mbox{-lang}	& \{\ \mbox{assemblic-space-modules}	& , & \mbox{Meta C++}\ \}							\\
+																	\\
+0\mbox{-lang}	& \{\ \mbox{C++}\ \}													\\
+\end{array} $$
+
+\vspace{0.5cm}
+
+\begin{center}
+\bf Language Indirection Design
+\end{center}
+
+$$ \begin{array}{lllll}
+\mbox{\bf languages}	& \mbox{\bf modules}	& \mbox{\bf assemblics}			& \mbox{;}	& \mbox{\bf symbolics}		\\
+																	\\
+0\mbox{-lang}		& 			& \mbox{assemblic grammars (C++)}							\\
+																	\\
+1\mbox{-lang}		& 0\mbox{-module}	& \mbox{assemblic spaces}		& \mbox{;}	& \mbox{symbolic grammars}	\\
+																	\\
+2\mbox{-lang}		& 1\mbox{-module}	& \mbox{assemblic branches}		& \mbox{;}	& \mbox{symbolic spaces}	\\
+																	\\
+3\mbox{-lang}		& 2\mbox{-module}	& \mbox{assemblic lenses}		& \mbox{;}	& \mbox{symbolic branches}	\\
+\end{array} $$
+
+\vspace{0.5cm}
+
+For the following definitions, assume $ T_0 $ is a type system. A judgement ($ \lambda : \Lambda $)
+is a binding of an \emph{instance} ($ \lambda $) and a \emph{type} ($ \Lambda $).
+
+\begin{definition}[compositional reflexivity]
+Let $ A $ be a type in $ T_0 $, we define the {\bf reflex} with respect to $ A $ as
+$$ \begin{array}{rl}
+\mbox{reflex}_A		& : A\to A		\\
+						\\
+\mbox{reflex}_A(a)	& := a			\\
+\end{array} $$
+
+where $ a:A $.
+\end{definition}
+
+Here the reflex operator is just the standard \emph{identity} function for its respective type.
+The terminology ``reflex'' coincides with Homotopy Type Theory which denotes it as ``refl''.\\[0.5cm]
+
+\begin{definition}[compositional transitivity]
+Let $ A, B $ be types in $ T_0 $,
+we define the {\bf transit} with respect to $ A, B $ as
+$$ \begin{array}{rllcl}
+\mbox{transit}_{A, B}			& : (A\to B)\times A	& \to	& B		\\
+											\\
+\mbox{transit}_{A, B}(\,(f,a)\,)	& := f(a)					\\
+\end{array} $$
+
+where $ f:A\to B $ and $ a:A $.
+\end{definition}
+
+Here the transit operator is just the standard \emph{apply} operator known in functional programming.
+This construct is key in building a programming language interpreter. If you get down to the heart of it
+an interpreter is a combination of ``eval'' and ``apply'' (SICP Ch4). In applicative order (eager) evaluation,
+if you have the expression
+$$ (+\ 1\ 2\ (*\ 3\ 7)) $$
+you first identify the operator (+), then its operands (1 2 (* 3 7)), but before you pass these arguments to this
+function you evaluate them
+$$ (\mbox{eval } 1)\quad (\mbox{eval }2)\quad (\mbox{eval } (*\ 3\ 7)) $$
+The transit operator is key because there is another way to view this evaluation: Assume all objects in the interpreter's
+computation space are applicable, which is to say they have an evaluation code. Objects such as the numeral $ 1 $ would
+evaluate to themselves, and so their evaluation code is {\bf reflex}$ _\mathbb{N} $.
+
+This by the way is the starting point for {\bf Dual Theory}, the idea being you take an existing type system $ T_0 $
+and assign each ``instance'' a second ``type'': If it's a function object (f, a), you assign it its respective {\bf transit},
+otherwise it defaults as a {\bf reflex}.\\[0.5cm]
+
+\newpage
+
+What's the value in this way of thinking?
+
+\begin{definition}[compositional form]
+Let $ A, B, C $ be types in $ T_0 $, with $ f : B\to C $. We define the
+{\bf compositional form} of $ f $ relative to $ A $ as
+$$ \begin{array}{rlcl}
+f_A	& : (A\to B)\times A	& \to	& C		\\
+							\\
+	& := f\circ \mbox{transit}_{A,B}		\\
+\end{array} $$
+
+\end{definition}
+What's the meaning of this? In math, when we write the composition $ g(f(a)) $ there is a lot we take for granted.
+In programming, we actually have to be a bit more rigorous in how we interpret this computation. In eager evaluation,
+we would evaluate $ f(a)=b $ first then pass the result and evaluate $ g(b) $. In eager programming paradigms this also
+works, but in lazy paradigms we've effectively memoized or delayed $ f(a) $, in which case it needs its own type.
+This is where the compositional form comes in. Instead of evaluating $ f(a) $ immediately, we've effectively bound
+the function name with the argument $ (f, a) $ without actually evaluating the expression. This is exactly our
+function object instance.
+
+In terms of practical application: When defining grammar for functions, if you plan on using lazy expressions
+this compositional form is ideal for grammatical forms which are readily composable. Keep in mind, \emph{source code}
+is often viewed outside the paradigms of programming, but source code itself is a lazy or delayed expression.
+
+Finally, in C++ template programming, {\bf structs} are used as template functions and so are lazy by their
+very implementation. When defining new grammar for template programming, compositional forms offer a starting point
+for its design. As I'm building my own library with its own metaprogramming branch, this is incredibly important
+to me.
+
+%\noindent\begin{minipage}{7cm}
+%\begin{asy}
+%unitsize(1cm);
+%
+%//
+%
+%pair hstep  = (5,0);
+%pair arstep = (1.25,0);
+%
+%pair vstep  = (0,3.5);
+%pair acstep = (0,1);
+%
+%pair r0     = (0,0);
+%pair r0r    = r0 + arstep;
+%
+%pair r1     = r0 + hstep;
+%pair r1l    = r1 - arstep;
+%pair r1r    = r1 + arstep;
+%pair r1d    = r1 - acstep;
+%
+%pair r2     = r1 + hstep;
+%pair r2l    = r2 - arstep;
+%
+%pair c0     = r1 - vstep;
+%pair c0u    = c0 + acstep;
+%pair c0d    = c0 - acstep;
+%
+%pair c1     = c0 - vstep;
+%pair c1u    = c1 + acstep;
+%pair c1d    = c1 - acstep;
+%
+%pair c2     = c1 - vstep;
+%pair c2u    = c2 + acstep;
+%pair c2d    = c2 - acstep;
+%
+%pair c3     = c2 - vstep;
+%pair c3u    = c3 + acstep;
+%
+%//
+%
+%string sr0  = "\parbox{1.75cm}{\bfseries objects}";
+%string sr1  = "\parbox{1.75cm}{\bfseries function \\ objects}";
+%string sr2  = "\parbox{1.75cm}{\bfseries eager \\ functions}";
+%
+%string sc0  = "\parbox{0.75cm}{\bfseries copair}";
+%string sc1  = "\parbox{0.75cm}{\bfseries pair}";
+%string sc2  = "\parbox{0.75cm}{\bfseries list}";
+%string sc3  = "\parbox{0.75cm}{\bfseries cases}";
+%
+%//
+%
+%draw(r0r--r1l, Arrow);
+%draw(r1r--r2l, Arrow);
+%
+%draw(r1d--c0u, Arrow);
+%draw(c0d--c1u, Arrow);
+%draw(c1d--c2u, Arrow);
+%draw(c2d--c3u, Arrow);
+%
+%//
+%
+%safeLabel(sr0, r0, 1.00, 0.25);
+%safeLabel(sr1, r1, 1.25, 0.50);
+%safeLabel(sr2, r2, 1.25, 0.50);
+%
+%safeLabel(sc0, c0, 0.90, 0.25);
+%safeLabel(sc1, c1, 0.70, 0.25);
+%safeLabel(sc2, c2, 0.70, 0.25);
+%safeLabel(sc3, c3, 0.80, 0.25);
+%
+%\end{asy}
+%\end{minipage}\\[1cm]
+
+\end{document}
+

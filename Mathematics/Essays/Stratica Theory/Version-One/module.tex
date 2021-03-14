@@ -1,0 +1,441 @@
+% Copyright 2018-2019 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1cm,right=1cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{asymptote}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amsmath}
+
+\begin{asydef}
+// this comment prevents a compilation bug.
+
+real direction(bool value)
+{
+	return value ? 1 : -1;
+}
+
+pair segment(pair current = (0,0), string align, real projection, real angle = 0)
+{
+	align = (align == "E") ? "EU" :
+		(align == "N") ? "NL" :
+		(align == "W") ? "WD" :
+		(align == "S") ? "SR" : align;
+
+	real base          = direction(substr(align, 0, 1) == "E" || substr(align, 0, 1) == "N");
+	real adjacent      = direction(substr(align, 1, 1) == "R" || substr(align, 1, 1) == "U") * Tan(angle);
+	pair initialVertex = (substr(align, 0, 1) == "E" || substr(align, 0, 1) == "W") ? (base, adjacent) : (adjacent, base);
+	pair scaledVertex  = scale(projection) * initialVertex;
+	pair shiftedVertex = shift(current)    * scaledVertex;
+
+	return shiftedVertex;
+}
+
+//
+
+void drawpath(path p)
+{
+	draw(p);
+
+	for (int k=0; k < size(p); ++k)
+	{
+		dot(point(p, k));
+	}
+}
+
+void safeLabel(picture pic = currentpicture, Label L, pair position, real width, real height,
+		align align = NoAlign, pen p = currentpen, filltype filltype = NoFill)
+{
+	pair sw = position + (-width,-height);
+	pair se = position + (-width, height);
+	pair nw = position + ( width,-height);
+	pair ne = position + ( width, height);
+
+	filldraw(pic, sw--se--ne--nw--cycle, white, p);
+	label(pic, L, position, align, p, filltype);
+}
+
+\end{asydef}
+
+\title{Module Theory}
+\author{Daniel Nikpayuk}
+\date{December 1, 2019}
+\pagestyle{empty}
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+Module Theory is intended to offer a \emph{schema} for organizing the tools used to build modelling spaces:\\[0.25cm]
+
+\begin{center}
+\begin{asy}
+unitsize(1cm);
+
+pen darkgray = gray(0.35);
+
+pair p00 = (0,0);
+
+pair p10 = segment(p00, "SL", 2, 74.5);
+pair p11 = segment(p00, "SR", 2,  6.5);
+pair p12 = segment(p00, "SR", 2, 74.5);
+
+pair p20 = segment(p10, "SL", 2, 33);
+pair p21 = segment(p10, "SR", 2, 33);
+pair p22 = segment(p11, "SL", 2, 60);
+pair p23 = segment(p11, "SR", 2,  1);
+pair p24 = segment(p11, "SR", 2, 60);
+pair p25 = segment(p12, "SL", 2, 29);
+pair p26 = segment(p12, "SR", 2, 29);
+
+pair p30 = segment(p20, "S", 2);
+pair p31 = segment(p21, "S", 2);
+pair p32 = segment(p22, "S", 2);
+pair p33 = segment(p23, "S", 2);
+pair p34 = segment(p24, "S", 2);
+pair p35 = segment(p25, "S", 2);
+pair p36 = segment(p26, "S", 2);
+
+//
+
+string s00 = "module";
+
+string s10 = "interface";
+string s11 = "perspective";
+string s12 = "model";
+
+string s20 = "structure";
+string s21 = "navigator";
+string s22 = "identity";
+string s23 = "proximity";
+string s24 = "functor";
+string s25 = "filter";
+string s26 = "space";
+
+string s30 = "\parbox{2.30cm}{primitives,\\constructors,\\selectors}";
+string s31 = "\parbox{2.10cm}{monoids,\\arithmetics,\\algebras}";
+string s32 = "\parbox{2.05cm}{equality,\\inequality,\\equivalence}";
+string s33 = "\parbox{4.05cm}{less than (or equal),\\greater than (or equal)}";
+string s34 = "\parbox{1.85cm}{property\\preserving\\maps}";
+string s35 = "\parbox{1.80cm}{logical\\predicates}";
+string s36 = "\parbox{1.80cm}{modelling objects,\\subspaces}";
+
+//
+
+draw(p00--p10);
+draw(p00--p11);
+draw(p00--p12);
+
+draw(p10--p20);
+draw(p10--p21);
+draw(p11--p22);
+draw(p11--p23);
+draw(p11--p24);
+draw(p12--p25);
+draw(p12--p26);
+
+draw(p20--p30, darkgray);
+draw(p21--p31, darkgray);
+draw(p22--p32, darkgray);
+draw(p23--p33, darkgray);
+draw(p24--p34, darkgray);
+draw(p25--p35, darkgray);
+draw(p26--p36, darkgray);
+
+//
+
+safeLabel(s00, p00, 0.75, 0.25);
+
+safeLabel(s10, p10, 0.90, 0.25);
+safeLabel(s11, p11, 1.15, 0.25);
+safeLabel(s12, p12, 0.70, 0.25);
+
+safeLabel(s20, p20, 0.95, 0.25);
+safeLabel(s21, p21,    1, 0.25);
+safeLabel(s22, p22, 0.85, 0.25);
+safeLabel(s23, p23,    1, 0.25);
+safeLabel(s24, p24, 0.80, 0.25);
+safeLabel(s25, p25, 0.60, 0.25);
+safeLabel(s26, p26, 0.60, 0.25);
+
+safeLabel(s30, p30, 1.25, 0.85, darkgray);
+safeLabel(s31, p31, 1.16, 0.85, darkgray);
+safeLabel(s32, p32, 1.16, 0.85, darkgray);
+safeLabel(s33, p33, 2.12, 0.55, darkgray);
+safeLabel(s34, p34, 1.05, 0.85, darkgray);
+safeLabel(s35, p35, 1.03, 0.55, darkgray);
+safeLabel(s36, p36, 1.00, 0.85, darkgray);
+
+\end{asy}
+\end{center}
+
+\vspace{0.5cm}
+
+\subsection*{motivation}
+
+Motivation for this theory comes from the desire to standardize the ways in which we design and organize computer programming
+source code. This is not to say module theory is intended to be \emph{the only way} to design and organize such code,
+rather it is meant to be \emph{a} standard way.
+
+As it stands, the module terminology already exists as a paradigm in many programming languages, the difference
+here is this theory takes its inspiration from mathematical modelling.
+
+\subsection*{inspiration}
+
+What makes a space good as a model?
+
+For example $ \mathbb{R}^3 $ the mathematical space that represents our 3 dimensional world is a privileged model in math
+literature, why then is it so successful? Why can we model spheres and toruses and cubes and dodecahedrons and Mobius strips
+and so many other spaces with this one single modelling space? The full answers to these questions are philosophical in nature
+and so are up for debate, but otherwise I feel it is safe to say they have everything to do with mathematical \emph{methodologies},
+which are the principles that guide a mathematician's value-systems.
+
+I will claim here that the ``subsetting'' paradigm:
+$$ \{\,x\in A\ |\ P(x)\,\} $$
+from Set Theory (a foundational language of mathematics) offers such a methodology, and is the initial inspiration for many
+privileged mathematical models. The idea is if a space, or structure, or (simply) set, is accessible such that one also has
+easy access to its substructures, subspaces, or subsets, this underlying \emph{entropy}, or \emph{expressivity},
+is a sufficient condition when determining a successful model.
+
+\subsection*{implementation}
+
+So what makes a space entropic/expressive when it comes to subspacing?
+
+The short answer: Expressive tools that allow us to group and regroup the elements of a space with ease.
+After researching common patterns among the constructions of ``successful'' modelling spaces such as $ \mathbb{R} $
+or $ \emph{N} $, the module theory I have arrived at organizes its tools as follows:
+
+\begin{itemize}
+\item {\bf interface}: The tools to interact with a given space.
+	\begin{itemize}
+	\item {\bf structure}: The tools to construct the space, and access its internal states.
+	\item {\bf navigator}: The tools to navigate to individual elements of a space, usually at a lower cost
+                               than the construction tools otherwise allow for.
+	\end{itemize}
+\item {\bf perspective}: The tools to compare elements of a given space.
+	\begin{itemize}
+	\item {\bf identity}: The tools to compare the identities of elements of a space.
+	\item {\bf proximity}: The direct tools to compare nearness of elements and orderings of a space.
+	\item {\bf functor}: The indirect tools to compare elements of a space, by means of some other similarly
+			     behaving space usually exterior to the module.
+	\end{itemize}
+\item {\bf model}: The tools to create specific models from the given space.
+	\begin{itemize}
+	\item {\bf filter}: The tools constructed from {\bf perspective} tools to group and regroup the elements of a space.
+	\item {\bf space}: Unique descriptions of the implemented subspaces of the module's space.
+	\end{itemize}
+\end{itemize}
+The \emph{interface, perspective, model} groupings are called {\bf partitions}. Strictly speaking they're unnecessary
+in any module theory formalisms, but on a personal level I find they clarify the relationships between what
+are otherwise the \emph{structure, navigator, identity, proximity, functor, filter}, and \emph{space} {\bf divisions}.
+
+In practice if you're using this schema, I recommend you start by asking the following questions:
+
+\begin{center}
+\emph{What space are you trying to model?\\
+What tools are you using to do so?}
+\end{center}
+
+Module theory then offers a standardized way to organize these tools, and to even clarify some of their
+relationships.
+
+\subsection*{higher order modelling}
+
+The design of a module is intentionally \emph{recursive}.
+
+As the final division of a module is the modelling \emph{space} (and its subspaces), one can then reinterpret the meaning
+of that space to be a space of other already existing modules:\\[0.25cm]
+
+\begin{center}
+\begin{asy}
+unitsize(1cm);
+
+//
+
+pair m00 = (0,0);
+pair m01 = (1,0);
+pair m02 = (2,0);
+
+pair m10 = (  -1, 1);
+pair m11 = ( 1.5, 1);
+pair m12 = (2.75, 1);
+
+pair m20 = (-1.5, 2);
+pair m21 = (0.25, 2);
+pair m22 = (   1, 2);
+pair m23 = (   3, 2);
+
+pair m30 = (  -2, 3);
+pair m31 = (  -1, 3);
+pair m32 = (   0, 3);
+pair m33 = (   1, 3);
+pair m34 = (   2, 3);
+pair m35 = (   3, 3);
+
+pair m40 = (-2.5, 4);
+pair m41 = (  -1, 4);
+pair m42 = ( 0.5, 4);
+pair m43 = ( 1.5, 4);
+pair m44 = ( 2.5, 4);
+pair m45 = (   3, 4);
+pair m46 = (   4, 4);
+
+pair m50 = (  -3, 5);
+pair m51 = (-1.5, 5);
+pair m52 = (-0.2, 5);
+pair m53 = (   1, 5);
+pair m54 = (   2, 5);
+pair m55 = (   4, 5);
+pair m56 = (   5, 5);
+
+pair m60 = (  -3, 6);
+pair m61 = (-1.5, 6);
+pair m62 = (-0.2, 6);
+pair m63 = (   1, 6);
+pair m64 = (   2, 6);
+pair m65 = (   4, 6);
+pair m66 = (   5, 6);
+
+draw(m00--m10, gray, MidArrow);
+draw(m01--m21, gray, Arrow(Relative(0.32)));
+draw(m01--m11, gray, MidArrow);
+draw(m02--m12, gray, MidArrow);
+
+draw(m10--m20, gray, MidArrow);
+draw(m10--m21, gray, MidArrow);
+draw(m11--m22, gray, MidArrow);
+draw(m12--m23, gray, MidArrow);
+
+draw(m20--m30, gray, MidArrow);
+draw(m20--m31, gray, MidArrow);
+draw(m21--m32, gray, MidArrow);
+draw(m22--m33, gray, MidArrow);
+draw(m22--m34, gray, MidArrow);
+draw(m23--m34, gray, MidArrow);
+draw(m23--m35, gray, MidArrow);
+
+draw(m30--m40, lightblue, MidArrow);
+draw(m30--m41, lightblue, MidArrow);
+draw(m31--m42, lightblue, MidArrow);
+draw(m32--m43, gray, MidArrow);
+draw(m33--m43, gray, MidArrow);
+draw(m34--m43, gray, MidArrow);
+draw(m34--m44, gray, MidArrow);
+draw(m35--m45, lightgreen, MidArrow);
+draw(m35--m46, lightgreen, MidArrow);
+
+draw(m40--m50, lightblue, MidArrow);
+draw(m41--m51, lightblue, MidArrow);
+draw(m41--m52, lightblue, MidArrow);
+draw(m42--m52, lightblue, MidArrow);
+draw(m43--m53, gray, MidArrow);
+draw(m44--m54, gray, MidArrow);
+draw(m45--m55, lightgreen, MidArrow);
+draw(m46--m56, lightgreen, MidArrow);
+
+draw(m50--m60, paleblue, MidArrow);
+draw(m51--m61, paleblue, MidArrow);
+draw(m52--m62, paleblue, MidArrow);
+draw(m53--m63, lightgray, MidArrow);
+draw(m54--m64, lightgray, MidArrow);
+draw(m55--m65, palegreen, MidArrow);
+draw(m56--m66, palegreen, MidArrow);
+
+dot(m00);
+dot(m01);
+dot(m02);
+
+dot(m10);
+dot(m11);
+dot(m12);
+
+dot(m20);
+dot(m21);
+dot(m22);
+dot(m23);
+
+dot(m30, blue);
+dot(m31, blue);
+dot(m32);
+dot(m33);
+dot(m34);
+dot(m35, green);
+
+dot(m40, blue);
+dot(m41, blue);
+dot(m42, blue);
+dot(m43);
+dot(m44);
+dot(m45, green);
+dot(m46, green);
+
+dot(m50, blue);
+dot(m51, blue);
+dot(m52, blue);
+dot(m53);
+dot(m54);
+dot(m55, green);
+dot(m56, green);
+
+\end{asy}
+\end{center}
+
+\vspace{0.5cm}
+
+Although simplistically unlabeled, this graphic can be interpreted as a module of modules. Each dot is a local module,
+while the arrows connecting are the navigational paths allowing us to access specific local modules. Within this global
+module, we would then classify the tools used to compare these dots, and use these comparisions to group and regroup
+these local modules.
+
+In practice, this sort of thing could be interpreted as the basis of a code library. In this case, dot module constructors
+aren't strictly necessary as they already exist, while navigational paths represent module dependencies. After all,
+you can't access a dot module until you know you have access to the tools from other dot modules that it depends on.
+
+In any case, as this reuse of ``module'' terminology can become confusing between local and global, the initial modules
+will instead be called $ 0 $-modules, modules of such modules will be called $ 1 $-modules, modules of $ 1 $-modules called
+$ 2 $-modules, and so on and so on. In this sense, you have higher order modules:
+$$\begin{array}{cl}
+\vdots		& 				\\
+						\\
+\mbox{module-3}	& \qquad\mbox{library}		\\
+\mbox{module-2}	& \qquad\mbox{lens}		\\
+\mbox{module-1}	& \qquad\mbox{branch}		\\
+\mbox{module-0}	& \qquad\mbox{module}		\\
+\end{array}$$
+Keep in mind the \emph{library, lens, branch, module} terminology here are just examples, used as local aliases in what
+is otherwise the implementation of specific library of mine. In practice your own library might be made up of more
+or less $ n $-modules with other alias names of your own as you see fit.
+
+As for using module theory to assist in organizing code: It is most effective when the code you're writing is meant to
+be a model for many applications. Clear cut examples in real world programming languages are objects as part of the
+object oriented programming paradigm, or more generally the module paradigm.
+
+\subsection*{conclusion}
+
+I will finish by saying this research is open and ongoing, so I will leave you with some thoughts to entice your further
+interest.
+
+For starters, one of the main values in using this schema is that when the relationships are identified, any module
+adhering to this design is well suited for modular composition: Structure composes with structure, navigators compose
+with navigators, identity, proximity, functor perspectives compose respectively with their corresponding perspectives.
+When building a library, you can then focus on building your narrative design instead rather than how its tools will
+be organized.
+
+Next, one important application is in modelling proof assistants. In this case, the space you're modelling is the space
+of ``grammatical objects'' of some other programming language. You can then talk about individual grammar points, compare
+when possible, group and regroup them, claim and prove theorems about them, or even use the subspaces as the basis to
+organize branches, lens, and libraries.
+
+Finally, Not only does module theory offer a natural means of organizing modelling code, it offers other insights as well.
+For example within any programming language, the grammar tends to provide a few ``functions'' with side effects. Such
+functions are the bane of functional programming, considered necessary evils otherwise weakening an immutable scheme,
+but on the context of the tools used to build models, such functions are actually classified quite naturally as functors. 
+
+\end{document}

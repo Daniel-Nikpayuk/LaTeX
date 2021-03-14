@@ -1,0 +1,393 @@
+% Copyright 2018 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1cm,right=1cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{asymptote}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amsmath}
+
+\begin{asydef}
+// this comment prevents a compilation bug.
+
+pair p00 = (0,0);
+
+pair p10 = (-4.5,-2);
+pair p11 = (1.75,-2);
+pair p12 = (10.50,-2);
+
+pair p20 = (-6.5,-4);
+pair p21 = (-3.5,-4);
+pair p22 = (-0.5,-4);
+pair p23 = (3.10,-4);
+pair p24 = (7.25,-4);
+pair p25 = (10.50,-4.30);
+
+pair p30 = (-6.5,-6);
+pair p31 = (-3.5,-6);
+pair p32 = (-0.5,-6);
+pair p33 = (3.10,-6);
+pair p34 = (7.25,-6);
+
+//
+
+string s00 = "module";
+
+string s10 = "interface";
+string s11 = "perspective";
+string s12 = "model";
+
+string s20 = "structure";
+string s21 = "navigator";
+string s22 = "identity";
+string s23 = "proximity";
+string s24 = "functor";
+string s25 = "\parbox{2.20cm}{submodules,\\branches}";
+
+string s30 = "\parbox{2.10cm}{atoms,\\constructive\\grammar}";
+string s31 = "\parbox{2.10cm}{arithmetics,\\monoids,\\algebras}";
+string s32 = "\parbox{1.75cm}{equality,\\inequality}";
+string s33 = "\parbox{4.05cm}{less than (or equal),\\greater than (or equal)}";
+string s34 = "\parbox{2.65cm}{print, map,\\morph, repeat,\\assign}";
+
+//
+
+void safeLabel(picture pic = currentpicture, Label L, pair position, real width, real height,
+		align align = NoAlign, pen p = currentpen, filltype filltype = NoFill)
+{
+	pair sw = position + (-width,-height);
+	pair se = position + (-width, height);
+	pair nw = position + ( width,-height);
+	pair ne = position + ( width, height);
+
+	filldraw(pic, sw--se--ne--nw--cycle, white, p);
+	label(pic, L, position, align, p, filltype);
+}
+
+\end{asydef}
+
+\title{Module Theory}
+\author{Daniel Nikpayuk}
+\date{October 13, 2018}
+\pagestyle{empty}
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+The following is my most practiced paradigm for designing a code module for a specified \emph{type}:\\[0.25cm]
+
+\hspace{-0.75cm}\begin{asy}
+unitsize(1cm);
+
+pen darkgray = gray(0.35);
+
+//
+
+draw(p00--p10);
+draw(p00--p11);
+draw(p00--p12);
+
+draw(p10--p20);
+draw(p10--p21);
+
+draw(p11--p22);
+draw(p11--p23);
+draw(p11--p24);
+
+draw(p12--p25, darkgray);
+
+draw(p20--p30, darkgray);
+draw(p21--p31, darkgray);
+draw(p22--p32, darkgray);
+draw(p23--p33, darkgray);
+draw(p24--p34, darkgray);
+
+//
+
+safeLabel(s00, p00, 0.75, 0.25);
+
+safeLabel(s10, p10, 0.90, 0.25);
+safeLabel(s11, p11, 1.15, 0.25);
+safeLabel(s12, p12, 0.70, 0.25);
+
+safeLabel(s20, p20, 0.95, 0.25);
+safeLabel(s21, p21,    1, 0.25);
+safeLabel(s22, p22, 0.85, 0.25);
+safeLabel(s23, p23,    1, 0.25);
+safeLabel(s24, p24, 0.80, 0.25);
+safeLabel(s25, p25, 1.30, 0.55, darkgray);
+
+safeLabel(s30, p30, 1.30, 0.85, darkgray);
+safeLabel(s31, p31, 1.25, 0.85, darkgray);
+safeLabel(s32, p32, 1.05, 0.55, darkgray);
+safeLabel(s33, p33, 2.20, 0.55, darkgray);
+safeLabel(s34, p34, 1.55, 0.85, darkgray);
+
+\end{asy}
+
+\vspace{0.5cm}
+
+\subsection*{intuition}
+
+The idea is that the best types to design are the ones that have multitudes of subtypes. To achieve this, our type
+would need specifics for construction, and ways to navigate its instances. Once able to reach all such instances,
+you then look to compare: You should be able to group and regroup instances to form subtypes of interest. Doing
+it this way assures you can also navigate subtype instances, not to mention subtyping your subtypes---all
+because you already have access to those operations within the root type.
+
+This paradigm is inspired from the patterns I see within \emph{mathematical spaces}. I ask meta-mathematical questions
+such as: Why is $ \mathbb{R}^3 $ so successful? Why can you model spheres and toruses and cubes and dodecahedrons and
+so many other spaces with this one single space? Physicists and engineers and others use it and its subspaces for all
+sorts of applications. These sorts of questions guide this design.
+
+\newpage
+
+\subsection*{details}
+
+To get the ball rolling, I introduce the idea of a \emph{highly navigable} space. Keeping things at an intuitive
+level, such a space would imply
+
+\begin{enumerate}
+\item {\bf navigability}: If you can't navigate the internal elements of a set-oriented structure, what's it's value?
+			  Extending this, if you can't navigate it easily or freely, this also limits its value as
+			  a toolset.
+\item {\bf multiplicity}: Highly navigable doesn't just mean easily navigable, it means you can navigate it in many
+			  different ways. It becomes highly interpretable, where it has many subspaces which themselves
+			  are navigable. This allows for the space as a whole the ability to model many different
+			  applications.
+\end{enumerate}
+
+With this said, it is not unnatural from this perspective that a {\bf module} here focuses on its navigability, as well
+as its capacity to generate subtypes. Of course, as with anything else, we still need to start with its constructive
+grammar, which is to say its {\bf interface}. Don't take this for granted, as it is often the case its navigational
+features derive from its constructive grammars.
+
+I'll explain this with my classic example of a $ 16\ \!\! $-bit \emph{word}. As a type, such a word has an interface,
+which is to say it has a \emph{structure} (composed of bits) as well as a means to \emph{navigate} to those bits
+and identify their value (or mutate them if such operations are permitted).
+
+\begin{itemize}
+\item {\bf structure}:	Identify the atoms, and the constructive grammar that make up the internals of this type.
+\item {\bf navigator}:	Navigators often start with arithmetics, which build into monoids, and algebras. For example
+			when navigating the natural numbers, you start with the successor function, from there
+			you can build addition, then multiplication, and exponentiation. These later operators
+			don't give you greater access to the natural numbers in their potential, but they certainly
+			give you faster access in application. The key thing to note here is that your navigational
+			system will effectively be a \emph{universal coordinate system} in the sense that you can use
+			it to access all components that make up the interface structure.
+\end{itemize}
+
+Beyond the interface of a type is its {\bf perspective}. This leads up to generating our desired subtypes.
+Just as a structure needs a universal coordinate system for navigation, substructures need a universal language
+for separating and joining a type's internal instances. In a meta-mathematical sense, the common pattern in dividing
+and uniting is the broad idea of a \emph{comparison}. If we can compare the internals of a type against a particular
+value system, we can decide to split them, or concatenate them. How do we compare things in a general sense though?
+The approach I offer here is an outward expanding collection of concentric circles of \emph{similarity}:
+
+\begin{itemize}
+\item {\bf identity}:	The first step in determining similarity is testing for equality, or inequality.
+\item {\bf proximity}:	If two objects aren't equal, the next best measure of similarity is the idea of \emph{nearness},
+			which generally translates to metrics, ordering relations, and otherwise general topological
+			nearness. In practice though we do often have strong tests such as less than, less than or equal,
+			greater than, greater than or equal.
+\item {\bf functor}:	If we cannot identify two objects, and there is no desirable measure of nearness, we tend then
+			to compare by indirectly through the use of another type. 
+
+			At the root (module) level, the most powerful functors tend to be the well known \emph{print, map}
+			operators. Printing is common for computational types. Mapping produces its own specializations:
+			\emph{morph, repeat, assign}. Here I'm using ``morph'' in the special case that \emph{map} is an
+			endofunctor (maps back to itself); ``assign'' being a special case of morph. My use of ``repeat''
+			is the common one. In code these specializations are often worth distinguishing as they are
+			used frequently enough to warrant cycle optimization.
+
+			Finally, within submodules, functors tend to be more type specific, and so their patterns tend
+			to be harder to predict in advance, but at least we can reserve space for them here.
+\end{itemize}
+
+Following the perspective of a type we can begin to look at its {\bf model}. With models, we are interpreting
+and reinterpreting subtypes which offers a level of closure.~\footnote{Given that the non-recursive
+aspects of this module are used to generate the self-similar nature, this concept in a sense is \emph{complete}.}
+
+My advice to you: Don't be too strict when it comes to typology. Type safety is important but many of the best
+innovations come from being able to reinterpret the purpose of anything and everything around us.~\footnote{This idea
+I borrow both from mathematics as well as my own Inuit culture} In my culture, in the Arctic, we reinterpret water
+(snow) and many other materials for greater reuse. We're not fixated on a type being limited to any one kind of thing.
+With our current discussion, a $ 16\ \!\! $-bit word can be reinterpreted as a $ 16\ \!\! $-bit unsigned integer,
+or a utf-16 unicode character, for example.  The idea of a model is narrow our type instance focus and to be able
+to equip such instances with additional functions.~\footnote{If you're concerned about corrupting the underlying
+type system, you can create a \emph{contextual scope} to mitigate any complications introduced.}
+
+\subsection*{generality}
+
+Modules not only help us design types, they help us design narratives:\\[0.25cm]
+
+\hspace{-0.75cm}\begin{asy}
+unitsize(1cm);
+
+//
+
+pair m00 = (0,0);
+pair m01 = (1,0);
+pair m02 = (2,0);
+
+pair m10 = (  -1, 1);
+pair m11 = ( 1.5, 1);
+pair m12 = (2.75, 1);
+
+pair m20 = (-1.5, 2);
+pair m21 = (0.25, 2);
+pair m22 = (   1, 2);
+pair m23 = (   3, 2);
+
+pair m30 = (  -2, 3);
+pair m31 = (  -1, 3);
+pair m32 = (   0, 3);
+pair m33 = (   1, 3);
+pair m34 = (   2, 3);
+pair m35 = (   3, 3);
+
+pair m40 = (-2.5, 4);
+pair m41 = (  -1, 4);
+pair m42 = ( 0.5, 4);
+pair m43 = ( 1.5, 4);
+pair m44 = ( 2.5, 4);
+pair m45 = (   3, 4);
+pair m46 = (   4, 4);
+
+pair m50 = (  -3, 5);
+pair m51 = (-1.5, 5);
+pair m52 = (-0.2, 5);
+pair m53 = (   1, 5);
+pair m54 = (   2, 5);
+pair m55 = (   4, 5);
+pair m56 = (   5, 5);
+
+pair m60 = (  -3, 6);
+pair m61 = (-1.5, 6);
+pair m62 = (-0.2, 6);
+pair m63 = (   1, 6);
+pair m64 = (   2, 6);
+pair m65 = (   4, 6);
+pair m66 = (   5, 6);
+
+draw(m00--m10, gray, MidArrow);
+draw(m01--m21, gray, Arrow(Relative(0.32)));
+draw(m01--m11, gray, MidArrow);
+draw(m02--m12, gray, MidArrow);
+
+draw(m10--m20, gray, MidArrow);
+draw(m10--m21, gray, MidArrow);
+draw(m11--m22, gray, MidArrow);
+draw(m12--m23, gray, MidArrow);
+
+draw(m20--m30, gray, MidArrow);
+draw(m20--m31, gray, MidArrow);
+draw(m21--m32, gray, MidArrow);
+draw(m22--m33, gray, MidArrow);
+draw(m22--m34, gray, MidArrow);
+draw(m23--m34, gray, MidArrow);
+draw(m23--m35, gray, MidArrow);
+
+draw(m30--m40, lightblue, MidArrow);
+draw(m30--m41, lightblue, MidArrow);
+draw(m31--m42, lightblue, MidArrow);
+draw(m32--m43, gray, MidArrow);
+draw(m33--m43, gray, MidArrow);
+draw(m34--m43, gray, MidArrow);
+draw(m34--m44, gray, MidArrow);
+draw(m35--m45, lightgreen, MidArrow);
+draw(m35--m46, lightgreen, MidArrow);
+
+draw(m40--m50, lightblue, MidArrow);
+draw(m41--m51, lightblue, MidArrow);
+draw(m41--m52, lightblue, MidArrow);
+draw(m42--m52, lightblue, MidArrow);
+draw(m43--m53, gray, MidArrow);
+draw(m44--m54, gray, MidArrow);
+draw(m45--m55, lightgreen, MidArrow);
+draw(m46--m56, lightgreen, MidArrow);
+
+draw(m50--m60, paleblue, MidArrow);
+draw(m51--m61, paleblue, MidArrow);
+draw(m52--m62, paleblue, MidArrow);
+draw(m53--m63, lightgray, MidArrow);
+draw(m54--m64, lightgray, MidArrow);
+draw(m55--m65, palegreen, MidArrow);
+draw(m56--m66, palegreen, MidArrow);
+
+dot(m00);
+dot(m01);
+dot(m02);
+
+dot(m10);
+dot(m11);
+dot(m12);
+
+dot(m20);
+dot(m21);
+dot(m22);
+dot(m23);
+
+dot(m30, blue);
+dot(m31, blue);
+dot(m32);
+dot(m33);
+dot(m34);
+dot(m35, green);
+
+dot(m40, blue);
+dot(m41, blue);
+dot(m42, blue);
+dot(m43);
+dot(m44);
+dot(m45, green);
+dot(m46, green);
+
+dot(m50, blue);
+dot(m51, blue);
+dot(m52, blue);
+dot(m53);
+dot(m54);
+dot(m55, green);
+dot(m56, green);
+
+\end{asy}
+
+\vspace{0.5cm}
+
+This graphic can be interpreted as a \emph{narrative} module which can help you design libraries among other things.
+Each dot is a local module, and the arrows connecting them are dependencies. The dots (local modules) are instances
+of this narrative type, and they are navigated through their storied relationships. You can then compare the dots
+respectively, and use these comparisons to create subnarratives. In the above the subnarratives are in blue and green.
+This might be a bit abstract, so I'll give two examples.
+
+The first example is none other than \emph{axiomatic set theory} itself! The dots at the bottom are axioms,
+where definitions and theorems are derived from them as higher level dots. This derivation process continues
+fanning upward and outward as axiomatic systems tend to do. You create the subnarratives to be other branches
+of math derived from set theory such as group theory, graph theory, etc.
+
+The second example is for programming in particular, in the case you might want to create narratives of
+\emph{hardware} types. The major narrative then has local hardware type modules as dots, and source dependencies
+as the arrows. You create subnarratives when you concentrate on specific hardware abstractions such as screen,
+memory, touchpad, etc.
+
+\subsection*{conclusion}
+
+I will finish by saying the value in this paradigm is that when the relationships are identified, any module that
+adheres to this design is well suited for composition. Structure composes with structure, navigators compose with
+navigators, identity, proximity, functor perspectives compose respectively with their corresponding perspectives.
+
+If building a library, you can then focus on building your narrative design. Furthermore, if you have a narrative
+that's stabilized, a common optimization translates quite readily: For any given stratification of composed
+layers (structure, navigator, function), you unroll, reduce overhead, compress.~\footnote{I would warn, this
+optimization is mostly relevant when you're frequently passing back and forth between layers of abstraction.}
+
+\end{document}

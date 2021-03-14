@@ -1,0 +1,231 @@
+% Copyright 2018 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1cm,right=1cm,top=1.5cm,bottom=1.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\newcommand{\then}{\ensuremath{\quad\Longrightarrow\quad}}
+\newcommand{\equals}{\ensuremath{\quad =\quad}}
+
+\newcommand{\fourqquad}{\ensuremath{\qquad\qquad\qquad\qquad}}
+\newcommand{\alphahat}{\ensuremath{\hat{\alpha}}}
+
+\pagestyle{empty}
+\begin{document}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+Recently, I was looking to solve the combinatorial problem of \emph{the average number of \,$ 0 $s in a binary string of length
+$ n $ containing no substring \,$ 00 $} (two or more zeros in a row). We can encode this language into the generating function:
+$$ P(z,u)\quad=\quad\frac{1+uz}{1-z(1+uz)} $$
+and solve the \emph{mean} as the \emph{moment in} $ u $ we're looking for. This sort of thing ends up being a lot of algebraic
+work by hand and is best solved by the symbolic packages of a computer, but otherwise what lessons can be learned if we had to
+do it ourselves?
+
+The object of this article is to apply the idea of \emph{interface theory}, where we start with a space, take an inventory
+of its subspaces, and then for any given subspace create a compressed representation which maintains its own navigational algebra.
+This is an \emph{interface layer}. Solving the moments of the above generating function offers a quality example of this process,
+showing of the merits of interface design toward general problem solving.
+
+To begin, when we're looking to solve for the individual terms of a rational generating function such as the above, it helps to decompose
+it into its roots:
+
+\begin{align*}
+P(z,u)	& \equals \frac{1+uz}{1-z(1+uz)}						\\
+											\\
+	& \equals \frac{1+uz}{1-z-uz^2}							\\
+											\\
+	& \equals \frac{-1}{u} \cdot \frac{uz+1}{z^2+\frac{1}{u}z-\frac{1}{u}}		\\
+											\\
+	& \equals \frac{-1}{u} \cdot \frac{uz+1}{[z-\alpha(u)][z-\alphahat(u)]}		\\
+\end{align*}
+where
+$$ \alpha(u) \equals \frac{-1+\sqrt{4u+1}}{2u} \fourqquad \alphahat(u) \equals \frac{-1-\sqrt{4u+1}}{2u} $$
+
+The value of such a decomposition is that we can further separate our derived expression into its \emph{partial fraction}
+representation which offers a simpler means to finding the terms of the generating function. The problem is that we're now
+working with square roots in our $ \alpha, \alphahat $, which can get pretty ugly when manipulating our expression into
+its partial fraction equivalent, and is likely prone to error given all the details we need to keep track of.
+
+This is where interface theory comes in. We are now working with a grammar which includes square roots, but we'd prefer
+to abstract a way from this. The idea then is to come up with an interface, a compressed representation which has its own
+homomorphic algebra.~\footnote{When I say ``homomorphic algebra'' I'm using it in a casual intuitive sense, not a formal one.}
+
+We already have our compressions: $ \alpha, \alphahat $, so we only need derive algebraic rules. The main thing with square
+roots is we would prefer to always have them in the numerators of our rational functions, and this will inform our algebra
+as well. Regardless, it is natural to run through the arithmetic operators of \emph{addition} and \emph{multiplication} first:
+$$ \alpha+\alphahat \equals \frac{-1}{u} \fourqquad \alpha\alphahat \equals \frac{-1}{u} $$
+these derive quite readily from the definitions.
+
+Next, it we derive the \emph{additive} and \emph{multiplicative} inverses:
+\begin{align*}
+-\alpha			& \equals \frac{1}{u}+\alphahat		& \frac{1}{\alpha}	& \equals -u\alphahat	\\
+														\\
+-\alphahat		& \equals \frac{1}{u}+\alpha		& \frac{1}{\alphahat}	& \equals -u\alpha	\\
+\end{align*}
+
+With these, we have the basis needed to derive pretty much any other form we'd be interested in, for example:
+\begin{align*}
+\alpha-\alphahat		& \equals \alpha+\left(\frac{1}{u}+\alpha\right)		\\
+												\\
+				& \equals \frac{1}{u}+2\alpha					\\
+												\\
+				& \quad\mbox{or}						\\
+												\\
+\alpha^2			& \equals (-\alpha)(-\alpha)					\\
+												\\
+				& \equals -\alpha\left(\frac{1}{u}+\alphahat\right)		\\
+												\\
+				& \equals -\alpha\frac{1}{u}-\alpha\alphahat			\\
+												\\
+				& \equals \frac{1}{u}-\frac{1}{u}\alpha				\\
+												\\
+				& \quad\mbox{or}						\\
+												\\
+\frac{\alpha}{\alphahat}	& \equals -u\alpha^2						\\
+												\\
+				& \equals -u\left(\frac{1}{u}-\frac{1}{u}\alpha\right)		\\
+												\\
+				& \equals -1+\alpha						\\
+\end{align*}
+
+Finally, there is one additional trick worth knowing:
+\begin{align*}
+(c+\alpha)(c+\alphahat)	& \equals c^2+c(\alpha+\alphahat)+\alpha\alphahat		\\
+											\\
+			& \equals c^2+c\frac{-1}{u}+\frac{-1}{u}			\\
+											\\
+			& \equals \frac{c^2\,u-(c+1)}{u}				\\
+\end{align*}
+which is useful for when you want to move the irrational functions $ \alpha, \alphahat $ from a denominator to its numerator:
+\begin{align*}
+\frac{1}{c+\alpha}	& \equals \frac{1}{c+\alpha} \cdot \frac{c+\alphahat}{c+\alphahat}		\\
+													\\
+			& \equals (c+\alphahat)\,\frac{u}{c^2\,u-(c+1)}					\\
+													\\
+			& \equals \frac{cu}{c^2\,u-(c+1)}+\frac{u}{c^2\,u-(c+1)}\,\alphahat		\\
+\end{align*}
+which you might say is pretty complicated, but it's the closest form to a rational function we can achieve---it involves
+only a single square root in the numerator---and rational functions are otherwise which are well known and well behaved.
+
+Finally, for our purposes, there's one more which will be of use:
+\begin{align*}
+(\alpha-\alphahat)^2	& \equals \left(\frac{1}{u}+2\alpha\right)^2							\\
+															\\
+			& \equals \frac{1}{u^2}+\frac{4}{u}\alpha+4\alpha^2						\\
+															\\
+			& \equals \frac{1}{u^2}+\frac{4}{u}\alpha+4\left(\frac{1}{u}-\frac{1}{u}\alpha\right)		\\
+															\\
+			& \equals \frac{1}{u^2}+\frac{4}{u}\alpha+\frac{4}{u}-\frac{4}{u}\alpha				\\
+															\\
+			& \equals \frac{4u+1}{u^2}									\\
+\end{align*}
+
+Let's summarize all of these secondary identities as follows:
+\begin{align}
+\alpha-\alphahat			& \equals \frac{1}{u}+2\alpha							\\
+\alpha^2				& \equals \frac{1}{u}-\frac{1}{u}\alpha						\\
+\frac{\alpha}{\alphahat}		& \equals -1+\alpha								\\
+\frac{1}{c+\alpha}			& \equals \frac{cu}{c^2\,u-(c+1)}+\frac{u}{c^2\,u-(c+1)}\,\alphahat		\\
+\frac{1}{(\alpha-\alphahat)^2}		& \equals \frac{u^2}{4u+1}							\\
+\end{align}
+
+\begin{align*}
+P(z,u)	& \equals \frac{-1}{u} \cdot \frac{uz+1}{(z-\alpha)(z-\alphahat)}		\\
+\end{align*}
+
+\begin{align*}
+\frac{uz+1}{(z-\alpha)(z-\alphahat)}	& \equals \frac{A}{z-\alpha}+\frac{B}{z-\alphahat}				\\
+															\\
+					& \equals \frac{A(z-\alphahat)+B(z-\alpha)}{(z-\alpha)(z-\alphahat)}		\\
+															\\
+					& \equals \frac{(A+B)z-(A\alphahat+B\alpha)}{(z-\alpha)(z-\alphahat)}		\\
+\end{align*}
+
+\begin{align*}
+A+B			& \equals u		\\
+						\\
+A\alphahat+B\alpha	& \equals -1		\\
+\end{align*}
+
+\begin{align*}
+A\alphahat+B\alphahat	& \equals u\alphahat	\\
+						\\
+A\alphahat+B\alpha	& \equals -1		\\
+\end{align*}
+
+\begin{align*}
+B(\alpha-\alphahat)	& \equals -1-u\alphahat											\\
+																\\
+B			& \equals \frac{-1-u\alphahat}{\alpha-\alphahat}							\\
+																\\
+			& \equals \frac{-1-u\alphahat}{\alpha-\alphahat} \cdot \frac{\alpha-\alphahat}{\alpha-\alphahat}	\\
+																\\
+			& \equals (-1-u\alphahat)(\frac{1}{u}+2\alpha)\,\frac{u^2}{4u+1}					\\
+																\\
+			& \equals (\frac{-1}{u}-2\alpha-\alphahat-2u\alpha\alphahat)\,\frac{u^2}{4u+1}				\\
+																\\
+			& \equals (2-\alpha)\,\frac{u^2}{4u+1}									\\
+																\\
+			& \equals \frac{2u^2}{4u+1}-\frac{u^2}{4u+1}\,\alpha							\\
+\end{align*}
+
+\begin{align*}
+A	& \equals u-B												\\
+														\\
+	& \equals u-\frac{2u^2}{4u+1}+\frac{u^2}{4u+1}\,\left(\frac{-1}{u}-\alphahat\right)			\\
+														\\
+	& \equals \frac{2u^2+u}{4u+1}-\frac{u}{4u+1}-\frac{u^2}{4u+1}\,\alphahat				\\
+														\\
+	& \equals \frac{2u^2}{4u+1}-\frac{u^2}{4u+1}\,\alphahat							\\
+\end{align*}
+
+\begin{align*}
+P(z,u)	& \equals \frac{-1}{u}\left(\frac{2u^2}{4u+1}-\frac{u^2}{4u+1}\,\alphahat\right)\frac{1}{z-\alpha}
+                  +\frac{-1}{u}\left(\frac{2u^2}{4u+1}-\frac{u^2}{4u+1}\,\alpha\right)\frac{1}{z-\alphahat}				\\
+																	\\
+	& \equals \frac{-1}{u}\left(\frac{2u^2}{4u+1}-\frac{u^2}{4u+1}\,\alphahat\right)\frac{1}{\alpha}
+                  \cdot \frac{1}{1-\frac{z}{\alpha}}
+                  +\frac{-1}{u}\left(\frac{2u^2}{4u+1}-\frac{u^2}{4u+1}\,\alpha\right)\frac{1}{\alphahat}
+                  \cdot \frac{1}{1-\frac{z}{\alphahat}}											\\
+																	\\
+	& \equals \left(\frac{2u^2}{4u+1}\,\alpha-\frac{u^2}{4u+1}\,\alpha^2\right) \frac{1}{1-(-u\alpha)z}
+                  +\left(\frac{2u^2}{4u+1}\,\alphahat-\frac{u^2}{4u+1}\,\alphahat^2\right) \frac{1}{1-(-u\alphahat)z}		\\
+\end{align*}
+
+\begin{align*}
+\frac{u^2}{4u+1}\,\alpha^2				& \equals \frac{u^2}{4u+1}\left(\frac{1}{u}-\frac{1}{u}\alpha\right)		\\
+																	\\
+							& \equals \frac{u}{4u+1}-\frac{u}{4u+1}\,\alpha					\\
+																	\\
+\frac{2u^2}{4u+1}\,\alpha-\frac{u^2}{4u+1}\,\alpha^2	& \equals \frac{2u^2}{4u+1}\,\alpha-\frac{u}{4u+1}+\frac{u}{4u+1}\,\alpha	\\
+																	\\
+							& \equals -\frac{u}{4u+1}+\frac{2u^2+u}{4u+1}\,\alpha				\\
+\end{align*}
+
+\begin{align*}
+P(z,u)	& \equals \left(-\frac{u}{4u+1}+\frac{2u^2+u}{4u+1}\,\alpha\right) \frac{1}{1-(-u\alpha)z}
+                  +\left(-\frac{u}{4u+1}+\frac{2u^2+u}{4u+1}\,\alphahat\right) \frac{1}{1-(-u\alphahat)z}		\\
+															\\
+[z^n]P(z,u)	& \equals \left(-\frac{u}{4u+1}+\frac{2u^2+u}{4u+1}\,\alpha\right)(-u\alpha)^n
+                  +\left(-\frac{u}{4u+1}+\frac{2u^2+u}{4u+1}\,\alphahat\right)(-u\alphahat)^n				\\
+\end{align*}
+
+\begin{align*}
+P(z,u)	& \equals \frac{1+uz}{1-z(1+uz)}										\\
+															\\
+	& \equals \left(-\frac{u}{4u+1}+\frac{2u^2+u}{4u+1}\,\alpha\right) \frac{1}{1-(-u\alpha)z}
+                  +\left(-\frac{u}{4u+1}+\frac{2u^2+u}{4u+1}\,\alphahat\right) \frac{1}{1-(-u\alphahat)z}		\\
+\end{align*}
+where
+$$ \alpha(u) \equals \frac{-1+\sqrt{4u+1}}{2u} \fourqquad \alphahat(u) \equals \frac{-1-\sqrt{4u+1}}{2u} $$
+
+\end{document}
+

@@ -1,0 +1,144 @@
+% Copyright 2020 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1.75cm,right=2.5cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{asymptote}
+
+\newcommand{\then}{\ensuremath{\quad\Longrightarrow\quad}}
+\newcommand{\equals}{\ensuremath{\quad =\quad}}
+
+\newcommand{\fourqquad}{\ensuremath{\qquad\qquad\qquad\qquad}}
+
+\begin{asydef}
+// this comment prevents a compilation bug.
+
+\end{asydef}
+
+\title{Category Theory}
+\author{Daniel Nikpayuk}
+\date{January 3, 2020}
+\pagestyle{empty}
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\ \\[0.5cm]
+
+\noindent\begin{asy}
+unitsize(1cm);
+
+//
+
+path container = scale(2.5,1.5)*unitcircle;
+
+//
+
+label("0.", (0,0));
+
+draw(shift(4,-2)*container);
+
+dot((4,-2));
+dot((5,-1));
+dot((3,-1.5));
+dot((2.75,-2.75));
+dot((5,-2.75));
+
+label("Category C", (4,0));
+
+//
+
+label("1.", (0,-5));
+
+draw(shift(4,-7)*container);
+
+dot((4,-7));
+dot((5,-6));
+dot((3,-6.5));
+dot((2.75,-7.75));
+dot((5,-7.75));
+
+draw(shift(14,-7)*container);
+
+dot((14,-7));
+dot((15,-6));
+dot((13,-6.5));
+dot((12.75,-7.75));
+dot((15,-7.75));
+
+draw((7.5,-7)--(10.5,-7), Arrow);
+
+label("Category C", (4,-5));
+label("Category C (copied)", (14,-5));
+
+label("functor", (9,-6.6));
+
+//
+
+label("2.", (0,-10));
+
+draw(shift(4,-12)*container);
+
+pair i00 = (4,-12);
+pair i01 = shift(0.15,0.5)*i00;
+pair i02 = shift(0,-0.5)*i00;
+
+draw(i00--i01, blue);
+draw(i00--i02, blue);
+
+dot(i00);
+dot(i01, blue);
+dot(i02, blue);
+
+pair i10 = (3,-11);
+pair i11 = (3.1,-11.25);
+
+draw(i10--i11, blue);
+
+dot(i10);
+dot(i11, blue);
+
+dot((5,-11));
+dot((2.75,-12.75));
+dot((5,-12.75));
+
+draw(shift(14,-12)*container);
+
+pair j00 = (12.75,-12.75);
+pair j01 = shift(-0.1,0.5)*j00;
+pair j02 = shift(0.1,0.5)*j00;
+pair j03 = shift(0.25,0.25)*j00;
+
+draw(j00--j01, blue);
+draw(j00--j02, blue);
+draw(j00--j03, blue);
+
+dot(j00);
+dot(j01, blue);
+dot(j02, blue);
+dot(j03, blue);
+
+pair j10 = (15,-11);
+pair j11 = shift(-0.25,-0.25)*j10;
+pair j12 = shift(0,-0.25)*j10;
+
+draw(j10--j11, blue);
+draw(j10--j12, blue);
+
+dot(j10);
+dot(j11, blue);
+dot(j12, blue);
+
+dot((14,-12));
+dot((13,-11.5));
+dot((15,-12.75));
+
+draw((7.5,-12)--(10.5,-12), Arrow);
+
+label("Category D (extension of C)", (4,-10));
+label("Category E (extension of C)", (14,-10));
+
+label("functor", (9,-11.6));
+
+\end{asy}
+
+\end{document}
+

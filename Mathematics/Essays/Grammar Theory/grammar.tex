@@ -1,0 +1,71 @@
+% Copyright 2018 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1cm,right=1cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{asymptote}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amsmath}
+
+\begin{asydef}
+// this comment prevents a compilation bug.
+
+import three;
+
+triple camera_angle = (-1, -1, 1);
+
+currentprojection = perspective(camera = camera_angle);
+
+void draw_axes(real scalar = 5)
+{
+	triple X3 = scalar*X;
+	triple Y3 = scalar*Y;
+	triple Z3 = scalar*Z;
+
+	draw(O--X3, red + dotted, EndArrow3);
+	draw(O--Y3, red + dotted, EndArrow3);
+	draw(O--Z3, red + dotted, EndArrow3);
+
+	label("$ x $", X3, red);
+}
+
+void draw_ground(real scalar = 5)
+{
+	triple DL3 = scalar*(-1, -1, 0);
+	triple DR3 = scalar*( 1, -1, 0);
+	triple UR3 = scalar*( 1,  1, 0);
+	triple UL3 = scalar*(-1,  1, 0);
+
+	draw(DL3--DR3--UR3--UL3--cycle, red + dotted);
+}
+
+\end{asydef}
+
+\title{Grammar Theory}
+\author{Daniel Nikpayuk}
+\date{September 17, 2018}
+\pagestyle{empty}
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+\begin{asy}
+unitsize(1cm);
+
+draw_axes();
+
+draw_ground();
+
+\end{asy}
+
+\vspace{0.5cm}
+
+\end{document}

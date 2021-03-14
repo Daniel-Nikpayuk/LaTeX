@@ -1,0 +1,121 @@
+% Copyright 2015 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1cm,right=1cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+
+\pagestyle{empty}
+\begin{document}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+Here's the deal, let's say you have a finite set: $ \{0, 1, 2, 3, 4, 5, 6\} $\\[0.1cm]
+
+And you want to enumerate every subset of a particular size, say $ 2 $:
+
+$$ \begin{array}{ccc}
+\{0, 1\} & \{1, 3\} & \{2, 6\} \\
+\{0, 2\} & \{1, 4\} & \{3, 4\} \\
+\{0, 3\} & \{1, 5\} & \{3, 5\} \\
+\{0, 4\} & \{1, 6\} & \{3, 6\} \\
+\{0, 5\} & \{2, 3\} & \{4, 5\} \\
+\{0, 6\} & \{2, 4\} & \{4, 6\} \\
+\{1, 2\} & \{2, 5\} & \{5, 6\}
+\end{array} $$
+
+Simple combinatorics could have told us how many such subsets there are:
+$$ {7\choose 2}=21 $$
+It's even quite easy to find a bijection from the above \emph{enumerates} onto the set of numbers between $ 0-20 $:
+$$ \{0, 1, 2,\ldots , 19, 20\} $$
+since it's already listed out, you simply assign to each a natural number:
+$$ \begin{array}{lll}
+\{0, 1\} \to 0 & \{1, 3\} \to 7 & \{2, 6\} \to 14 \\
+\{0, 2\} \to 1 & \{1, 4\} \to 8 & \{3, 4\} \to 15 \\
+\{0, 3\} \to 2 & \{1, 5\} \to 9 & \{3, 5\} \to 16 \\
+\{0, 4\} \to 3 & \{1, 6\} \to 10 & \{3, 6\} \to 17 \\
+\{0, 5\} \to 4 & \{2, 3\} \to 11 & \{4, 5\} \to 18 \\
+\{0, 6\} \to 5 & \{2, 4\} \to 12 & \{4, 6\} \to 19 \\
+\{1, 2\} \to 6 & \{2, 5\} \to 13 & \{5, 6\} \to 20
+\end{array} $$
+
+But a slightly less obvious, lesser known result is to find a---to put it in more computing science terms---\emph{random access}
+approach, which is to say a bijective map as function which acts on its input alone: A map which is not recursive with respect
+to any of the other subsets as arguments.  The intention of this article is to demonstrate how to do such a convoluted thing:\\[0.1cm]
+
+We'll be working with a case example as the mapping itself is still a bit more algorithmic than it is formulaic.
+Take $ \{3, 5\} $ as our case study.
+
+First we need to standardize our terminology. We're working with an $ n $-set, in this case $ n=7 $, and we are enumerating its
+$ m $-subsets, in this case $ m=2 $.  The first thing we do is to ``normalize'' our input by translating it into a monotonically
+non-decreasing sequence instead of the monotonically increasing set it's currently represented as. We do this by subtracting
+the identity sequence:
+$$ \langle 0, 1,\ldots, i\rangle_{i=0}^{m-1} $$
+Which is basic component-wise vector substraction:
+
+$$ \begin{array}{rc}
+  & \langle 3, 5\rangle  \\
+- & \langle 0, 1\rangle  \\ \hline
+  & \langle 3, 4\rangle
+\end{array} $$
+
+At this point we're now working with the sequence $ \langle 3, 4\rangle  $.
+
+The next step is to \emph{additively} partition our sequence into a kind of natural ``positional notation''---natural relative
+to non-decreasing sequences. We split up our sequence into sequences which match the following pattern:
+$$ 0^j|c^k\quad :=\quad\langle 0, 0, 0,\ldots\mbox{(j times)}, c, c, c,\ldots\mbox{(k times)}\rangle $$
+When I say split up, I mean whatever we partition this vector into, those other vectors (of the same dimension) must add back
+up to the original---with the additional constraint that each partition follows the above pattern. In our case study, this leads to:
+$$ \langle 3, 4\rangle \quad =\quad\langle 3, 3\rangle +\langle 0, 1\rangle $$
+And here's the final conversion, an actual formula:
+$$ 0^j|c^k\quad\to\quad {n-j\choose k}-{n-j-c\choose k},\quad j+k=m $$
+which in our case $ (n=7; m=2) $, we have
+$$ 0^j|c^k\quad\to\quad {7-j\choose k}-{7-j-c\choose k},\quad j+k=2 $$
+
+So for each partition, we map it with the above formula, and add all such maps back together to get our final bijection:
+\begin{eqnarray*}
+\langle 3, 4\rangle & = & \langle 3, 3\rangle + \langle 0, 1\rangle \\
+       & = & 0^0|3^2 + 0^1|1^1 \\
+       & = & ({7-0\choose 2} - {7-0-3\choose 2}) + ({7-1\choose 1} - {7-1-1\choose 1}) \\
+       & = & ({7\choose 2} - {4\choose 2}) + ({6\choose 1} - {5\choose 1}) \\
+       & = & (21 - 6) + (6 - 5) \\
+       & = & 15 + 1 \\
+       & = & 16 \\
+\end{eqnarray*}
+
+To top it all off, if you go back to our enumeration table above, and line up $ 16 $, you get: $ \{3, 5\} $, which is what
+we started with.  I'll end with another quick example for clarity, assume again a $ 7 $-set, but in this case a $ 3 $-subset:
+\begin{eqnarray*}
+\{1, 4, 6\} & \to & \langle 1, 4, 6\rangle - \langle 0, 1, 2\rangle \\
+            & = & \langle 1, 3, 4\rangle \\
+            & = & \langle 1, 1, 1\rangle + \langle 0, 2, 3\rangle \\
+            & = & \langle 1, 1, 1\rangle + \langle 0, 2, 2\rangle + \langle 0, 0, 1\rangle \\
+            & = & 0^0|1^3 + 0^1|2^2 + 0^2|1^1 \\
+            & = & ({7\choose 3} - {6\choose 3}) + ({6\choose 2} - {4\choose 2}) + ({5\choose 1} - {4\choose 1}) \\
+            & = & (35 - 20) + (15 - 6) + (5 - 4) \\
+            & = & 15 + 9 + 1 \\
+            & = & 25 \\
+\end{eqnarray*}
+
+I do not supply the proof here as it is intended to be included in an article I'm pushing to release later. Actually I had hoped
+to write the article this year, but I don't know if that'll happen---I have too many other projects keeping me busy. In anycase,
+I haven't come across this result,\footnote{regardless of notation, I admit mine might be a bit strange.} and so I'd like to think
+it's brand new \emph{even if it's not cutting edge} and this feeling is especially true given the day's effort I put into it,
+but my experience in such things is it's probably tucked away somewhere in some old old textbook, discovered long ago. Regardless,
+though it doesn't come up often, it is still useful every once in a while, especially in combinatorics or theoretical computing science.
+I hope you find it useful.\\[0.5cm]
+
+Daniel Nikpayuk\\[0.5cm]
+
+{\bfseries P.S.} It can probably be optimized.
+
+\end{document}
+

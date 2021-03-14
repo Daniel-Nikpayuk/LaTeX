@@ -1,0 +1,88 @@
+% Copyright 2015 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1cm,right=1cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\newcommand{\eq}{\ensuremath{\quad = \quad}}
+\newcommand{\lt}{\ensuremath{\quad < \quad}}
+\renewcommand{\leq}{\ensuremath{\quad\le\quad}}
+
+\pagestyle{empty}
+\begin{document}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+Restricted to integers, what is the largest $ n $-bit binary number we can square:
+$$ \mbox{square}(x)\quad =\quad x*x\quad =\quad x^2 $$
+without worry of arithmetic overflow? This is to say:
+$$ \mbox{max}\ \{ x\in\mathbb{Z}\ |\ x^2 < 2^n \} $$
+
+The obvious solution starts as:
+$$ x \lt 2^{\frac{n}{2}} $$
+In the case that $ n $ is \emph{even}, our solution is immediate as $ 2^{n/2} $ is a computable integer, and thus:
+$$ x \leq 2^{\frac{n}{2}}-1 $$
+Unfortunately things are not so simple if $ n $ is \emph{odd}, in this case we have:
+$$ x\lt 2^\frac{n}{2} \eq 2^{\left\lfloor\frac{n}{2}\right\rfloor}2^\frac{1}{2} \eq 2^\frac{n-1}{2}\sqrt{2},\qquad n\ge 1 $$
+The most direct solution then would be to calculate and round down:
+$$ x\lt 2^\frac{n-1}{2}\sqrt{2},\qquad n\ge 1 $$
+Notice as we're multiplying $ \sqrt{2} $ by a power of two, when implementing we only need to achieve binary accuracy
+of $ \frac{n-1}{2} $ bits then we can simply left-shift and coerce our \emph{double floating} point into our max.
+Unfortunately, the bit precision of \emph{double} is implementation specific with no hard rules in languages like C and C++.
+In practice it's unlikely to arise in an error, but such a solution still lacks certainly as well as portability.
+
+To this end, it makes sense to take a midpoint guess-and-check approach. Why? Given our bit precision, and the fact that
+we halve the list of possibilities each time, we would be making at most $ n $ guesses and checks. We can improve this
+though by starting off with a good lower and upper bound:
+$$ 2^\frac{n-1}{2} \leq m \leq 2^\frac{n+1}{2} $$
+Leaving us with only $ \frac{n-1}{2} $ possible guesses and checks. This solution scales well against current hardware
+architecture. If industry gives us $ 128 $-bit registers, we then have only $ 64 $ possible guesses and checks.
+We'll see how well this assumption stands the test of time\ldots
+
+We still need an efficient means of testing, where we know we don't have to worry about the exact problem
+we're trying to solve: arithmetic overflow.  We start again with:
+$$ x^2 \lt 2^n $$
+Dividing by $ 2^{n-1} $ on both sides leaves us with:
+$$ \left(\frac{x}{2^{(n-1)/2}}\right)^2 \lt 2 $$
+
+If we break up our test $ x $ into its division and remainder---dividing by $ 2^\frac{n-1}{2} $ we have:
+$$ x=2^\frac{n-1}{2}q+r $$
+applying this we get:
+$$ \begin{array}{rcl}
+\left(q+\frac{r}{2^{(n-1)/2}}\right)^2 & < & 2 \\
+ \\
+q^2 + \frac{2qr}{2^{(n-1)/2}} + \left(\frac{r}{2^{(n-1)/2}}\right)^2 & < & 2 \\
+\end{array} $$
+Notice if we set $ q=2 $ we'd have a contradiction, so $ 0\le q\le 1 $. But given we want $ x $ to be as large as possible
+it makes sense to set $ q=1 $:
+$$ \begin{array}{rcl}
+\frac{2r}{2^{(n-1)/2}} + \frac{r^2}{2^{n-1}} & < & 1 \\
+ \\
+2\cdot 2^\frac{n-1}{2}r + r^2 & < & 2^{n-1} \\
+2r^2 & < & 2^{n-1} - 2\cdot 2^\frac{n-1}{2}r + r^2 \\
+2r^2 & < & \left(2^\frac{n-1}{2} - r\right)^2 \\
+\end{array} $$
+
+This is ideal as we know from the division remainder theorem that:
+$$ 0 \leq r \lt 2^\frac{n-1}{2} $$
+and so
+$$ 0 \leq 2r^2 \lt 2^n $$
+So the left-side of our potential test will not overflow. Additionally:
+$$ 0 \lt 2^\frac{n-1}{2}-r \leq 2^\frac{n-1}{2} $$
+and so
+$$ 0 \lt \left(2^\frac{n-1}{2}-r\right)^2 \leq 2^{n-1} \lt 2^n $$
+So we need not worry about any overflow on both sides of our test.
+As such, we only need implement the midpoint method to determine our solution for arbitrary odd $ n $
+by applying the following test:
+$$ 2r^2 \lt \left(2^\frac{n-1}{2} - r\right)^2,\qquad\mbox{where}\quad r := x\mbox{ mod } 2^\frac{n-1}{2} $$
+
+\end{document}
+

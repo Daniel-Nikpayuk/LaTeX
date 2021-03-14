@@ -1,0 +1,2206 @@
+% Copyright 2019 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=2.5cm,right=2.5cm,top=2cm,bottom=2.5cm]{geometry}
+\usepackage{asymptote}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+
+\newcommand{\then}{\ensuremath{\quad\Longrightarrow\quad}}
+\newcommand{\equals}{\ensuremath{\quad =\quad}}
+
+\newcommand{\fourqquad}{\ensuremath{\qquad\qquad\qquad\qquad}}
+
+\begin{asydef}
+// this comment prevents a compilation bug.
+
+real direction(bool value)
+{
+	return value ? 1 : -1;
+}
+
+pair segment(pair current = (0,0), string align, real projection, real angle = 0)
+{
+	align = (align == "E") ? "EU" :
+		(align == "N") ? "NL" :
+		(align == "W") ? "WD" :
+		(align == "S") ? "SR" : align;
+
+	real base          = direction(substr(align, 0, 1) == "E" || substr(align, 0, 1) == "N");
+	real adjacent      = direction(substr(align, 1, 1) == "R" || substr(align, 1, 1) == "U") * Tan(angle);
+	pair initialVertex = (substr(align, 0, 1) == "E" || substr(align, 0, 1) == "W") ? (base, adjacent) : (adjacent, base);
+	pair scaledVertex  = scale(projection) * initialVertex;
+	pair shiftedVertex = shift(current)    * scaledVertex;
+
+	return shiftedVertex;
+}
+
+//
+
+void drawpath(path p)
+{
+	draw(p);
+
+	for (int k=0; k < size(p); ++k)
+	{
+		dot(point(p, k));
+	}
+}
+
+void safeLabel(picture pic = currentpicture, Label L, pair position, real width, real height,
+		align align = NoAlign, pen p = currentpen, filltype filltype = NoFill)
+{
+	pair sw = position + (-width,-height);
+	pair se = position + (-width, height);
+	pair nw = position + ( width,-height);
+	pair ne = position + ( width, height);
+
+	filldraw(pic, sw--se--ne--nw--cycle, white, p);
+	label(pic, L, position, align, p, filltype);
+}
+
+\end{asydef}
+
+\title{On the semantics of\\mathematical functions}
+\author{Daniel Nikpayuk}
+\date{October 26, 2019}
+\pagestyle{empty}
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+The intention of this essay is to demonstrate a universal property of mathematical functions
+that parallels the ``subsetting'' paradigm from Set Theory:
+$$ \{\,x\in A\ |\ P(x)\,\} $$
+Here we can view the set $ A $ as a \emph{model}, and the predicate $ P(x) $ as a \emph{filter}. The idea being
+presented then is that a function can be similarly decomposed into a model component followed by a filter component.
+
+\section*{what is a function?}
+
+Before I can demonstrate the claim that \emph{all} functions can be decomposed we should agree on terms, namely the idea
+of what a function even is. As there are alternative foundations to math these days there are different ways to implement
+this idea of a function. Regardless of the details, each approach tends to retain the following styles of notation:
+$$ f:A\to B \qquad\qquad f(x) \qquad\qquad f(x_1,x_2,\ldots,x_n) $$
+and their respective connotations. In vague terms this notation tells us that a function is something which takes
+one or more specific inputs and equates it (them) with a single specific output.
+
+What else can be said about functions in otherwise general terms?
+
+For starters, we can categorize them as what I would call \emph{strong} functions and \emph{weak} functions.
+The idea of a strong function is its output value can be computed from its input value. It might seem obvious
+or apparent that we would want all functions to be strong in this sense, but there is in fact a lot of math
+out there where this is not the case, so we can't take the difference for granted.
+
+Weak functions aren't computable, but for them to be meaningful would should at least be able to compute a \emph{proof}
+that they satisfy the basic specification of a function\footnote{Even this requirement of a proof can be weakened
+as mathematicians also \emph{assume} functions axiomatically, for example the Axiom of Choice in Set Theory.}:
+Exactly one output exists for each input. As far as weak functions go this is generally all that's needed of them,
+but in practice many such functions also retain enough logical properties to derive truths about the function's
+domain and codomain respectively. A function is after all meant to represent a relationship between the two.
+
+In this instance of function semantics, this sort of pattern shows up in math all the time that we give it a name:
+\emph{functor}. As I am looking to keep things context agnostic (as much as possible) I will refer to these patterns
+as weak functions as well. As for a quick example of such a weak function:
+$$ e^x:\mathbb{R}\to\mathbb{R}_{> 0} $$
+Strictly speaking there are many input values where this is not computable, though certainly they can be
+approximated, and otherwise such a function can at least tell us things about the relationship between
+$ \mathbb{R} $ and $ \mathbb{R}_{> 0} $.
+
+\subsection*{alternative notation}
+
+Before continuing with further intuitive specifications of the nature of a function, for the purposes of this essay
+I will here present an alternative (complementary) notation for functions than the one given above.
+
+I present to you what I call \emph{grammatical path} notation:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p10 = segment(p00, "SL", 1, 20);
+ pair p11 = segment(p00, "SR", 1, 40);
+ pair p12 = segment(p00, "SR", 1, 60);
+ pair p13 = segment(p00, "SR", 1, 70);
+ 
+ //
+ 
+ draw(p00--p10);
+ draw(p00--p11);
+ draw(p00--p12);
+ draw(p00--p13);
+ 
+ //
+ 
+ safeLabel("$f$", p00, 0.25, 0.25);
+ 
+ safeLabel("$y$", p10, 0.25, 0.25);
+ safeLabel("$x_1$", p11, 0.25, 0.25);
+ safeLabel("$x_2$", p12, 0.25, 0.25);
+ safeLabel("$x_3$", p13, 0.25, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+such a representation is intended to convey the same information as
+$$ y=f(x_1,x_2,x_3) $$
+
+Not too much will be said about this style of notation other than it's meant to show relationships more
+clearly in a visual way, the tradeoff being it takes up more space on the page. Not only can it show relationships more
+clearly, in fact a particular use compared with \emph{pathless} notation is when we're wanting to reference function
+arguments anonymously (which tends to be done from time to time). In this case we can \emph{path restrict} the argument
+with the following notation: $ f/n\ (\,= x_n\,) $. Furthermore, the image of a function $ y $ could be then also be
+denoted anonymously as: $ f/0 $.
+
+In practice when representing functions this way it is often more convenient to hide the $ f/0 $ argument altogether:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p11 = segment(p00, "SR", 1, 40);
+ pair p12 = segment(p00, "SR", 1, 60);
+ pair p13 = segment(p00, "SR", 1, 70);
+ 
+ //
+ 
+ draw(p00--p11);
+ draw(p00--p12);
+ draw(p00--p13);
+ 
+ //
+ 
+ safeLabel("$f$", p00, 0.25, 0.25);
+ 
+ safeLabel("$x_1$", p11, 0.25, 0.25);
+ safeLabel("$x_2$", p12, 0.25, 0.25);
+ safeLabel("$x_3$", p13, 0.25, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+which works so long as we recall that it is still an accessible part of the grammatical structure.
+This convenience will largely be applied in the remainder of this essay.
+
+This \emph{hiding} convention does bring up one potential problem though: In the case the image is not actually
+hidden, how do you know whether the leftmost path represents the function image or an argument? To answer this,
+it is usually clear by context alone, but when it's not we can signify the difference by a change in color
+or a double line or double surrounding box, etc. I'm leaving the exact specification open so as to maintain
+a user-friendly design, but the point is it's not a difficult problem to solve.
+
+\subsection*{lambda inspiration}
+
+How else would we describe the connotations of a function?
+
+So far they equate input(s) with an output, and are strong or weak. From here we take strong functions as our muse.
+So what of these computable functions then? Alonzo Church introduced the lambda calculus back in the early twentieth
+century as a means of describing such functions. Briefly, and to translate into modern terms, his idea is that with
+
+\begin{enumerate}
+\item {\bfseries lambda abstraction} you could construct new functions.
+\item {\bfseries lambda application} you could construct new \emph{function objects}.
+\item {\bfseries lambda reduction} you could evaluate function objects, and as a corollary you could evaluate functions.
+\end{enumerate}
+These insights offer us a way forward, but if we are to include weak functions we have to weaken his ideas.
+
+The first thing to note is that function construction as well as function object construction tend to be sufficiently
+robust \emph{as is} to include weak functions already, in this sense there isn't much to be said about them. On the other
+hand, as grammatical path notation is the means to demonstrating the univeral property alluded to at the beginning of this
+essay, much of the focus will be on ideas of construction, and how they can be equipped with this alternative notation.
+
+As for function evaluation, given that weak functions aren't computable, this idea itself needs to be weakened
+as \emph{translation with a halting condition}. If the function isn't computable itself, the relationship
+it describes between its domain and comdomain can be translated until an intended conclusion (implication)
+is met, which would be the halting condition. In this sense, ``reduction'' is no longer an appropriate word.
+
+\section*{function construction}
+
+If our focus now is function construction, the notion of functions we've been discussing so far can be called
+\emph{primitive} functions. This is in the sense of what I call the \emph{internal state} schema, a strategy
+to constructively build objects in math: Start with primitive objects and use rules of construction to combine
+them into composite objects.
+
+In this case, ``composite'' is exactly the right word. The way to build new functions from basic ones is
+to \emph{compose} them:
+$$ (f\circ g)(x)\ =\ f(g(x)) $$
+
+Function composition has different meanings when it comes to strong and weak functions, but both share
+the property that the composition operator is associative. Otherwise the thing to note is that a strong
+function composed with a strong function is meant to be strong, while if just one of the functions is
+weak the composite is necessarily weak as well.
+
+How does function composition relate to grammatical path notation? Take our previous grammatical path function
+$$ f(x_1,x_2,x_3) $$
+and compose it with $ g $ such that $ g(w)=x_2 $:
+$$ f(x_1,g(w),x_3) $$
+
+As an example of how to represent function composition in this alternative notation we now extend our previous visual:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p10 = segment(p00, "SL", 1, 20);
+ pair p11 = segment(p00, "SR", 1, 40);
+ pair p12 = segment(p00, "SR", 1, 60);
+ pair p13 = segment(p00, "SR", 1, 70);
+ 
+ pair p20 = segment(p12, "SL", 1, 20);
+ pair p21 = segment(p12, "SR", 1, 50);
+ 
+ //
+ 
+ draw(p00--p10);
+ draw(p00--p11);
+ draw(p00--p12);
+ draw(p00--p13);
+ 
+ draw(p12--p20);
+ draw(p12--p21);
+ 
+ //
+ 
+ label("$y_f=f(x_1,g(w),x_3)$:", (0,0.75), N);
+ 
+ safeLabel("$f$", p00, 0.25, 0.25);
+ 
+ safeLabel("$y_f$", p10, 0.25, 0.25);
+ safeLabel("$x_1$", p11, 0.25, 0.25);
+ safeLabel("$g$", p12, 0.25, 0.25);
+ safeLabel("$x_3$", p13, 0.25, 0.25);
+ 
+ safeLabel("$x_2$", p20, 0.25, 0.25);
+ safeLabel("$w$", p21, 0.25, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+the idea is we view this visual as a \emph{tree} and so whenever we create a composite we replace the given
+\emph{leaf} with the appropriate \emph{root node} of the composing function, and otherwise move the replaced
+leaf to then be the composing function's image value. As example of this, $ y_g $ in the above representation
+corresponds to $ x_2 $.
+
+As a design concern, potentially there's more than one way to show a function composition visually as an extension
+of the previous \emph{primitive} grammatical path notation, so we should ask: Why choose this approach? We could
+have swapped the labels $ g $ and $ x_2 $ in the above graphic, for example.
+
+To figure this out we go back to the idea of strong and weak functions. On the one hand if the composite function
+is strong each composing function is also strong and thus their images (outputs) are computable. We would need a way
+to represent this. If on the other hand the composite is weak then at least one of the composing functions is weak
+and we'd still need a way to represent its output symbolically.
+
+This grammatical path notation allows us to do these things, in particular allowing us to hide $ x_2 $ visually,
+or to represent it anonymously as $ x_2\,(=f/2/0) $. Also, this approach to the notation further allows us to reserve
+the root position $ g\,(=f/2)$ for the function name itself.
+
+Besides, if we had these labels swapped as in the suggested alternate, it would break with the existing design.
+
+\subsection*{strong function evaluation}
+
+For the most part compositionality is straightfoward, but there is a subtlety worth discussing that's not often brought
+up with strong function composition: \emph{order of evaluation}. This sort of consideration is usually part of the
+realm of computing science and compiler\footnote{The programs that interpret source code and evaluate functions.}
+design, but it's still something we should discuss here as the underlying conventions in math that prevent
+it from being an issue are themselves usually only taught informally, and given that we're constructing functions
+philosophically it's best to be as explicit as possible here.
+
+Continuing with the previous example, in order to evaluate $ f $ it is usually the case we need to evaluate $ g $
+first, but this is not always true.  This consideration shows up in computing science in competing paradigms called
+\emph{applicative order evaluation} and \emph{normal order evaluation}.
+
+With applicative order we first compute all the arguments that are also functions ($ g $ in the example) before passing
+on to the next function, while in normal order the arguments are passed without first evaluating them. In many programming
+contexts such arguments don't even end up being used within the body of their function's definition, in which case they're
+not evaluated at all.  It's a moot point when you're only interested in final output, but there are many contexts in which
+such computational savings are semantically meaningful.
+
+In any case, how or why is such a distinction applicable in a math notation context? The issue arises due to the ambiguity
+of mathematical function notation: $ f(x) $ is meant to represent $ y $ (as in $ y=f(x) $), but it also demonstrates
+the relationship between $ y $ and $ x $ as conveyed by $ f $. The problem then is we can view $ f(x) $ instead
+as the \emph{function object} type $ (f,x) $ which has all the information needed to be evaluated, but otherwise
+is just a data structure holding that information---it is not intended to be evaluated on its own.
+
+So when we interpret and evaluate the function $ f(x_1,g(w),x_3) $ this ambiguity allows us to ``abuse the notation''
+and interpret it as $ f(x_1,(g,w),x_3) $ and thus pass the object $ (g,w) $ unevaluated until it is needed. Another
+way to look at it if you're concerned about such lax \emph{type casting} is we could instead substitute some symbolic
+$ u $ for $ g(w) $ without actually calculating it, and then only calculate it if needed during evaluation of $ f $.
+Either way, as mathematicians we are using one form in some contexts, and the other form in others, all the while
+never making these assumptions clear.
+
+With this said, for our purposes it is better to clarify and specify our evaluation policy here as:
+\begin{center}
+\bfseries applicative order evaluation
+\end{center}
+
+As a final note on this matter: Although these evaluation paradigms can compete, the reason we adopt applicative
+order evaluation is a) it's a simpler starting point, b) we can implement normal order evaluation (by means of
+function objects) as a specialized pattern within it. By the way, these paradigms also go by the better known
+names: \emph{eager} (applicative) evaluation, and \emph{lazy} (normal) evaluation, respectively.
+
+\subsection*{currying}
+
+Currying is a universal property of functions that effectively says for each function:
+$$ f\ :\ A \times B \to C $$
+there is an equivalent function
+$$ f'\ :\ A \to (B \to C) $$
+such that 
+$$ f(a,b)\ =\ f'(a)(b)	$$
+As this is an equivalence the implication goes both ways.
+
+To clarify this property in more casual language: A function's arguments can be applied all at once during its evaluation,
+or one at a time. In the case you evaluate one at a time you're returning a new function to which the remaining arguments
+are then applied. Given this convention, mathematicians usually drop the parenthesis in the type specification:
+$$ f'\ :\ A \to B \to C $$
+with the understanding that the composition is \emph{right associative} (right-to-left application of parentheses).
+
+In terms of our grammatical path notation, currying basically says the following two functions are equivalent:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p10 = segment(p00, "SL", 1, 20);
+ pair p11 = segment(p00, "SR", 1, 40);
+ pair p12 = segment(p00, "SR", 1, 65);
+ 
+ pair q00 = (7,0);
+ 
+ pair q10 = segment(q00, "SL", 1, 30);
+ pair q11 = segment(q00, "SR", 1, 50);
+ 
+ pair q20 = segment(q10, "SL", 1, 30);
+ pair q21 = segment(q10, "SR", 1, 45);
+ 
+ //
+ 
+ draw(p00--p10);
+ draw(p00--p11);
+ draw(p00--p12);
+ 
+ draw(q00--q10);
+ draw(q00--q11);
+ 
+ draw(q10--q20);
+ draw(q10--q21);
+ 
+ //
+ 
+ label("$\sim$", (4.20,-0.84), S);
+ 
+ safeLabel("$f$", p00, 0.25, 0.25);
+
+ safeLabel("$y$", p10, 0.25, 0.25);
+ safeLabel("$a$", p11, 0.25, 0.25);
+ safeLabel("$b$", p12, 0.25, 0.25);
+
+ safeLabel("$f'$", q00, 0.25, 0.25);
+
+ safeLabel("$y_{f'}$", q10, 0.30, 0.25);
+ safeLabel("$a$", q11, 0.25, 0.25);
+ 
+ safeLabel("$y$", q20, 0.25, 0.25);
+ safeLabel("$b$", q21, 0.25, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+As we have already discussed the basics of function composition, this grammatical path notation helps us to understand
+currying as an \emph{extension of function composition}, allowing for composition not only within the arguments of functions,
+but also within its image. For clarity, such a composite image might then be called a \emph{curried image}.
+
+\section*{decomposition}
+
+We have enough now to show that any tree structured function can be decomposed into what I term as the
+\emph{model / filter} schema.
+
+We'll use a ``sum of squares'' (sosq) function as our primary example:
+$$ \mbox{sosq} (x,y) := x^2+y^2 $$
+{\bfseries Note:} As this is only an essay outlining major ideas, no formal proofs will be given regarding any 
+of the following case studies.
+
+Getting started, the \emph{body} of this function is $ x^2+y^2 $, which as a grammatical visual is as follows:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p11 = segment(p00, "SL", 1, 40);
+ pair p12 = segment(p00, "SR", 1, 40);
+ 
+ pair p21 = segment(p11, "SL", 1, 20);
+ pair p22 = segment(p11, "SR", 1, 20);
+ pair p23 = segment(p12, "SL", 1, 20);
+ pair p24 = segment(p12, "SR", 1, 20);
+ 
+ //
+ 
+ draw(p00--p11);
+ draw(p00--p12);
+ 
+ draw(p11--p21);
+ draw(p11--p22);
+ 
+ draw(p12--p23);
+ draw(p12--p24);
+ 
+ //
+ 
+ safeLabel("$+$", p00, 0.25, 0.25);
+ 
+ safeLabel("$*$", p11, 0.25, 0.25);
+ safeLabel("$*$", p12, 0.25, 0.25);
+ 
+ safeLabel("$x$", p21, 0.25, 0.25);
+ safeLabel("$x$", p22, 0.25, 0.25);
+ 
+ safeLabel("$y$", p23, 0.25, 0.25);
+ safeLabel("$y$", p24, 0.25, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The process of this decomposition starts by determining the modelling function. This is done by generalizing the existing body.
+In this case, we can start by acknowledging the underlying types of the arguments $ x,y $ as well as the functions $ +,* $.
+As it is the intention to generalize, we will simply specify the arguments to have some type $ M $:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p11 = segment(p00, "SL", 1, 55);
+ pair p12 = segment(p00, "SR", 1, 55);
+ 
+ pair p21 = segment(p11, "SL", 1, 35);
+ pair p22 = segment(p11, "SR", 1, 35);
+ pair p23 = segment(p12, "SL", 1, 35);
+ pair p24 = segment(p12, "SR", 1, 35);
+ 
+ //
+ 
+ draw(p00--p11);
+ draw(p00--p12);
+ 
+ draw(p11--p21);
+ draw(p11--p22);
+ 
+ draw(p12--p23);
+ draw(p12--p24);
+ 
+ //
+ 
+ safeLabel("$+$", p00, 0.25, 0.25);
+ 
+ safeLabel("$*$", p11, 0.25, 0.25);
+ safeLabel("$*$", p12, 0.25, 0.25);
+ 
+ safeLabel("$x:M$", p21, 0.60, 0.27);
+ safeLabel("$x:M$", p22, 0.60, 0.27);
+ 
+ safeLabel("$y:M$", p23, 0.60, 0.27);
+ safeLabel("$y:M$", p24, 0.60, 0.27);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+but in cases such as these we should specify the function types as well:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p11 = segment(p00, "SL", 1, 65);
+ pair p12 = segment(p00, "SR", 1, 65);
+ 
+ pair p21 = segment(p11, "SL", 1, 40);
+ pair p22 = segment(p11, "SR", 1, 40);
+ pair p23 = segment(p12, "SL", 1, 40);
+ pair p24 = segment(p12, "SR", 1, 40);
+ 
+ //
+ 
+ draw(p00--p11);
+ draw(p00--p12);
+ 
+ draw(p11--p21);
+ draw(p11--p22);
+ 
+ draw(p12--p23);
+ draw(p12--p24);
+ 
+ //
+ 
+ safeLabel("$+:M\times M\to M$", p00, 1.65, 0.25);
+ 
+ safeLabel("$*:M\times M\to M$", p11, 1.60, 0.25);
+ safeLabel("$*:M\times M\to M$", p12, 1.60, 0.25);
+ 
+ safeLabel("$x:M$", p21, 0.60, 0.27);
+ safeLabel("$x:M$", p22, 0.60, 0.27);
+ 
+ safeLabel("$y:M$", p23, 0.60, 0.27);
+ safeLabel("$y:M$", p24, 0.60, 0.27);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+This can be somewhat overwhelming to look at, so if we've previously specified the underlying types and there's
+no risk of confusion we will instead now \emph{actively} hide such type info when reasonable.
+
+From here the most natural way to generalize toward a model is to free up the restrictions on the input arguments.
+In the case of sosq we have the following constraints:
+$$ \mbox{sosq}/\!+^1\!/*^1\ =\ \mbox{sosq}/\!+^1\!/*^2
+\qquad \mbox{and} \qquad \mbox{sosq}/\!+^2\!/*^1\ =\ \mbox{sosq}/\!+^2\!/*^2 $$
+which is to say $ x = y $ and $ y = y $. Notice that I've chosen to use the anonymous style notation here to describe
+these constraints. In order to help aid in reading path directions I've superscripted the given \emph{step} ordinals
+above the operator names. The anonymous style is a bit more tedious if you're not use to reading it, but it portrays
+underlying relationships more clearly than simply saying $ x = x $.
+
+So if we free up this constraint, we can generalize accordingly:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p11 = segment(p00, "SL", 1, 55);
+ pair p12 = segment(p00, "SR", 1, 55);
+ 
+ pair p21 = segment(p11, "SL", 1, 35);
+ pair p22 = segment(p11, "SR", 1, 35);
+ pair p23 = segment(p12, "SL", 1, 35);
+ pair p24 = segment(p12, "SR", 1, 35);
+ 
+ //
+ 
+ draw(p00--p11);
+ draw(p00--p12);
+ 
+ draw(p11--p21);
+ draw(p11--p22);
+ 
+ draw(p12--p23);
+ draw(p12--p24);
+ 
+ //
+ 
+ safeLabel("$+$", p00, 0.25, 0.25);
+ 
+ safeLabel("$*$", p11, 0.25, 0.25);
+ safeLabel("$*$", p12, 0.25, 0.25);
+ 
+ safeLabel("$w:M$", p21, 0.60, 0.27);
+ safeLabel("$x:M$", p22, 0.60, 0.27);
+ 
+ safeLabel("$y:M$", p23, 0.60, 0.27);
+ safeLabel("$z:M$", p24, 0.60, 0.27);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+For the time being this is sufficiently general to be our model, so we now turn our focus to determining
+this model's \emph{signature}. We do this first by flipping our visual:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p11 = segment(p00, "NL", 1, 55);
+ pair p12 = segment(p00, "NR", 1, 55);
+ 
+ pair p21 = segment(p11, "NL", 1, 35);
+ pair p22 = segment(p11, "NR", 1, 35);
+ pair p23 = segment(p12, "NL", 1, 35);
+ pair p24 = segment(p12, "NR", 1, 35);
+ 
+ //
+ 
+ draw(p00--p11);
+ draw(p00--p12);
+ 
+ draw(p11--p21);
+ draw(p11--p22);
+ 
+ draw(p12--p23);
+ draw(p12--p24);
+ 
+ //
+ 
+ safeLabel("$+$", p00, 0.25, 0.25);
+ 
+ safeLabel("$*$", p11, 0.25, 0.25);
+ safeLabel("$*$", p12, 0.25, 0.25);
+ 
+ safeLabel("$w:M$", p21, 0.60, 0.27);
+ safeLabel("$x:M$", p22, 0.60, 0.27);
+ 
+ safeLabel("$y:M$", p23, 0.60, 0.27);
+ safeLabel("$z:M$", p24, 0.60, 0.27);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+to which we can then \emph{factor out} sosq's signature:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p11 = segment(p00, "NL", 1, 55);
+ pair p12 = segment(p00, "NR", 1, 55);
+ 
+ pair p21 = segment(p11, "NL", 1, 35);
+ pair p22 = segment(p11, "NR", 1, 35);
+ pair p23 = segment(p12, "NL", 1, 35);
+ pair p24 = segment(p12, "NR", 1, 35);
+ 
+ pair p31 = segment(p21, "N", 2);
+ pair p32 = segment(p22, "N", 2);
+ pair p33 = segment(p23, "N", 2);
+ pair p34 = segment(p24, "N", 2);
+ 
+ //
+ 
+ draw(p00--p11);
+ draw(p00--p12);
+ 
+ draw(p11--p21);
+ draw(p11--p22);
+ 
+ draw(p12--p23);
+ draw(p12--p24);
+ 
+ draw((p21 + (0, 0.4)) -- (p31 + (0, -0.3)), lightblue, MidArrow);
+ draw((p22 + (0, 0.4)) -- (p32 + (0, -0.3)), lightblue, MidArrow);
+ draw((p23 + (0, 0.4)) -- (p33 + (0, -0.3)), lightblue, MidArrow);
+ draw((p24 + (0, 0.4)) -- (p34 + (0, -0.3)), lightblue, MidArrow);
+ 
+ //
+ 
+ safeLabel("$+$", p00, 0.25, 0.25);
+ 
+ safeLabel("$*$", p11, 0.25, 0.25);
+ safeLabel("$*$", p12, 0.25, 0.25);
+ 
+ safeLabel("$w:M$", p21, 0.60, 0.27);
+ safeLabel("$x:M$", p22, 0.60, 0.27);
+ 
+ safeLabel("$y:M$", p23, 0.60, 0.27);
+ safeLabel("$z:M$", p24, 0.60, 0.27);
+ 
+ label("$($", p31 + (-0.65, 0.05));
+ label("$w,$", p31);
+ label("$x,$", p32);
+ label("$y,$", p33);
+ label("$z$", p34);
+ label("$)$", p34 + (0.55, 0.05));
+ label("--- model signature", p34 + (2.5, 0.05));
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+This is to say our model's signature is:
+$$ (w, x, y, z) $$
+and so then our model itself is defined as follows:
+$$ \mbox{model}(w, x, y, z)\ :=\ w*x+y*z $$
+By the way this factoring process is effectively equivalent to \emph{lambda abstraction} mentioned previously
+regarding the lambda calculus. In more general trees it is computed by enumerating the (non-image) leaves of
+the given body of the function.
+
+As a quick aside, in the case of curried functions this approach to lambda abstraction needs to be modified
+slightly: The enumeration over the tree used to factor out the signature needs to be done in two parts. First
+it would step through the non-image leaves, and only then it would go into the image leaf and continue.
+Greater care is required so we don't inadvertently change the signature's ordering.
+
+For example with initial equivalence of curried functions:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p10 = segment(p00, "SL", 1, 20);
+ pair p11 = segment(p00, "SR", 1, 40);
+ pair p12 = segment(p00, "SR", 1, 65);
+ 
+ pair q00 = (7,0);
+ 
+ pair q10 = segment(q00, "SL", 1, 30);
+ pair q11 = segment(q00, "SR", 1, 50);
+ 
+ pair q20 = segment(q10, "SL", 1, 30);
+ pair q21 = segment(q10, "SR", 1, 45);
+ 
+ //
+ 
+ draw(p00--p10);
+ draw(p00--p11);
+ draw(p00--p12);
+ 
+ draw(q00--q10);
+ draw(q00--q11);
+ 
+ draw(q10--q20);
+ draw(q10--q21);
+ 
+ //
+ 
+ label("$\sim$", (4.20,-0.84), S);
+ 
+ safeLabel("$f$", p00, 0.25, 0.25);
+
+ safeLabel("$y$", p10, 0.25, 0.25);
+ safeLabel("$a$", p11, 0.25, 0.25);
+ safeLabel("$b$", p12, 0.25, 0.25);
+
+ safeLabel("$f'$", q00, 0.25, 0.25);
+
+ safeLabel("$y_{f'}$", q10, 0.30, 0.25);
+ safeLabel("$a$", q11, 0.25, 0.25);
+ 
+ safeLabel("$y$", q20, 0.25, 0.25);
+ safeLabel("$b$", q21, 0.25, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if we enumerated over $ f' $ in the non-curried way, we'd end up with a $ (b)(a) $ signature,
+which is not what we'd want.
+
+Getting back to the decomposition, since we now have our model it's time to derive the filter:
+$$ \begin{array}{rcl}
+\mbox{model}	& / & \mbox{filter}		\\
+						\\
+(w*x+y*z)	& / & P(w,x,y,z)		\\
+\end{array} $$
+
+With the process used to determine this model, our function's filter then just ends up being
+a predicate statement that explicitly states the information we had abstracted away:
+$$ \mbox{filter}(w,x,y,z) \quad :\Longleftrightarrow \quad (w=x\mbox{ and }y=z) $$
+
+And that's it! We now have the first demonstration that a function
+can be decomposed into this \emph{model/filter} schema:
+$$ \begin{array}{lcrcl}
+\mbox{body}	& \quad & \mbox{model}	& / & \mbox{filter}		\\
+									\\
+x^2+y^2		& \quad & (w*x+y*z)	& / & (w=x\mbox{ and }y=z)	\\
+\end{array} $$
+
+\subsection*{complete decomposition}
+
+With the above decomposition we were satisfied with the model component as it was,
+but the truth is we can still go further to achieve a complete decomposition.
+
+So far our understanding of how to construct functions is derived from the \emph{internal state} schema which
+first defines primitive functions and then uses those primitives equipped with function composition to define
+new function combinations. Then again, this grammatical path notation now suggests an extension, or reorientation
+of this schema. To return to our above example, the function primitives of our \emph{sum of squares function}
+are the well known monoids $ +,* $, but we can now loosen this constraint to arbitrary functions $ f, g, h $:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p11 = segment(p00, "SL", 1, 65);
+ pair p12 = segment(p00, "SR", 1, 65);
+ 
+ pair p21 = segment(p11, "SL", 1, 40);
+ pair p22 = segment(p11, "SR", 1, 40);
+ pair p23 = segment(p12, "SL", 1, 40);
+ pair p24 = segment(p12, "SR", 1, 40);
+ 
+ //
+ 
+ draw(p00--p11);
+ draw(p00--p12);
+ 
+ draw(p11--p21);
+ draw(p11--p22);
+ 
+ draw(p12--p23);
+ draw(p12--p24);
+ 
+ //
+ 
+ safeLabel("$f$", p00, 0.25, 0.27);
+ 
+ safeLabel("$g$", p11, 0.25, 0.27);
+ safeLabel("$h$", p12, 0.25, 0.27);
+ 
+ safeLabel("$w$", p21, 0.25, 0.27);
+ safeLabel("$x$", p22, 0.25, 0.27);
+ 
+ safeLabel("$y$", p23, 0.25, 0.27);
+ safeLabel("$z$", p24, 0.25, 0.27);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+While we're at it we could free up the monoid \emph{type} we're
+currently using in place for the domains and codomains respectively:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p11 = segment(p00, "SL", 1, 65);
+ pair p12 = segment(p00, "SR", 1, 65);
+ 
+ pair p21 = segment(p11, "SL", 1, 40);
+ pair p22 = segment(p11, "SR", 1, 40);
+ pair p23 = segment(p12, "SL", 1, 40);
+ pair p24 = segment(p12, "SR", 1, 40);
+ 
+ //
+ 
+ draw(p00--p11);
+ draw(p00--p12);
+ 
+ draw(p11--p21);
+ draw(p11--p22);
+ 
+ draw(p12--p23);
+ draw(p12--p24);
+ 
+ //
+ 
+ safeLabel("$f:E\to F\to G$", p00, 1.55, 0.27);
+ 
+ safeLabel("$g:A\to B\to E$", p11, 1.55, 0.27);
+ safeLabel("$h:C\to D\to F$", p12, 1.55, 0.27);
+ 
+ safeLabel("$w:A$", p21, 0.60, 0.27);
+ safeLabel("$x:B$", p22, 0.60, 0.27);
+ 
+ safeLabel("$y:C$", p23, 0.60, 0.27);
+ safeLabel("$z:D$", p24, 0.60, 0.27);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+in standard notation this would be:
+$$ f(g(w,x),h(y,z)) $$
+
+So here's the thing: The functions $ f,g,h $ themselves are no longer fixed or hardwired, they are now variable.
+The idea then is that a complete model decomposition factors these out as well:
+$$ \begin{array}{rcl}
+\mbox{model}		& / & \mbox{filter}		\\
+							\\
+f(g(w,x),h(y,z))	& / & P(f,g,h;w,x,y,z)		\\
+\end{array} $$
+
+The consequence here is that the model component of this decomposition can itself be decomposed,
+allowing us to modularize the construction of a function into the following parts:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (8,1);
+ 
+ pair p11 = segment(p00, "SL", 1, 65);
+ pair p12 = segment(p00, "SR", 1, 65);
+ 
+ pair p21 = segment(p11, "SL", 1, 40);
+ pair p22 = segment(p11, "SR", 1, 40);
+ pair p23 = segment(p12, "SL", 1, 40);
+ pair p24 = segment(p12, "SR", 1, 40);
+ 
+ //
+ 
+ draw((2,0)--(4,0), Arrow);
+ 
+ draw(p00--p11);
+ draw(p00--p12);
+ 
+ draw(p11--p21);
+ draw(p11--p22);
+ 
+ draw(p12--p23);
+ draw(p12--p24);
+ 
+ //
+ 
+ label("$(f,g,h\,;w,x,y,z)$", (0,0));
+ 
+ label("{\scriptsize signature:}", (-0.85,0.75));
+ label("{\scriptsize enumeration:}", (2.9,0.55));
+ label("{\scriptsize tree:}", (8,1.8));
+ 
+ safeLabel("$ $", p00, 0.25, 0.27);
+ 
+ safeLabel("$ $", p11, 0.25, 0.27);
+ safeLabel("$ $", p12, 0.25, 0.27);
+ 
+ safeLabel("$ $", p21, 0.25, 0.27);
+ safeLabel("$ $", p22, 0.25, 0.27);
+ 
+ safeLabel("$ $", p23, 0.25, 0.27);
+ safeLabel("$ $", p24, 0.25, 0.27);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Which is to say a function model can not only be constructed from the \emph{internal state} schema, it can also be
+constructed as a combination of a signature, a tree, and an enumeration that admits to certain type-semantic properties.
+
+In this extended schema we still need primitive functions, but our means of defining combinations becomes modular,
+and much more expressive because of it---so much so we can define a type theoretic \emph{induction} operator
+to categorize all functions possessing a given signature if we so choose:
+$$ \mbox{induct}(\mathcal{S}, \mathcal{T}, e, f) $$
+where $ \mathcal{S} $ is the desired signature, $ \mathcal{T} $ the composing tree, $ e:\mathcal{S}\to\mathcal{T} $
+the required enumeration relating the two, and $ f $ the model filter.
+
+Overall induction is straightforward, but due to \emph{currying} we need to take a refined approach with
+the ideas of \emph{signatures} and \emph{enumerations}. Take the basic currying equivalance for example:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p10 = segment(p00, "SL", 1, 20);
+ pair p11 = segment(p00, "SR", 1, 40);
+ pair p12 = segment(p00, "SR", 1, 65);
+ 
+ pair q00 = (7,0);
+ 
+ pair q10 = segment(q00, "SL", 1, 30);
+ pair q11 = segment(q00, "SR", 1, 50);
+ 
+ pair q20 = segment(q10, "SL", 1, 30);
+ pair q21 = segment(q10, "SR", 1, 45);
+ 
+ //
+ 
+ draw(p00--p10);
+ draw(p00--p11);
+ draw(p00--p12);
+ 
+ draw(q00--q10);
+ draw(q00--q11);
+ 
+ draw(q10--q20);
+ draw(q10--q21);
+ 
+ //
+ 
+ label("$\sim$", (4.20,-0.84), S);
+ 
+ safeLabel("$f$", p00, 0.25, 0.25);
+
+ safeLabel("$y$", p10, 0.25, 0.25);
+ safeLabel("$a$", p11, 0.25, 0.25);
+ safeLabel("$b$", p12, 0.25, 0.25);
+
+ safeLabel("$f'$", q00, 0.25, 0.25);
+
+ safeLabel("$y_{f'}$", q10, 0.30, 0.25);
+ safeLabel("$a$", q11, 0.25, 0.25);
+ 
+ safeLabel("$y$", q20, 0.25, 0.25);
+ safeLabel("$b$", q21, 0.25, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The representative example of a signature is effectively a \emph{tuple},
+but this currying equivalence shows when we lambda abstract:
+$$ (a,b)\ \sim\ (a)(b) $$
+we end up with signatures that are also families of tuples, and moreover any given tuple in fact has many equivalances.
+If we want this induction principle to be expressive, we need to allow for these alternative forms as well.
+
+As for enumerations: Taken as true function primitives (or even meta-functions), they embed the elements
+of a signature into the nodes and leaves of their given tree. This embedding ends up excluding the leaves
+that (after-the-fact) become the image leaves of their respective composing functions. Naturally functions
+are mapped to nodes, while both functions and non-functions are mapped to the remaining leaves,
+all in such a way that type theoretic composition is satisfied.
+
+In practice a \emph{left-to-right} parsing algorithm is a reasonable default,
+which would then cycle twice in the case of curried functions.
+
+\subsection*{model/facade paradigm}
+
+There is a special case of the model/filter schema worth mentioning here.
+
+Even though the filter and model of a function have the same signature the filter itself isn't a function,
+it is a logical statement. In practice however the filter does often provide enough information to turn it
+into a function, and when one exists it is called a \emph{facade}.
+
+From a programming perspective we would effectively be taking the model's signature, filtering it,
+then refactoring it into its respective facade signature. Looking back at our \emph{sum of squares}
+(sosq) function this would be as follows:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p11 = segment(p00, "NL", 1, 55);
+ pair p12 = segment(p00, "NR", 1, 55);
+ 
+ pair p21 = segment(p11, "NL", 1, 35);
+ pair p22 = segment(p11, "NR", 1, 35);
+ pair p23 = segment(p12, "NL", 1, 35);
+ pair p24 = segment(p12, "NR", 1, 35);
+ 
+ pair p31 = segment(p21, "N", 1.5);
+ pair p32 = segment(p22, "N", 1.5);
+ pair p33 = segment(p23, "N", 1.5);
+ pair p34 = segment(p24, "N", 1.5);
+ 
+ pair p41 = segment(p31, "N", 1.5);
+ pair p42 = segment(p32, "N", 1.5);
+ pair p43 = segment(p33, "N", 1.5);
+ pair p44 = segment(p34, "N", 1.5);
+ 
+ pair p51 = segment(p41, "N", 1.5);
+ pair p52 = segment(p42, "N", 1.5);
+ 
+ //
+ 
+ draw(p00--p11);
+ draw(p00--p12);
+ 
+ draw(p11--p21);
+ draw(p11--p22);
+ 
+ draw(p12--p23);
+ draw(p12--p24);
+ 
+ draw((p21 + (0, 0.4)) -- (p31 + (0, -0.3)), lightblue, MidArrow);
+ draw((p22 + (0, 0.4)) -- (p32 + (0, -0.3)), lightblue, MidArrow);
+ draw((p23 + (0, 0.4)) -- (p33 + (0, -0.3)), lightblue, MidArrow);
+ draw((p24 + (0, 0.4)) -- (p34 + (0, -0.3)), lightblue, MidArrow);
+ 
+ draw((p31 + (0, 0.3)) -- (p41 + (0, -0.3)), lightblue, MidArrow);
+ draw((p32 + (0, 0.3)) -- (p42 + (0, -0.3)), lightblue, MidArrow);
+ draw((p33 + (0, 0.3)) -- (p43 + (0, -0.3)), lightblue, MidArrow);
+ draw((p34 + (0, 0.3)) -- (p44 + (0, -0.3)), lightblue, MidArrow);
+ 
+ draw((p41 + (0, 0.3)) -- (p51 + (0, -0.3)), lightblue, MidArrow);
+ draw((p42 + (0, 0.3)) -- (p51 + (0, -0.3)), lightblue, MidArrow);
+ draw((p43 + (0, 0.3)) -- (p52 + (0, -0.3)), lightblue, MidArrow);
+ draw((p44 + (0, 0.3)) -- (p52 + (0, -0.3)), lightblue, MidArrow);
+ 
+ //
+ 
+ safeLabel("$+$", p00, 0.25, 0.25);
+ 
+ safeLabel("$*$", p11, 0.25, 0.25);
+ safeLabel("$*$", p12, 0.25, 0.25);
+ 
+ safeLabel("$w$", p21, 0.25, 0.27);
+ safeLabel("$x$", p22, 0.25, 0.27);
+ 
+ safeLabel("$y$", p23, 0.25, 0.27);
+ safeLabel("$z$", p24, 0.25, 0.27);
+ 
+ label("$($", p31 + (-0.35, 0.05));
+ label("$w,$", p31);
+ label("$x,$", p32);
+ label("$y,$", p33);
+ label("$z$", p34);
+ label("$)$", p34 + (0.25, 0.05));
+ label("--- model signature", p34 + (2.5, 0.05));
+ 
+ label("$($", p41 + (-0.35, 0.05));
+ label("$u,$", p41);
+ label("$u,$", p42);
+ label("$v,$", p43);
+ label("$v$", p44);
+ label("$)$", p44 + (0.25, 0.05));
+ label("--- filtered signature", p44 + (2.5, 0.05));
+ 
+ label("$($", p51 + (-0.35, 0.05));
+ label("$u,$", p51);
+ label("$v$", p52);
+ label("$)$", p52 + (0.25, 0.05));
+ label("--- facade signature", p52 + (5.3, 0.05));
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The facade then ends up decompressing its own signature back into its (filtered) model signature and applies this
+to the model function itself. Another way to say this: When such facades exist, we can decompose the main function
+into its facade followed by its model. With our sum of squares this is as follows:
+$$ \mbox{sosq}(u,v) \quad = \quad \mbox{facade}(u,v)\ \mapsto\ \mbox{model}(w,x,y,z) $$
+
+\subsection*{recursion}
+
+Before finishing this section, one last top level class of functions needs to be demonstrated to successfully claim
+universality of this grammatical path notation, and its model/filter schema. As the subsection title suggests,
+I am speaking of \emph{recursive functions}.
+
+As in previous sections we will explore a case study here. In particular let's look at the well known Fibonacci numbers:
+$$ \mbox{Fib}_n = \mbox{Fib}_{n-1} + \mbox{Fib}_{n-2}\qquad,\qquad \mbox{Fib}_0=\mbox{Fib}_1=1 $$
+The thing to note about the current approach in defining recursion is that mathematicians do it by describing
+\emph{equality relationships} between values of a recursive function's arguments (the above equality as example).
+On the upside this approach allows for much flexibility in the identity manipulations that mathematicians prefer,
+but this is also problematic: Such definitions are not \emph{constructive}, they only describe a relationship
+that \emph{exists}. This is to say the details are missing when it comes to actually computing the number
+values of such functions.
+
+I intend here to give an outline of actual constructive approaches. With that said, the underlying interpretation
+is actually quite narrow and subtle, so we will walk through this line of thinking carefully. We start by asking:
+How do we translate this equality relationship that \emph{specifies} a recursive function into a grammatical
+path representation that \emph{implements} such a function?
+
+The first subtlety of interpretation is to realize that the recursive function
+$$ \mbox{Fib} : \mathbb{N}\to\mathbb{N} $$
+exists as a weak function, based on mathematical induction, using the above equality relationship in its proof.
+Accepting this assumption (or verifying it yourself), we can now introduce it \emph{by name} in the following
+grammatical path notation:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p11 = segment(p00, "SR", 1, 40);
+ 
+ //
+ 
+ draw(p00--p11);
+ 
+ //
+ 
+ safeLabel("Fib", p00, 0.45, 0.25);
+ 
+ safeLabel("$n$", p11, 0.25, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+but this is little more than a symbolic function, it has no internal structure or details to help us calculate it.
+Intuitively we know we can do better by demonstrating a strong (computable) function as well.
+
+The second subtlety comes from the need to show the grammatical path representation of a recursive function
+can always be decomposed into a model and facade. This is subtle because we can't actually show a decomposition
+without knowing the implementation details of the (strongly defined) function to begin with. For this reason
+the technical approach is to define the
+$$ \mbox{model}\ ,\ \mbox{facade} $$
+functions independently of Fibonacci, then show their composition to be equivalent to it:
+$$ \mbox{Fib} \quad \sim \quad (\,\mbox{facade}\ \mapsto\ \mbox{model}\,) $$
+If we can do this it would follow naturally that these \emph{model} and \emph{facade} functions are the model
+and facade components of Fib itself---thus proving strong recursive functions also follow the model/filter
+schema.\footnote{Weak recursive functions follow almost identically to this approach.}
+
+Let's start by defining what will be the \emph{model} component of Fib. The thing to realize about recursion is that it
+is actually just a specialized form of function composition, and since we know $ \mbox{Fib} : \mathbb{N}\to\mathbb{N} $
+exists we can define our model as:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p10 = segment(p00, "S", 1);
+ 
+ pair p20 = segment(p10, "SL", 1, 30);
+ pair p21 = segment(p10, "SR", 1, 35);
+ pair p22 = segment(p10, "SR", 1, 70);
+ 
+ pair p30 = segment(p20, "SL", 1, 20);
+ pair p31 = segment(p20, "SR", 1, 20);
+ pair p32 = segment(p22, "SL", 1, 30);
+ pair p33 = segment(p22, "SR", 1, 35);
+ pair p34 = segment(p22, "SR", 1, 70);
+ 
+ pair p40 = segment(p32, "SL", 1, 20);
+ pair p41 = segment(p32, "SR", 1, 20);
+ pair p42 = segment(p34, "SL", 1, 35);
+ pair p43 = segment(p34, "SR", 1, 35);
+ 
+ pair p50 = segment(p42, "S", 1);
+ pair p51 = segment(p43, "S", 1);
+ 
+ pair p60 = segment(p50, "SL", 1, 20);
+ pair p61 = segment(p50, "SR", 1, 20);
+ pair p62 = segment(p51, "SL", 1, 20);
+ pair p63 = segment(p51, "SR", 1, 20);
+ 
+ //
+ 
+ draw(p10--p20);
+ draw(p10--p21);
+ draw(p10--p22);
+ 
+ draw(p20--p30);
+ draw(p20--p31);
+ draw(p22--p32);
+ draw(p22--p33);
+ draw(p22--p34);
+ 
+ draw(p32--p40);
+ draw(p32--p41);
+ draw(p34--p42);
+ draw(p34--p43);
+ 
+ draw(p42--p50);
+ draw(p43--p51);
+ 
+ draw(p50--p60);
+ draw(p50--p61);
+ draw(p51--p62);
+ draw(p51--p63);
+ 
+ //
+ 
+ label("model:", p00);
+ 
+ safeLabel("if", p10, 0.25, 0.25);
+ 
+ safeLabel("$=$", p20, 0.25, 0.25);
+ safeLabel("$1$", p21, 0.25, 0.25);
+ safeLabel("if", p22, 0.25, 0.25);
+ 
+ safeLabel("$n$", p30, 0.25, 0.25);
+ safeLabel("$0$", p31, 0.25, 0.25);
+ safeLabel("$=$", p32, 0.25, 0.25);
+ safeLabel("$1$", p33, 0.25, 0.25);
+ safeLabel("$+$", p34, 0.25, 0.25);
+ 
+ safeLabel("$n$", p40, 0.25, 0.25);
+ safeLabel("$1$", p41, 0.25, 0.25);
+ safeLabel("Fib", p42, 0.45, 0.25);
+ safeLabel("Fib", p43, 0.45, 0.25);
+ 
+ safeLabel("$-$", p50, 0.25, 0.25);
+ safeLabel("$-$", p51, 0.25, 0.25);
+ 
+ safeLabel("$n$", p60, 0.25, 0.25);
+ safeLabel("$1$", p61, 0.25, 0.25);
+ safeLabel("$n$", p62, 0.25, 0.25);
+ safeLabel("$2$", p63, 0.25, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+from here we can factor out the complete signature as:
+$$ (\mbox{if}, =, \mbox{if}, =, +, \mbox{Fib}, -, \mbox{Fib}, -\,; n, 0, 1, n, 1, 1, n, 1, n, 2) $$
+If you find such a signature overwhelming don't fear, so do I.
+We can simplify this and alleviate our fears by refactoring:
+$$ (\mbox{if}, =, +, \mbox{Fib}, -\,; n, 0, 1, 2) $$
+By getting rid of the redundancy this is much more reasonable. In any case, we can do better still:
+Notice the only non-constant element of this signature is the variable $ n $, in this case then we can
+(holding all other input constant) refactor our facade signature to a minimal version as:
+$$ \mbox{facade}(n) $$
+This lines up with our desired $ \mbox{Fib}(n) $. From here it is relatively easy to show with mathematical
+induction that Fib and this model/facade combo are equal. As such, the interpretation for computing this function
+is to start with $ \mbox{Fib}(n) $, substitute our respective implementation
+$$ \mbox{Fib}_{\mbox{\scriptsize fac}}(n)\ \mapsto\ \mbox{Fib}_{\mbox{\scriptsize mod}}(\ldots) $$
+and evaluate until you arrive at the terms:
+$$ \mbox{Fib}(n-1)\ ,\ \mbox{Fib}(n-2) $$
+in which case you recursively apply again, and again, and [\,\ldots], until halting conditions are reached.
+
+By the way, in the above the ellipsis of $ \mbox{Fib}_{\mbox{\scriptsize mod}}(\ldots) $ is there to
+hide the clutter of the signature we otherwise already know.
+
+\section*{applications}
+
+\subsection*{filter swapping}
+
+One of the reasons we modularize a function into its model/filter form is because it allows us to swap things
+out cleanly and otherwise reuse parts.
+
+Returning to one of our above examples: Looking at the sosq model as being independent of sosq itself, what other
+functions can we resolve from it? For starters we could swap out the filter to narrow the function arguments:
+$$ \begin{array}{lcrcl}
+\mbox{body}	& \quad & \mbox{model}	& / & \mbox{filter}			\\
+										\\
+wx+1		& \quad & (w*x+y*z)	& / & (y:\{1\}\mbox{ and } z:\{1\})	\\
+\end{array} $$
+The difference with this filter and the original sosq one is that with $ wx+1 $ we are narrowing the model's
+arguments independently of each other, while with $ x^2+y^2 $ we're relating the arguments to each other.
+In practice any such filter will be some combination of both.
+
+Looking back at the Fibonacci model, many of its arguments were constants. I didn't make it explicitly clear
+at the time, but we were taking this narrowing approach there as well.
+
+\subsection*{Riemann integration}
+
+As an example of how more general decompositions can be practical, let's look at how we'd represent the following
+intended function:
+$$ \int_a^bf(x)\,dx $$
+Here the following would be sufficient as our model:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p10 = segment(p00, "SL", 1, 20);
+ pair p11 = segment(p00, "SR", 1, 40);
+ pair p12 = segment(p00, "SR", 1, 60);
+ 
+ //
+ 
+ draw(p00--p10);
+ draw(p00--p11);
+ draw(p00--p12);
+ 
+ //
+ 
+ label("model$(;f,a,b)$:", (0,1.00));
+ 
+ safeLabel("$\int$", p00, 0.25, 0.25);
+ 
+ safeLabel("$f$", p10, 0.25, 0.25);
+ safeLabel("$a$", p11, 0.25, 0.25);
+ safeLabel("$b$", p12, 0.25, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+where
+$$ f:\mathbb{R}\to\mathbb{R}	\qquad a:\mathbb{R}	\qquad b:\mathbb{R} $$
+keeping in mind we could encode this more directly as:
+$$ \mbox{model}\ :\ (\mathbb{R}\to\mathbb{R}) \to\mathbb{R} \to\mathbb{R} \to\mathbb{R} $$
+Our filter follows as:
+$$ \mbox{filter}(;f,a,b) \quad := \quad f \mbox{ is Riemann Integrable over the interval } [a,b] $$
+
+Although we can claim this is a filter in a general sense, we shouldn't take for granted that such a logical
+property alone actually encodes a valid function every time. So far I'm being casual about the filter property
+``Riemann Integrable'', but given that it is a well researched concept within formal calculus / real analysis
+I'm comfortable saying we can use the specifics of its definition to show that this model/filter combination
+in fact satisfies a weak function.
+
+Finally, in the general case it is not a strong function given that it is real valued, but there is still enough
+detail in its definition regarding \emph{Riemann sums} that we can at least define approximation functions
+which are themselves fully computable.
+
+\subsection*{decomposition lattices}
+
+So far this modelling property of functions might not seem especially novel, but it shows its some of its strength
+when we look closer at functions with facades. Notably, any given facade (which is a function itself) might be
+decomposed into its own facade and its own model:
+$$ \mbox{facade}\ r \quad = \quad \mbox{subfacade}\ r\ \mapsto\ \mbox{submodel}\ s $$
+here $ r, s $ are the respective signatures of these functions. The reason the submodel has a different signature
+than the (sub)facade is to reinforce the idea that such signatures are implementation specific and may in fact differ.
+With decomposable facades we can in theory now split the main function into three:
+$$ \mbox{function}\ r \quad = \quad
+\mbox{subfacade}\ r\ \mapsto\ \mbox{submodel}\ s\ \mapsto\ \mbox{model}\ t $$
+
+In practice some decompositions end up being trivial, but many do not. Functions that allow for non-trivial decompositions
+increase function expressivity and even offer options when creating function inventories: Which functions occur most often
+and are best suited as primitives or near primitives? Alternative options allow for greater flexibility in design,
+and even the potential to compress existing dependency narratives.
+
+The reason this works is because we now have variability of the input signature when it comes to determining the model
+component:
+$$ \mbox{function}\ r \quad = \quad
+\mbox{subfacade}\ r\ \mapsto
+\!\!\!\!\!\!\!\!\!\,\underbrace{\mbox{submodel}\ s\ \mapsto\ \mbox{model}\ t}_{
+\begin{array}{c}
+\mbox{\scriptsize function expressivity happens here in}	\\
+\mbox{\scriptsize terms of alternative representations}
+\end{array}} $$
+The signature $ t $ for the most general model is fixed, but with facade decomposition there ends up being a lattice
+of signatures $ s $ to respecify the model input. As such, when choosing a model we may now also be more selective
+of its signature.
+
+\section*{recursive evaluation}
+
+We're pretty much done at this point, especially regarding \emph{constructive} aspects of functions, but I think
+it's important and instructive to briefly look at an \emph{evaluative} aspect of functions that is often neglected,
+and to which this grammatical path notation is well suited to help explain.
+
+When recursion was introduced previously we went over the subtlety of interpreting the construction of recursive
+functions, in particular the need to define their existence before we could define actual implementations.
+As it turns out, when it comes to the evaluation of recursive functions there are similarly subtleties in how
+to correctly interpret them, necessary to prevent things like infinite loops. These are considerations to which
+mathematicians seldom discuss (if at all), so I thought I would end this essay on such a note.
+
+Getting into it now, I had previously mentioned that function recursion is actually just
+a special form of function composition, so let's elaborate on that. Our example this time
+will be the \emph{factorial} function:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p10 = segment(p00, "S", 1);
+ 
+ pair p20 = segment(p10, "SL", 1, 30);
+ pair p21 = segment(p10, "SR", 1, 35);
+ pair p22 = segment(p10, "SR", 1, 67);
+ 
+ pair p30 = segment(p20, "S", 1);
+ pair p31 = segment(p22, "SL", 1, 35);
+ pair p32 = segment(p22, "SR", 1, 45);
+ 
+ pair p40 = segment(p32, "S", 1);
+ 
+ pair p50 = segment(p40, "S", 1);
+ 
+ //
+ 
+ draw(p00--p10);
+ 
+ draw(p10--p20);
+ draw(p10--p21);
+ draw(p10--p22);
+ 
+ draw(p20--p30);
+ draw(p22--p31);
+ draw(p22--p32);
+ 
+ draw(p32--p40);
+ 
+ draw(p40--p50);
+ 
+ //
+ 
+ label("factorial($num$):", (0,0.75), N);
+ 
+ safeLabel("fact$_{\mbox{\scriptsize mod}}$", p00, 0.70, 0.25);
+ 
+ safeLabel("if", p10, 0.25, 0.25);
+ 
+ safeLabel("isZero", p20, 0.60, 0.25);
+ safeLabel("1", p21, 0.25, 0.25);
+ safeLabel("$*$", p22, 0.25, 0.25);
+ 
+ safeLabel("$num$", p30, 0.49, 0.25);
+ safeLabel("$num$", p31, 0.49, 0.25);
+ safeLabel("factorial", p32, 0.85, 0.25);
+ 
+ safeLabel("dec", p40, 0.40, 0.25);
+ 
+ safeLabel("$num$", p50, 0.49, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Here unlike in previous examples I have condensed the functions
+$$ (n\ =\ 0) \qquad \mbox{to} \qquad \mbox{isZero(n)}
+\qquad\qquad \mbox{and} \qquad\qquad (n\ -\ 1) \qquad \mbox{to} \qquad \mbox{dec(n)} $$
+This above implementation is perfectly fine, but to be honest
+I myself would prefer to work with the following alternative:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p10 = segment(p00, "S", 1);
+ 
+ pair p20 = segment(p10, "SL", 1, 30);
+ pair p21 = segment(p10, "SR", 1, 35);
+ pair p22 = segment(p10, "SR", 1, 70);
+ 
+ pair p30 = segment(p20, "S", 1);
+ pair p31 = segment(p22, "SL", 1, 30);
+ pair p32 = segment(p22, "SR", 1, 55);
+ 
+ pair p40 = segment(p31, "SL", 1, 25);
+ pair p41 = segment(p31, "SR", 1, 35);
+ pair p42 = segment(p32, "S", 1);
+ 
+ //
+ 
+ draw(p00--p10);
+ 
+ draw(p10--p20);
+ draw(p10--p21);
+ draw(p10--p22);
+ 
+ draw(p20--p30);
+ draw(p22--p31);
+ draw(p22--p32);
+ 
+ draw(p31--p40);
+ draw(p31--p41);
+ draw(p32--p42);
+ 
+ //
+ 
+ label("factModel$(prod, num)$:", (0,0.75), N);
+ 
+ safeLabel("factModel$_{\mbox{\scriptsize mod}}$", p00, 1.30, 0.25);
+ 
+ safeLabel("if", p10, 0.25, 0.25);
+ 
+ safeLabel("isZero", p20, 0.60, 0.25);
+ safeLabel("$prod$", p21, 0.49, 0.25);
+ safeLabel("factModel", p22, 1.00, 0.25);
+ 
+ safeLabel("$num$", p30, 0.49, 0.25);
+ safeLabel("$*$", p31, 0.25, 0.25);
+ safeLabel("dec", p32, 0.40, 0.25);
+ 
+ safeLabel("$prod$", p40, 0.49, 0.25);
+ safeLabel("$num$", p41, 0.49, 0.25);
+ safeLabel("$num$", p42, 0.49, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+where we implement factorial itself as:
+$$ \mbox{factorial}(num)\ :=\ \mbox{factModel}(1, num) $$
+Either way, we can construct a recursive function by means of function composition, and at first glance it appears
+we can evaluate such constructions as is---we certainly did previously---but this isn't the whole truth: The use
+of function composition here is \emph{cyclical}, and as a consequence any practical interpretation requires us
+to also mitigate the possibility of the semantics breaking down as we attempt our evaluation---the
+aforementioned infinite loop problem.
+
+This problem arises due to the \emph{applicative order} policy we previously assumed when evaluating composite
+functions. As a reminder, when evaluating a composite function:
+$$ f(x_1,g(w),x_3) $$
+the policy states that we first evaluate the input terms $ x_1, g(w), x_3 $ before passing them to $ f $ in its
+evaluation. As an addendum: Given that $ x_1, x_3 $ aren't functions the policy further states that any such
+non-function would by default ``evaluate'' to itself.
+
+The problem with the applicative order approach can be demonstrated with our factorial function example. Let's look
+at what actually happens when our $ num $ input equals zero: Within the body of our function we would need to evaluate
+the following expression:
+$$ \begin{array}{rl}
+\mbox{if}\ (								\\
+		& \mbox{isZero}(num),					\\
+		& prod,							\\
+		& \mbox{factModel}(num*prod\,, \mbox{dec}(num))		\\
+)									\\
+\end{array} $$
+but before we could evaluate the main function \emph{if} we would need to evaluate its input. In doing so
+we would need to evaluate
+$$ \mbox{factModel}(num*prod\,, \mbox{dec}(num)) $$
+which given $ num = 0 $ would be
+$$ \mbox{factModel}(0\,, -1) $$
+Not only are the semantics of our intended function wrong $(prod = 0)$, but on the next iteration our conditional
+test becomes $ \mbox{isZero}(-1) $ which will now always return \emph{false} as we keep decrementing ad infinitum,
+thus our infinite loop.
+
+So what can we do about this? To solve this problem we have to time the evaluation of particular values at particular
+grammatical locations just right, and to do this we need to delve into normal order evaluation just a little bit.
+Lazy evaluation as it is also called is achieved by decomposing the apply operator as follows:
+$$ \mbox{apply}\ =\ \mbox{delay}\ \mapsto\ \mbox{force} $$
+
+If you're unfamiliar with these functions, the apply operator takes a function, and some input, and then evaluates:
+$$ \mbox{apply}(+, 1, 2)\ =\ 3 $$
+whereas the delay operator takes the same input and converts it to a \emph{function object}:
+$$ \mbox{delay}(+, 1, 2)\ =\ (+, 1, 2) $$
+and finally the force operator takes function object input and evaluates:
+$$ \mbox{force}((+, 1, 2))\ =\ +(1,2) \qquad \mbox{which in common notation is } (1 + 2)\ =\ 3 $$
+
+Again, I'm being casual here, if we were to be rigorous we'd have to consider these operators to be polymorphic
+(dependent function types), and within a type theoretic framework we'd tediously have to determine the types
+required to make the semantics of these functions valid. If we want to remain casual but infer a basic level
+of rigor, we can instead conceptualize these operators as entire families of functions.
+
+Assuming these operators then, we can now reimplement our recursive factorial function in steps:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p10 = segment(p00, "S", 1);
+ 
+ pair p20 = segment(p10, "SL", 1, 30);
+ pair p21 = segment(p10, "SR", 1, 35);
+ pair p22 = segment(p10, "SR", 1, 72);
+ 
+ pair p30 = segment(p20, "S", 1);
+ pair p31 = segment(p22, "SL", 1, 35);
+ pair p32 = segment(p22, "SR", 1, 52);
+ pair p33 = segment(p22, "SR", 1, 73);
+ 
+ pair p40 = segment(p32, "SL", 1, 20);
+ pair p41 = segment(p32, "SR", 1, 39);
+ pair p42 = segment(p33, "S", 1);
+ 
+ //
+ 
+ draw(p00--p10);
+ 
+ draw(p10--p20);
+ draw(p10--p21);
+ draw(p10--p22);
+ 
+ draw(p20--p30);
+ draw(p22--p31);
+ draw(p22--p32);
+ draw(p22--p33);
+ 
+ draw(p32--p40);
+ draw(p32--p41);
+ draw(p33--p42);
+ 
+ //
+ 
+ label("factModel$(prod, num)$:", (0,0.75), N);
+ 
+ safeLabel("factModel$_{\mbox{\scriptsize mod}}$", p00, 1.30, 0.25);
+ 
+ safeLabel("if", p10, 0.25, 0.25);
+ 
+ safeLabel("isZero", p20, 0.60, 0.25);
+ safeLabel("$prod$", p21, 0.49, 0.25);
+ safeLabel("delay", p22, 0.55, 0.25);
+ 
+ safeLabel("$num$", p30, 0.49, 0.25);
+ safeLabel("factModel", p31, 1.00, 0.25);
+ safeLabel("$*$", p32, 0.25, 0.25);
+ safeLabel("dec", p33, 0.40, 0.25);
+ 
+ safeLabel("$prod$", p40, 0.49, 0.25);
+ safeLabel("$num$", p41, 0.49, 0.25);
+ safeLabel("$num$", p42, 0.49, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In this first step the \emph{delay} function converts its input into a function object, so now if we call
+this function with $ num = 0 $ our previous infinite loop problem disappears: When we go to evaluate the
+third argument of the main \emph{if} function we run into a function object which is a non-function,
+so we ``evaluate'' it to itself.
+
+That's the first step. The second step comes from realizing that when we evaluate this modified factorial,
+we are now returning a function object some of the time, which it is no longer the desired output. In this
+case we need to now force this object after it is returned:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p10 = segment(p00, "S", 1);
+ 
+ pair p20 = segment(p10, "S", 1);
+ 
+ pair p30 = segment(p20, "SL", 1, 30);
+ pair p31 = segment(p20, "SR", 1, 35);
+ pair p32 = segment(p20, "SR", 1, 72);
+ 
+ pair p40 = segment(p30, "S", 1);
+ pair p41 = segment(p32, "SL", 1, 35);
+ pair p42 = segment(p32, "SR", 1, 52);
+ pair p43 = segment(p32, "SR", 1, 73);
+ 
+ pair p50 = segment(p42, "SL", 1, 20);
+ pair p51 = segment(p42, "SR", 1, 39);
+ pair p52 = segment(p43, "S", 1);
+ 
+ //
+ 
+ draw(p00--p10);
+
+ draw(p10--p20);
+ 
+ draw(p20--p30);
+ draw(p20--p31);
+ draw(p20--p32);
+ 
+ draw(p30--p40);
+ draw(p32--p41);
+ draw(p32--p42);
+ draw(p32--p43);
+ 
+ draw(p42--p50);
+ draw(p42--p51);
+ draw(p43--p52);
+ 
+ //
+ 
+ label("factModel$(prod, num)$:", (0,0.75), N);
+ 
+ safeLabel("factModel$_{\mbox{\scriptsize mod}}$", p00, 1.30, 0.25);
+ 
+ safeLabel("force", p10, 0.55, 0.25);
+ 
+ safeLabel("if", p20, 0.25, 0.25);
+ 
+ safeLabel("isZero", p30, 0.60, 0.25);
+ safeLabel("$prod$", p31, 0.49, 0.25);
+ safeLabel("delay", p32, 0.55, 0.25);
+ 
+ safeLabel("$num$", p40, 0.49, 0.25);
+ safeLabel("factModel", p41, 1.00, 0.25);
+ safeLabel("$*$", p42, 0.25, 0.25);
+ safeLabel("dec", p43, 0.40, 0.25);
+ 
+ safeLabel("$prod$", p50, 0.49, 0.25);
+ safeLabel("$num$", p51, 0.49, 0.25);
+ safeLabel("$num$", p52, 0.49, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+This works until you realize our conditional might instead return a number value, and since this is not
+a function object---there is nothing to force---our call to \emph{force} would now have incorrect input.
+Solving this is the final step in this case.
+
+There's more than one approach actually. The first is to replace the number output $ prod $ with its own
+function object $ (\mbox{id}, prod) $ where \emph{id} is the identity function, in which case it is now
+the correct input for force and when applied it just returns the number $ prod $ which is what we want.
+
+The second approach is to define a convenience function I call \emph{dual} which accepts alternate
+(coproduct type) input, where if it's a function object (matching a predefined type) it dispatches
+to the appropriate force function, and if it's not it dispatches to the required identity:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p10 = segment(p00, "S", 1);
+ 
+ pair p20 = segment(p10, "S", 1);
+ 
+ pair p30 = segment(p20, "SL", 1, 30);
+ pair p31 = segment(p20, "SR", 1, 35);
+ pair p32 = segment(p20, "SR", 1, 72);
+ 
+ pair p40 = segment(p30, "S", 1);
+ pair p41 = segment(p32, "SL", 1, 35);
+ pair p42 = segment(p32, "SR", 1, 52);
+ pair p43 = segment(p32, "SR", 1, 73);
+ 
+ pair p50 = segment(p42, "SL", 1, 20);
+ pair p51 = segment(p42, "SR", 1, 39);
+ pair p52 = segment(p43, "S", 1);
+ 
+ //
+ 
+ draw(p00--p10);
+
+ draw(p10--p20);
+ 
+ draw(p20--p30);
+ draw(p20--p31);
+ draw(p20--p32);
+ 
+ draw(p30--p40);
+ draw(p32--p41);
+ draw(p32--p42);
+ draw(p32--p43);
+ 
+ draw(p42--p50);
+ draw(p42--p51);
+ draw(p43--p52);
+ 
+ //
+ 
+ label("factModel$(prod, num)$:", (0,0.75), N);
+ 
+ safeLabel("factModel$_{\mbox{\scriptsize mod}}$", p00, 1.30, 0.25);
+ 
+ safeLabel("dual", p10, 0.45, 0.25);
+ 
+ safeLabel("if", p20, 0.25, 0.25);
+ 
+ safeLabel("isZero", p30, 0.60, 0.25);
+ safeLabel("$prod$", p31, 0.49, 0.25);
+ safeLabel("delay", p32, 0.55, 0.25);
+ 
+ safeLabel("$num$", p40, 0.49, 0.25);
+ safeLabel("factModel", p41, 1.00, 0.25);
+ safeLabel("$*$", p42, 0.25, 0.25);
+ safeLabel("dec", p43, 0.40, 0.25);
+ 
+ safeLabel("$prod$", p50, 0.49, 0.25);
+ safeLabel("$num$", p51, 0.49, 0.25);
+ safeLabel("$num$", p52, 0.49, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Basically these approaches do the same thing in their behaviour, but I find the \emph{dual} approach allows
+for more intuitive implementations during function construction. Having multiple $ (\mbox{id}, value) $
+terms can be tedious, especially within nested conditionals.
+
+Finally, does this approach work for the first implementation of our factorial function?
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p10 = segment(p00, "S", 1);
+ 
+ pair p20 = segment(p10, "SL", 1, 30);
+ pair p21 = segment(p10, "SR", 1, 35);
+ pair p22 = segment(p10, "SR", 1, 67);
+ 
+ pair p30 = segment(p20, "S", 1);
+ pair p31 = segment(p22, "SL", 1, 35);
+ pair p32 = segment(p22, "SR", 1, 45);
+ 
+ pair p40 = segment(p32, "S", 1);
+ 
+ pair p50 = segment(p40, "S", 1);
+ 
+ //
+ 
+ draw(p00--p10);
+ 
+ draw(p10--p20);
+ draw(p10--p21);
+ draw(p10--p22);
+ 
+ draw(p20--p30);
+ draw(p22--p31);
+ draw(p22--p32);
+ 
+ draw(p32--p40);
+ 
+ draw(p40--p50);
+ 
+ //
+ 
+ label("factorial($num$):", (0,0.75), N);
+ 
+ safeLabel("fact$_{\mbox{\scriptsize mod}}$", p00, 0.70, 0.25);
+ 
+ safeLabel("if", p10, 0.25, 0.25);
+ 
+ safeLabel("isZero", p20, 0.60, 0.25);
+ safeLabel("1", p21, 0.25, 0.25);
+ safeLabel("$*$", p22, 0.25, 0.25);
+ 
+ safeLabel("$num$", p30, 0.49, 0.25);
+ safeLabel("$num$", p31, 0.49, 0.25);
+ safeLabel("factorial", p32, 0.85, 0.25);
+ 
+ safeLabel("dec", p40, 0.40, 0.25);
+ 
+ safeLabel("$num$", p50, 0.49, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\noindent The easy answer is \emph{yes}, but it takes a bit more care than the second form did:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p10 = segment(p00, "S", 1);
+ 
+ pair p20 = segment(p10, "S", 1);
+ 
+ pair p30 = segment(p20, "SL", 1, 30);
+ pair p31 = segment(p20, "SR", 1, 35);
+ pair p32 = segment(p20, "SR", 1, 70);
+ 
+ pair p40 = segment(p30, "S", 1);
+ pair p41 = segment(p32, "SL", 1, 35);
+ pair p42 = segment(p32, "SR", 1, 52);
+ pair p43 = segment(p32, "SR", 1, 76);
+ 
+ pair p50 = segment(p42, "SL", 1, 25);
+ pair p51 = segment(p42, "SR", 1, 35);
+ pair p52 = segment(p43, "SL", 1, 25);
+ pair p53 = segment(p43, "SR", 1, 45);
+ 
+ pair p60 = segment(p53, "S", 1);
+ 
+ //
+ 
+ draw(p00--p10);
+
+ draw(p10--p20);
+ 
+ draw(p20--p30);
+ draw(p20--p31);
+ draw(p20--p32);
+ 
+ draw(p30--p40);
+ draw(p32--p41);
+ draw(p32--p42);
+ draw(p32--p43);
+ 
+ draw(p42--p50);
+ draw(p42--p51);
+ draw(p43--p52);
+ draw(p43--p53);
+ 
+ draw(p53--p60);
+ 
+ //
+ 
+ label("factorial($num$):", (0,0.75), N);
+ 
+ safeLabel("fact$_{\mbox{\scriptsize mod}}$", p00, 0.70, 0.25);
+ 
+ safeLabel("dual", p10, 0.45, 0.25);
+ 
+ safeLabel("if", p20, 0.25, 0.25);
+ 
+ safeLabel("isZero", p30, 0.60, 0.25);
+ safeLabel("1", p31, 0.25, 0.25);
+ safeLabel("delay", p32, 0.55, 0.25);
+ 
+ safeLabel("$num$", p40, 0.49, 0.25);
+ safeLabel("transit$(*)$", p41, 1.00, 0.30);
+ safeLabel("delay", p42, 0.55, 0.25);
+ safeLabel("delay", p43, 0.55, 0.25);
+ 
+ safeLabel("id", p50, 0.35, 0.25);
+ safeLabel("$num$", p51, 0.49, 0.25);
+ safeLabel("factorial", p52, 0.85, 0.25);
+ safeLabel("dec", p53, 0.40, 0.25);
+ 
+ safeLabel("$num$", p60, 0.49, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The extra care required comes from the need to maintain proper composition semantics
+as we now are delaying function calls and turning them into function objects.
+
+The logic here is that we would start by delaying the recursive call
+$$ \mbox{factorial}(\mbox{dec}(num)) \qquad\qquad\qquad \mbox{a.k.a. factorial}(num-1) $$
+but as it is composed with multiplication ($ * $) this composition no longer makes sense. Multiplication
+doesn't work with function object input. In this case we can convert our `$ * $' operator to transit$(*)$
+which is a version of multiplication that only takes function object input. The transit operator itself
+converts any given function into a modified form that takes only function object input. Upon evaluation such
+transited functions force the function objects and then pass their returns as the input to the original function:
+$$ \mbox{transit}(*)(a, b)\ =\ *(\,\mbox{force}(a)\,,\ \mbox{force}(b)\,) $$
+We're getting there.
+
+Now that we are using transit multiplication our $ num $ input (the first argument) no longer makes sense so we need
+to change its form to $ (\mbox{id}, num) $. Finally, if you think about it our transit multiplication actually ruins
+the whole thing because it automatically evaluates the delayed objects defeating the point to begin with. We then
+fix this by delaying one more time, to which this \emph{cascading} delay effect finally halts.
+
+To end here, I will add that this delay/transit/dual approach applies to general recursive functions.
+
+\section*{summary}
+
+I presented a lot of ideas in this essay, so I thought it fitting to summarize them.
+
+To start, we have asked what a function is, and what its major connotations are in the traditional literature.
+Beyond this, a function has input, output, can be strong or weak, can be evaluated as eager or as lazy, can be
+constructed as primitives and combinations of primitives, can be curried, can be constructed into a function object,
+can be evaluated as a function object, can be recursive. It has been shown that a grammatical path representation
+can do all this by means of its model/filter schema, to which its model can be decomposed into a signature,
+tree, evaluation, and its filter can sometimes be refactored into its own function called a facade.
+
+As mentioned earlier this essay is more about exposition than proof, but with that said I claim the demonstrations here
+did offer outlines to their respective formal proofs. As for the claim that this decomposition is a universal property
+of functions, it holds under the assumption this grammatical path notation is able to represent \emph{all possible
+functions} which is in fact a meta-mathematical claim. The best we can do is show it is at least as potent
+as existing models of math: Set Theory, Category Theory, Homotopy Type Theory, etc., which I think is reasonable.
+
+\end{document}
+

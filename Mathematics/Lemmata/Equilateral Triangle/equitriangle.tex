@@ -1,0 +1,118 @@
+% Copyright 2015 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=1cm,right=1cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{asymptote}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+
+\pagestyle{empty}
+\begin{document}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+\begin{asydef}
+import graph;
+import markers;
+unitsize(10cm);
+
+real s3=sqrt(3);
+pair o=(0,0);
+pair i=(1,0);
+
+pair _z(real cosphi, real sinphi, real scaler0, real scaler1, real numerator, real denominator)
+{
+	return numerator*(scaler0*cosphi-scaler1*sinphi, scaler1*cosphi+scaler0*sinphi)/denominator;
+}
+
+pair z0(real phi, real theta)
+{
+	real tantheta=Tan(theta);
+
+	return _z(Cos(phi), Sin(phi), 1, tantheta, 1, 1+s3*tantheta);
+}
+
+pair z1(real phi, real theta)
+{
+	real tantheta=Tan(theta);
+
+	return _z(Cos(phi), Sin(phi), s3, 1, tantheta, 1+s3*tantheta);
+}
+
+pair z2(real phi, real theta)
+{
+	real tantheta=Tan(theta);
+	real scaler0=1+s3*tantheta;
+	real scaler1=s3-tantheta;
+
+	return _z(Cos(phi), Sin(phi), scaler0, scaler1, 1, 2*scaler0);
+}
+
+real phi=15;
+
+pair e0=z0(phi,0);
+pair e1=z1(phi,0);
+pair e2=z2(phi,0);
+
+pair m0=z0(phi,60);
+pair m1=z1(phi,60);
+pair m2=z2(phi,60);
+
+real theta=10;
+
+pair t0=z0(phi, theta);
+pair t1=z1(phi, theta);
+pair t2=z2(phi, theta);
+
+\end{asydef}
+
+\noindent\hspace*{0cm}\begin{asy}
+//draw:
+
+draw(i--o--e0--e2--o);
+draw(e0--m0, dotted);
+draw(e1--m1, dotted);
+draw(e2--m2, dotted);
+
+draw(o--t0);
+dot(t0);
+label("$z_0$", t0, S);
+dot(t1);
+label("$z_1$", t1, SE);
+dot(t2);
+label("$z_2$", t2, E);
+
+markangle("$\phi$", i, o, e0);
+markangle("$\theta$", radius=50, e0, o, t0);
+
+\end{asy}
+
+\vspace{1cm}
+\begin{theorem} Given $ \phi\in\mathbb{R} $ and $ 0\le\theta\le\frac{\pi}{3} $ in the equilateral triangle above, we have:
+\end{theorem}
+
+\begin{eqnarray*}
+z_0 & = & \frac{1}{1+\sqrt{3}\tan\theta} (\cos\phi-\tan\theta\sin\phi,\ \tan\theta\cos\phi+\sin\phi) \\
+z_1 & = & \frac{\tan\theta}{1+\sqrt{3}\tan\theta} (\sqrt{3}\cos\phi-\sin\phi,\ \cos\phi+\sqrt{3}\sin\phi) \\
+z_2 & = & \frac{1}{2}\cdot\frac{1}{1+\sqrt{3}\tan\theta} ([1+\sqrt{3}\tan\theta]\cos\phi-[\sqrt{3}-\tan\theta]\sin\phi,
+	  \ [\sqrt{3}-\tan\theta]\cos\phi+[1+\sqrt{3}\tan\theta]\sin\phi)
+\end{eqnarray*}
+
+\end{document}
+
+%for (int k=0; k < 5; ++k)
+%	label( "("+string(point(p, k).x)+", "+string(point(p, k).y)+")" , (0, -k*cm), fontsize(24pt));
+
+%pair p=sin( (3, 2) );
+%string x=string(p.x);
+%string y=string(p.y);
+%label( "("+x+", "+y+")" , fontsize(24pt));
+
