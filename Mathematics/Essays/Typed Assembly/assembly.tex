@@ -1,0 +1,316 @@
+% Copyright 2021 Daniel Nikpayuk
+\documentclass[twoside]{article}
+\usepackage[letterpaper,left=2cm,right=2cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{asymptote}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% latex symbols:
+
+\newcommand{\vn}{\ensuremath{\varnothing}}
+
+\newcommand{\RA}{\Rightarrow}
+\newcommand{\lra}{\longrightarrow}
+\newcommand{\then}{\ensuremath{\quad\Longrightarrow\quad}}
+\newcommand{\qmapsto}{\ensuremath{\quad \mapsto \quad}}
+\newcommand{\mapsfrom}{\mathrel{\reflectbox{\ensuremath{\mapsto}}}}
+
+\newcommand{\defeq}{\ensuremath{\ :=\ }}
+\newcommand{\qeq}{\ensuremath{\quad =\quad}}
+\newcommand{\qqeq}{\ensuremath{\qquad =\qquad}}
+\newcommand{\qdefeq}{\ensuremath{\quad :=\quad}}
+\newcommand{\qqdefeq}{\ensuremath{\qquad :=\qquad}}
+
+\newcommand{\quadbar}{\ensuremath{\quad |\quad}}
+\newcommand{\quadcomma}{\ensuremath{\quad ,\quad}}
+\newcommand{\equals}{\ensuremath{\quad =\quad}}
+\newcommand{\defequals}{\ensuremath{\quad :=\quad}}
+
+\newcommand{\qed}{\nobreak \ifvmode \relax \else
+      \ifdim\lastskip<1.5em \hskip-\lastskip
+      \hskip1.5em plus0em minus0.5em \fi \nobreak
+      \vrule height0.75em width0.5em depth0.25em\fi}
+
+% latex markup:
+
+\newcommand{\strong}[1]{{\bfseries #1}}
+\newcommand{\bfmbox}[1]{\mbox{\bfseries #1}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+% latex spacing:
+
+\newcommand{\twoquad}{\ensuremath{\quad\quad}}
+\newcommand{\threequad}{\ensuremath{\quad\quad\quad}}
+\newcommand{\fourquad}{\ensuremath{\quad\quad\quad\quad}}
+
+\newcommand{\twoqquad}{\ensuremath{\qquad\qquad}}
+\newcommand{\threeqquad}{\ensuremath{\qquad\qquad\qquad}}
+\newcommand{\fourqquad}{\ensuremath{\qquad\qquad\qquad\qquad}}
+
+% essay symbols:
+
+\newcommand{\bv}[1][v]{\ensuremath{\mathbf #1}}
+\newcommand{\powerset}[2][P]{\ensuremath{\mathbb{#1}(#2)}}
+\newcommand{\nthps}[2][P]{\ensuremath{\mathbb{#1}^{#2}}}
+\newcommand{\nthus}[2][U]{\ensuremath{\mathbb{#1}^{#2}}}
+\newcommand{\psunion}[2][P]{\ensuremath{\bigcup\limits_{#2\ge 0}\mathbb{#1}^{#2}}}
+\newcommand{\usunion}[2][U]{\ensuremath{\bigcup\limits_{#2\ge 0}\mathbb{#1}^{#2}}}
+\newcommand{\stratified}{\ensuremath{\mathbb{U}^\infty}}
+\newcommand{\of}[1]{\ensuremath{(\mathcal{#1})}}
+\newcommand{\ofbb}[1]{\ensuremath{(\mathbb{#1})}}
+
+\newcommand{\readleft}{\ensuremath{\,_{_\leftarrow}\,}}
+\newcommand{\readright}{\ensuremath{\,_{_\rightarrow}\,}}
+
+% essay formatting:
+
+\newcommand{\mss}[1]{\ensuremath{\mbox{\scriptsize #1}}}
+\newcommand{\bms}[1]{\ensuremath{_{\mbox{\bfseries\tiny #1}}}}
+\newcommand{\bnms}[2]{\ensuremath{\bms{#1,}{_#2}}}
+
+\newcommand{\tab}[1][1.125cm]{\hspace{#1}}
+
+\newcommand{\col}[1][0ex]{& \hspace{#1}}
+\newcommand{\scol}{\col[0.15cm]}
+\newcommand{\lcol}{\col[0.45cm]}
+
+\newcommand{\msbox}[1]{\ensuremath{_{\mbox{\scriptsize #1}}}}
+\newcommand{\cbox}[1]{\mbox{// #1}}
+
+\newenvironment{proof}[1][Proof]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1:}]}{\end{trivlist}}
+\newenvironment{example}[1][Example]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{remark}[1][Remark]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+% essay functions:
+
+\newcommand{\subcirc}[1][m]{\ensuremath{\underset{#1}{\circ}}}
+\newcommand{\lcirc}{\subcirc[\ell]}
+\newcommand{\rcirc}{\subcirc[r]}
+
+\newcommand{\subfunc}[1]{\ensuremath{\langle #1\rangle}}
+
+\newcommand{\id}{\mbox{id}}
+
+\newcommand{\compose}{\mbox{compose}}
+\newcommand{\precompose}[1]{\ensuremath{\mbox{precompose}_{#1}}}
+\newcommand{\postcompose}[1]{\ensuremath{\mbox{postcompose}_{#1}}}
+
+\newcommand{\ndopose}{\mbox{endopose}}
+\newcommand{\prendopose}[1]{\ensuremath{\mbox{preendopose}_{#1}}}
+\newcommand{\postndopose}[1]{\ensuremath{\mbox{postendopose}_{#1}}}
+
+\newcommand{\lift}{\mbox{lift}}
+\newcommand{\stem}{\mbox{stem}}
+\newcommand{\costem}{\mbox{costem}}
+\newcommand{\distem}{\mbox{distem}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{asydef}
+// this comment prevents a compilation bug.
+
+real direction(bool value)
+{
+	return value ? 1 : -1;
+}
+
+pair offset(pair current, string align, real x = 0.03)
+{
+	pair shifter =	(align == "E") ? (x, 0) :
+			(align == "N") ? (0, x) :
+			(align == "W") ? (-x, 0) :
+			(align == "S") ? (0, -x) : (0,0);
+
+	return shift(shifter)*current;
+}
+
+pair segment(pair current = (0,0), string align, real projection, real angle = 0)
+{
+	align = (align == "E") ? "EU" :
+		(align == "N") ? "NL" :
+		(align == "W") ? "WD" :
+		(align == "S") ? "SR" : align;
+
+	real base          = direction(substr(align, 0, 1) == "E" || substr(align, 0, 1) == "N");
+	real adjacent      = direction(substr(align, 1, 1) == "R" || substr(align, 1, 1) == "U") * Tan(angle);
+	pair initialVertex = (substr(align, 0, 1) == "E" || substr(align, 0, 1) == "W") ? (base, adjacent) : (adjacent, base);
+	pair scaledVertex  = scale(projection) * initialVertex;
+	pair shiftedVertex = shift(current)    * scaledVertex;
+
+	return shiftedVertex;
+}
+
+//
+
+void drawpath(path p)
+{
+	draw(p);
+
+	for (int k=0; k < size(p); ++k)
+	{
+		dot(point(p, k));
+	}
+}
+
+void safeLabel(picture pic = currentpicture, Label L, pair position, real width, real height,
+	align align = NoAlign, pen textpen = currentpen, pen borderpen = currentpen,
+	pen fillpen = white, filltype filltype = NoFill, string bordertype = "round")
+{
+	if (bordertype == "round")
+	{
+		pair w = position + (-width, 0);
+		pair e = position + ( width, 0);
+		pair n = position + (0, height);
+		pair s = position + (0,-height);
+
+		filldraw(pic, w{up}::n{right}::e{down}::s{left}::cycle, fillpen, borderpen);
+	}
+	else if (bordertype == "box")
+	{
+		pair sw = position + (-width,-height);
+		pair se = position + (-width, height);
+		pair nw = position + ( width,-height);
+		pair ne = position + ( width, height);
+
+		filldraw(pic, sw--se--ne--nw--cycle, fillpen, borderpen);
+	}
+
+	label(pic, L, position, align, textpen, filltype);
+}
+
+
+\end{asydef}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{Typed Assembly: From Function to Text}
+\author{Daniel Nikpayuk}
+\date{August 5, 2021}
+\pagestyle{empty}
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1in]{../../../cc-by-nc.png}\\[0.1in]
+\tiny This article is licensed under \\
+\href{http://creativecommons.org/licenses/by-nc/4.0/}
+{Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
+\end{figure}
+
+What is typed assembly? The easiest way to explain is it's a deconstruction of the idea of function \strong{composition}.
+With composition, you take functions $ f_0, f_1, \ldots, f_{n-1}, f_n $ and compose them together:
+$$ f_n \circ f_{n-1} \circ \ldots \circ f_1 \circ f_0 $$
+
+Simple enough, but this only works if the functions have composable domains/codomains:
+$$ \begin{array}{rllll}
+f_0	& :	& X_0		& \to		& X_1		\\
+f_1	& :	& X_1		& \to		& X_2		\\
+	&	&		& \tab[0.75ex]\vdots		\\
+f_{n-1}	& :	& X_{n-1}	& \to		& X_n		\\
+f_n	& :	& X_n    	& \to		& X_{n+1}	\\
+\end{array} $$
+
+What if your functions instead have arbitrary domains?
+$$ \begin{array}{rllll}
+f_0	& :	& X_0		& \to		& Y_0		\\
+f_1	& :	& X_1		& \to		& Y_1		\\
+	&	&		& \tab[0.75ex]\vdots		\\
+f_{n-1}	& :	& X_{n-1}	& \to		& Y_{n-1}	\\
+f_n	& :	& X_n		& \to		& Y_n		\\
+\end{array} $$
+
+\newpage
+
+From a category theory perspective, you \emph{lift} these functions from their home category
+into a \emph{typed assembly} category:
+$$ \begin{array}{rllll}
+\mbox{lift}(f_0)	& :	& Z	& \to		& Z	\\
+\mbox{lift}(f_1)	& :	& Z	& \to		& Z	\\
+			&	&  	& \tab[0.75ex]\vdots	\\
+\mbox{lift}(f_{n-1})	& :	& Z	& \to		& Z	\\
+\mbox{lift}(f_n)	& :	& Z	& \to		& Z	\\
+\end{array} $$
+where our typed assembly category object $ Z $ in effect can be defined as:
+$$ Z \qdefeq X_0 \times \ldots \times X_n \times Y_0 \times \ldots \times Y_n $$
+
+By \emph{refactoring} the domains and codomains, we can now compose our lifted functions:
+$$ \mbox{lift}(f_n) \circ \mbox{lift}(f_{n-1}) \circ \ldots \circ \mbox{lift}(f_1) \circ \mbox{lift}(f_0) $$
+
+This idea is borrowed from \emph{register machine theory}, and in fact is how register machines are created
+if we were to explain how they work to an audience of mathematicians. The refactored common \emph{signature}
+forms the registers, and \emph{lifted composition} in effect is the continuation passing monad. Each lifted
+function represents an instruction. Finally, as we may desire \emph{recursion} we extend the register space
+$ Z $ such that each \emph{typed} register is given its own \emph{stack} so you can save and restore values.
+
+\newpage
+
+\ \\
+%\begin{comment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                  %
+                                  %
+\begin{center}
+ \begin{asy}
+ unitsize(1cm);
+ 
+ //
+ 
+ pair p00 = (0,0);
+ 
+ pair p10 = segment(p00, "SL", 1, 20);
+ pair p11 = segment(p00, "SR", 1, 40);
+ pair p12 = segment(p00, "SR", 1, 60);
+ pair p13 = segment(p00, "SR", 1, 70);
+ 
+ pair p20 = segment(p12, "SL", 1, 20);
+ pair p21 = segment(p12, "SR", 1, 50);
+ 
+ //
+ 
+ draw(p00--p10);
+ draw(p00--p11);
+ draw(p00--p12);
+ draw(p00--p13);
+ 
+ draw(p12--p20);
+ draw(p12--p21);
+ 
+ //
+ 
+ label("$y_f=f(x_1,g(w),x_3)$:", (0,0.75), N);
+ 
+ safeLabel("$f$", p00, 0.25, 0.25);
+ 
+ safeLabel("$y_f$", p10, 0.25, 0.25);
+ safeLabel("$x_1$", p11, 0.25, 0.25);
+ safeLabel("$g$", p12, 0.25, 0.25);
+ safeLabel("$x_3$", p13, 0.25, 0.25);
+ 
+ safeLabel("$x_2$", p20, 0.25, 0.25);
+ safeLabel("$w$", p21, 0.25, 0.25);
+ 
+ \end{asy}
+\end{center}
+                                  %
+                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\end{comment}
+
+\end{document}
