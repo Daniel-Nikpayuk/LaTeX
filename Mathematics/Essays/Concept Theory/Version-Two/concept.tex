@@ -214,6 +214,27 @@ void safeLabel(picture pic = currentpicture, Label L, pair position, real width,
 {Creative Commons Attribution-NonCommercial 4.0 International.}\\[0.3in]
 \end{figure}
 
+
+
+$$ \tab[-1.22cm] 1) \tab[1cm] 1+x+x^2+x^3+x^4+x^5+x^6+x^7+x^8+x^9+x^{10}	$$
+$$ \tab[-7.75cm] 2) \tab[1cm] \sum_{0\le k\le 10}x^k				$$
+$$ \tab[-8.05cm] 3) \tab[1cm] \frac{1-x^{11}}{1-x}				$$
+
+Here, the expressions (1) uses thirty symbols, (2) uses eight symbols, and (3) also uses eight symbols. Both (2) and (3)
+can be considered \emph{compressed} forms of (1), and each is \emph{scalable}. Here I use ``scalable'' in a traditional
+math sense: For example triangles are scalable because as you \emph{grow} a given triangle in size, you don't need
+(unsustainably) more info to represent it (because the proportions stay the same).
+
+These above two expressions are scalable in the sense that:
+$$ \tab[-4.45cm] 2) \tab[1cm] \sum_{0\le k\le 10}x^k + x^{11} \tab[1em] = \tab[1em] \sum_{0\le k\le 11}x^k	$$
+$$ \tab[-4.70cm] 3) \tab[1cm] \frac{1-x^{11}}{1-x}   + x^{11} \tab[2em] = \tab[1em] \frac{1-x^{12}}{1-x}	$$
+The idea is that we've ``grown'' these expressions (the lefthand side), and they are scalable because these scaled up
+versions can be refactored so as to not need more info to represent them (the righthand side). Scalability is its own
+form of \emph{optimization} having to do with compression. Then again, if we desire performance in our calculation,
+(3) is a better form than (2) because it (in general) requires fewer calculations when substituting for $ x $.
+
+\newpage
+
 \ \\
 \indent concept theory example: \tab[3.5cm] is there a relationship between \emph{concepts} and \emph{universe building} ?\\[-3ex]
 
@@ -248,7 +269,7 @@ $$ \def\arraystretch{1.2}
 \tab[1ex] \begin{array}{lll}
 \bfmbox{path}		\col[2ex] \bfmbox{target}	\col[2ex] \bfmbox{sifter}		\\[2ex]
 
-\parbox{6cm}{
+\tab[-1.25cm] \parbox{6cm}{
 Paths are the syntax of the expression. They are made up of \emph{steps}, and they offer a navigational component to expressions.
 } \col[2ex] \parbox{6cm}{
 Targets are the semiotics of the expression. They are the \emph{signs}, which are made up of \emph{signifiers} and \emph{signifieds}.

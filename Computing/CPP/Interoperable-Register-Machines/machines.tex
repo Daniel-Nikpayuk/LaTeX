@@ -237,7 +237,7 @@ allows this pattern to scale:
 
 \newpage
 
-	%\begin{comment}
+	\begin{comment}
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                                           %
                                           %
@@ -379,7 +379,7 @@ allows this pattern to scale:
                                           %
                                           %
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	%\end{comment}
+	\end{comment}
 
 The idea is that with the chains of machines (at a given level) we can either end the chain with
 a \emph{halting instruction} or a \emph{passing instruction}. Halters effectively become standalone functions
@@ -398,5 +398,44 @@ it is eventually returning to. Abstraction-wise it makes the most sense to carry
 
 \newpage
 
+\tab[0cm]{\Large Anatomy of a Compile Time Register Machine (C++ Function Template)}
+$$ \def\arraystretch{2}
+\tab[0cm] \begin{array}{llll}
+\bfmbox{Stack 1:} \col[1em]   \texttt{controls}\mbox{ \{n, c, d, r, i, j\}}              \col\col[1em] \texttt{registers\ldots} \\
+\bfmbox{Stack 2:} \col[1em]   \texttt{heap 0, heap 1}   \col[1em]   \texttt{heap 2, heap 3}  \col[1em] \texttt{heaps\ldots}     \\[-2em]
+		  \col[1em]   \underbrace{\tab[2.5cm]}  \col[1em]   \underbrace{\tab[2.5cm]}                                    \\
+		  \col[2.5em] \bfmbox{Stage 1}          \col[2.5em] \bfmbox{Stage 2}                                            \\[-2ex]
+		  \col      \mbox{(register mutations)} \col[3ex] \mbox{(function calls)}
+\end{array} $$
+
+\ \\[1cm]
+\tab[0cm]{\large A model for CTRM Trampolining which uses \emph{internal} rather than tail function calls}
+$$ \def\arraystretch{2}
+\tab[-2cm] \begin{array}{lll}
+\texttt{external call machine}                                                                         \\
+                               \col \texttt{current  call machine}                                     \\
+			       \col                                \col \texttt{internal call machine}
+\end{array} $$
+
+
+\newpage
+
+filler.
+
 \end{document}
+
+$$ \def\arraystretch{1.2}
+\tab[1ex] \begin{array}{lll}
+\bfmbox{path}		\col[2ex] \bfmbox{target}	\col[2ex] \bfmbox{sifter}		\\[2ex]
+
+\tab[-1.25cm] \parbox{6cm}{
+Paths are the syntax of the expression. They are made up of \emph{steps}, and they offer a navigational component to expressions.
+} \col[2ex] \parbox{6cm}{
+Targets are the semiotics of the expression. They are the \emph{signs}, which are made up of \emph{signifiers} and \emph{signifieds}.
+} \col[2ex] \parbox{6cm}{
+Sifters are the semantics of the expression. They are the \emph{propositions} which describe relationships between the semiotics.
+}
+
+\end{array} $$
+\ \\[-3ex]
 
