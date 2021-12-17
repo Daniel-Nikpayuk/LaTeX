@@ -315,33 +315,24 @@ The plot moves forward then by asking if we can do better? Can we find a single 
 
 Spoilers: The answer to this is yes, and it's known as a universal Turing machine.
 
-With this then being the plot, we have enough backstory that we can now organize our narrative design
-using the following categories:
+With this then being the plot, we have enough backstory that we can now organize our narrative design:
 
-\subsection*{Category 1: Space}
+\begin{enumerate}
 
-\strong{Must be compile time Turing complete (at least extensibly so)}
+\item \strong{Space}: Must be compile time Turing complete (at least extensibly so).
 
-\subsection*{Category 2: Algebra}
+\item \strong{Algebra}: Assumes constructivity of programs, where one starts with atomic programs and uses them to create
+compound programs. Assumes callability of programs, where one can additionally create compound programs out of either
+atomic programs or other compound programs.
 
-\strong{Assumes constructivity of programs, where one starts with atomic
-	programs and uses them to create compound programs}
+\item \strong{Hardware}: Assumes finite memory (at any given time, but is potentially extensible).
 
-\strong{Assumes callability of programs, where one can additionally create compound
-	programs out of either atomic programs or other compound programs}
+It should first be noted that our simulation---our compile time computation---is expected to run on top
+of one's compiler. As such, we inherit any of the bottleneck constraints that the compiler must consider.
+The most notable one being finite memory constraints, although in the context of a compiler and our vehicle
+of transmission this generally means \emph{nesting depth} constraints.
 
-\subsection*{Category 3: Hardware}
-
-\strong{Assumes finite memory (at any given time, but is potentially extensible)}
-
-It should first be noted that our simulation---our compile time computation---is expected to run on top of one's compiler.
-As such, we inherit any of the bottleneck constraints that the compiler must consider. The most notable one being
-finite memory constraints, although in the context of a compiler and our vehicle of transmission this generally means
-\emph{nesting depth} constraints.
-
-\subsection*{Category 4: Software}
-
-\strong{Assumes reasonable performance for program calls, especially recursive program calls}
+\item \strong{Software}: Assumes reasonable performance for program calls, especially recursive program calls
 
 Secondly, in terms of compiler bottlenecks, the major one to consider is peformance costs for when our register machines
 make recursive (program) calls. As we are simulating on top of the compiler, this cost adds up more quickly than the
@@ -349,9 +340,8 @@ rest. Given this, special care must be taken to minimize the cost of simulated r
 of the compiler's own recursive mechanisms without much in the way of our own overhead. As it turns out this is possible,
 and is why we privilege \emph{internal function template calls} over \emph{tail function template calls}.
 
-\subsection*{Category 5: Community}
-
-\strong{Assumes a user-friendly interface for architects to write, debug, and run their own compile time programs}
+\item \strong{Community}: Assumes a user-friendly interface for architects to write, debug, and run their own
+compile time programs.
 
 Unfortunatey it is a side effect of our vehicle of transmission that under the current design the architect
 is required to add housekeeping instructions to their code that are otherwise tedious an uninformative as
@@ -359,6 +349,12 @@ to the intended nature of their program. To abstract this away, we need an addit
 mechanism to detour to specific housekeeping machines while simultaneously preserving the current indices
 and our ability to return to the existing navigational path, furthermore without interfering with our
 ability to trampoline.
+
+\end{enumerate}
+
+Finally, the narrative design (specification and implementation) comes from both asking and answering the following
+questions: for each of the above narrative categories, we ask the same question: How do we translate using the C++17
+toolset?
 
 \section*{Methodology}
 
@@ -375,7 +371,7 @@ with proofs demonstrating the initial design constraints are satisfied according
 
 Function templates are our vehicle of transmission. What are we transmitting? The compile time computation.
 
-\subsection*{Category 1: Space}
+\subsection*{Space Methods}
 
 \subsubsection*{Turing Completion}
 
@@ -407,7 +403,7 @@ traditional design of register machines more generally. Specifically the major d
 closely copying ``Structure and Interpretation of Computer Programs'' Chapter 5, which describes a standalone register
 machine system implemented in the Scheme programming language, a variant within the larger LISP style of languages.
 
-\subsection*{Category 2: Algebra}
+\subsection*{Algebraic Methods}
 
 \subsubsection*{Continuation Passing}
 
@@ -427,7 +423,7 @@ but in the long run it is also advantageous to be able to \emph{call} programs a
 
 We do this to satisfy the user-friendly design principle known as \emph{modularity} of design.
 
-\subsection*{Category 3: Hardware}
+\subsection*{Hardware Methods}
 
 \subsubsection*{Nesting Depths}
 
@@ -451,13 +447,13 @@ Intersectionality of design. Beyond the theoretical, this design constraint is a
 it needs to be considered within every other practical design, which is to say it is at the intersection of all
 other designs.
 
-\subsection*{Category 4: Software}
+\subsection*{Software Methods}
 
 \strong{Reasonable Performance}
 
 Tail call vs Internal Call.
 
-\subsection*{Category 5: Community}
+\subsection*{Community Methods}
 
 \strong{Detour Abstraction}
 
