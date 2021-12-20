@@ -472,7 +472,14 @@ traditional wisdom when it comes to compiler optimization theory as well.
 
 With a goal in mind, how do we design for program call optimization then?
 
-Tail call vs Internal Call.
+\strong{Tail call vs Internal Call}
+
+The other major performance bottleneck to consider as mentioned earlier is that of accessing registers within
+a two stack memory system.
+
+As for program calls themselves: Given the two stack memory design, there is a minimum core of programs and hermeneutic
+machines required to achieve near-random memory access. These fall into the \emph{genre} of programs (texts) known
+as \emph{block} programs/machines.
 
 \subsection*{Community Methods}
 
