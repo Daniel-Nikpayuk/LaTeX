@@ -1,4 +1,4 @@
-Interoperable Register Machines
-===============================
+Compile Time Register Machines
+==============================
 
-A monadic narrative design for C++17 compile time interoperable continuation passing register machines.
+A narrative design for C++17 compile time register machines.

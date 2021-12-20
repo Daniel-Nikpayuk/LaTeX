@@ -332,7 +332,8 @@ of one's compiler. As such, we inherit any of the bottleneck constraints that th
 The most notable one being finite memory constraints, although in the context of a compiler and our vehicle
 of transmission this generally means \emph{nesting depth} constraints.
 
-\item \strong{Software}: Assumes reasonable performance for program calls, especially recursive program calls
+\item \strong{Software}: Assumes reasonable performance for program calls, especially regarding stack access
+asd well as recursive program calls
 
 Secondly, in terms of compiler bottlenecks, the major one to consider is peformance costs for when our register machines
 make recursive (program) calls. As we are simulating on top of the compiler, this cost adds up more quickly than the
@@ -450,6 +451,26 @@ other designs.
 \subsection*{Software Methods}
 
 \strong{Reasonable Performance}
+
+As far as software performance goes, the thing to remember is that we're simulating computations on top of
+an existing software computation---the compiler. At the same time, in general our simulation is that of a compiler,
+or rather an assembler itself. Keeping this is mind, we can take lessons learned from compiler optimizations themselves.
+
+First is \emph{inlining}, but that requires greater support for manipulating programs as objects, while also maintaining
+their types, so that when they are continuation passed the native compiler will do its work without throwing errors.
+Unfortunately I myself haven't fully succeeded in this area of research, and have for this reason honestly abandoned
+it in favor of other approaches.
+
+Secondly then, is to optimize against each individual hermeneutic machine, but as there are only finitely many such
+machines this approach doesn't scale. With that said, we can without loss of generality assume that each individual
+hermeneutic machine is of reasonable performance, in which case it then becomes a matter of finding bottlenecks
+in terms of how these machines are used---distributional patterns of use.
+
+From this perspective, program calls, especially recursive calls would be the notable constraint. I've read many
+social media accounts from practicing compiler theorists, I will claim that this observation also aligns with
+traditional wisdom when it comes to compiler optimization theory as well.
+
+With a goal in mind, how do we design for program call optimization then?
 
 Tail call vs Internal Call.
 
