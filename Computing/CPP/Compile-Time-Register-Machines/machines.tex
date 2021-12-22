@@ -218,9 +218,9 @@ void safeLabel(picture pic = currentpicture, Label L, pair position, real width,
 
 The intention of this essay is to introduce a specification along with key strategies for implementing
 a system of C++17 compile time register machines. By writing out the details in an essay style format
-it is also the intention here to provide a narrative story in the hopes of aiding later on in
-proof-verification, as well as general troubleshooting (debugging) following any actual implementation.
-It is assumed the reader already has a reasonable understanding of automata theory and finite state machines.
+it is also the intention here to provide a narrative story in the hopes of aiding in later on
+proof-verification as well as aiding general troubleshooting (debugging) following any actual implementation.
+It is assumed the reader has a reasonable understanding already of automata theory and finite state machines.
 
 The design considerations of the expected specification---which will be elaborated upon in the philosophy
 section below---are categorized as follows:
@@ -249,31 +249,36 @@ such a system of Turing complete register machines suffers from complexity, whic
 story (linear?  combinatorial?) is sufficient to describe all the patterns of interest. My compromise
 (and belief) is that at most two stories are in fact sufficient to tell the design wanting to be told.
 
-\subsection*{Story 1: A Humanist Perspective}
+\subsection*{Story 1: A Humanities Perspective}
 
-The first way navigate a system of register machines is to conceptualize them as a humanist inspired triple:
+The first way to navigate a system of register machines is to conceptualize them as a humanist inspired triple:
 $$ \{\,\mbox{text, reader, hermeneutic}\,\} $$
-I suspect most readers (of this essay) are already familiar with what a text is, and what a reader is, but
-the idea of \emph{hermeneutics} is a little less known. Mostly it's the idea that any given text can have
-more than one reading based on how you interpret it, and so there becomes a need to study the logic of
-possible interpretations (of texts) more generally.
+I suspect most readers (of this essay) are already familiar with what a \emph{text} is, and what a \emph{reader}
+is but the idea of \emph{hermeneutics} might be less well known. Mostly it's the idea that given a text, it can
+have more than one reading based on how you interpret it, and so there becomes a need to study the logic
+of possible interpretations (of texts) more generally.
 
-How then do we conceptualize systems of register machines this way?
+How then do we conceptualize a system of register machines this way?
 
-To put it most directly, register machines---as finite state machines---are expected to be equipped with
-memory devices (known as registers), but from our above humanist perspective we will anthropomorphize this
-memory to be our reader. Why? Reading is a passive act, even if a reader is associated with the idea of
-having \emph{agency}: The expectation is that whatever is read will change the internal nature of the reader.
-This is no less true of a memory of registers which are expected to be mutated as they read their given programs,
-applying their state machines' applications accordingly.
+To put it most directly, register machines---as finite state machines---are expected to be equipped with memory
+devices (known as registers), but from our above humanist perspective we will anthropomorphize this memory to be
+our \texttt{reader}. Why? Reading is a passive act,\,\footnote{This is true even when a reader is associated with
+the idea of having \emph{agency}.} which for us suggests that whatever is read is expected to change the internal
+nature of the reader. This is no less true of a memory of registers which when applying their state machines
+accordingly are expected to be mutated as they read their given programs.
 
-Thus, we have programs as our texts---often we tend to focus more specifically on the program \emph{controllers}
-though---and in turn we're left with our state machines corresponding with our hermeneutic, our given reading of
-the text. Why? The state machine, or correspondingly the hermeneutic/interpretation we're applying takes both
-the text and reader, and creates an interaction between them. Our text being made up of instructions which hold
-valuable fixed content but are otherwise largely symbolic, while our reader already holding its own relevant content
-when combined with the current location of text and hermeneutic modify the reader. The interaction continues this
-way, and so on and so on until the computation halts, and the reading of the text is considered successful.
+Resonating in adjunction with our reader, we can now also associate programs with our idea of a \texttt{text}---though
+often we tend to focus more specifically on program \emph{controllers}. In turn we're left with state machines which
+finally correspond to our \texttt{hermeneutic}---our given reading of the text. Why?
+
+The state machine (the interpretation) we're applying takes both the \texttt{reader} and the \texttt{text} and creates
+an interaction between them. Our text is made up of instructions that hold valuable but fixed content, and which are otherwise
+symbolic. Our reader already holds its own relevant and ever-changing content. The idea then is that the application of
+the hermeneutic to the reader and the current location of the text changes the reader, but this is exactly what state
+machines and their transition functions do.
+
+Finally, to complete the story, similar individual interactions continue this way, and so on and so on until
+the computation halts, and the reading of the text is considered successful and complete.
 
 This is a pretty lofty narrative, so let's summarize:
 
@@ -281,98 +286,86 @@ This is a pretty lofty narrative, so let's summarize:
 \item \strong{text}: corresponds to programs, often with controllers in mind.
 \item \strong{reader}: corresponds to the registers.
 \item \strong{hermeneutic}: corresponds to the finite state machines (transition functions?) that act on both
-	controller instructions as well as the registers to return the updated register state.
+	controller instructions as well as the registers to return the updated register states.
 \end{itemize}
 
-With this being said, I would like to add that the main purpose in framing register machine systems from this
-humanities lens is to clarify the roles of the actors in this otherwise complex play.
+With this story now told, I would like to add that the main purpose in framing register machine systems from
+a humanities lens is in fact to clarify the roles of the actors in this otherwise complex play.
 
-\subsection*{Story 2: An Equivalent Retelling}
+\subsection*{Story 2: A Relationship of Equals}
 
-Now that we know the main characters of our story, let's reorient and focus on the plot---which itself will ultimately
-help us understand the overarching narrative being presented in what follows.
+Now that we know the main characters of our story, let's reorient and focus on the plot---which will itself ultimately
+help us understand the overarching narrative being presented.
 
 The plot comes from theoretical computing science and automata theory, and is all about ensuring our register machines
-are Turing complete. The idea is since our memory of registers, our reader, takes the same shape regardless of texts
-or hermeneutics, we can hold it fixed. We'll make it our protagonist, and abstract it out. From here, we can then
-focus on telling the relationship between the text and the hermeneutic, or rather the programs and the finite state
-machines of interest.
+are Turing complete. The idea is since our reader---our memory of registers---takes the same shape regardless of texts
+or hermeneutics, we can hold it fixed and abstract it out. From here, we can then focus on telling the story of the
+relationship between the text and the hermeneutic, or rather between programs and finite state machines.
 
-In particular we are interested in the correspondence between programs and what we will call \emph{evaluators}.
-If we view our programs as forming a space, then we would recognize a given object as a program belonging to this
-space only if it had an evaluator. This is to say, a ``list of instructions'' is only a program if we can actually
-evaluate or compute it.
+In particular we are interested in the correspondence between programs and finite state machines that we will
+call \texttt{evaluators}. If we defined our programs from a mathematical lens as a \emph{space}, we would ask what
+the nature of all such \emph{objects} inhabiting this space to be? The consensus is that a given object belonging
+to this space is a program if and only if it is a ``list of instructions'' that we can actually compute. Putting
+this another way, we would say the object that is our program has an above mentioned \emph{evaluator}.
 
-In turn, what this says is that for each program in our space of programs, there is a corresponding evaluator in
-a space of evaluators.
+Without getting into specifics just yet, that's the basic idea of an evaluator. The thing to note here is that for each
+program in our space of programs we can consider the fact that there is a corresponding evaluator in a space of evaluators.
+Conceptually this is a nice clean plot point, but it's not a very interesting or even a useful story: A theory of computation
+isn't all that meaningful if we have to manually (with cleverness and originality) construct an unique evaluator for each
+program we want computed.
 
-Conceptually this is a nice clean plot point, but it's not a very interesting or even useful story: A theory of
-computation isn't all that meaningful if we have to manually, with cleverness and originality, construct an
-unique evaluator for each program we want computed.
+The plot moves forward by asking if we can do better: Can we find a single ``meta-evaluator'' such that it is finitely
+described and can itself simulate all other evaluators in our infinite evaluator space?
 
-The plot moves forward then by asking if we can do better? Can we find a single (finitely described)
-``meta-evaluator'' such that it can itself simulate all other evaluators in our evaluator space?
+Spoilers: The answer to this is yes, but with some tradeoffs. Either way it is known as a universal Turing machine.
 
-Spoilers: The answer to this is yes, and it's known as a universal Turing machine.
+\subsection*{The Narrative}
 
-With this then being the plot, we have enough backstory that we can now organize our narrative design:
+With the plot now in motion, we have enough backstory that we can finally organize our narrative specification:
 
 \begin{enumerate}
 
-\item \strong{Space}: Must be compile time Turing complete (at least extensibly so).
+\item \strong{Space}: Our system of register machines assumes \texttt{Turing completeness}.
 
-\item \strong{Algebra}: Assumes constructivity of programs, where one starts with atomic programs and uses them to create
-compound programs. Assumes callability of programs, where one can additionally create compound programs out of either
-atomic programs or other compound programs.
+We must identify the C++17 constructs we intend to use to implement our reader, our texts, and our hermeneutics,
+and further identify how to build a corresponding meta-hermeneutic (evaluator).
 
-\item \strong{Hardware}: Assumes finite memory (at any given time, but is potentially extensible).
+\item \strong{Algebra}: Our system of register machines assumes \texttt{constructivity} and \texttt{callability} of programs.
 
-It should first be noted that our simulation---our compile time computation---is expected to run on top
-of one's compiler. As such, we inherit any of the bottleneck constraints that the compiler must consider.
-The most notable one being finite memory constraints, although in the context of a compiler and our vehicle
-of transmission this generally means \emph{nesting depth} constraints.
+This means that we should not only be able to build composite programs out of atomic programs (constructivity), but we should
+also be able to create composite programs out of other composite programs (callability).
 
-\item \strong{Software}: Assumes reasonable performance for program calls, especially regarding stack access
-asd well as recursive program calls
+\item \strong{Hardware}: Our system of register machines assumes \texttt{finite memory}.
 
-Secondly, in terms of compiler bottlenecks, the major one to consider is peformance costs for when our register machines
-make recursive (program) calls. As we are simulating on top of the compiler, this cost adds up more quickly than the
-rest. Given this, special care must be taken to minimize the cost of simulated recursion, ideally even to make use
-of the compiler's own recursive mechanisms without much in the way of our own overhead. As it turns out this is possible,
-and is why we privilege \emph{internal function template calls} over \emph{tail function template calls}.
+Whatever our system ends up being, it is intended to be compile time computable, and will thus be simulated on top of
+our compiler's own computations. Given this, it is the expectation here that we will inherit any and all of the practical
+hardware constraints that the compiler must itself consider---the most notable one for us being \emph{nesting depth} limits.
 
-\item \strong{Community}: Assumes a user-friendly interface for architects to write, debug, and run their own
-compile time programs.
+\item \strong{Software}: Our system of register machines assumes \texttt{reasonable performance}.
 
-Unfortunatey it is a side effect of our vehicle of transmission that under the current design the architect
-is required to add housekeeping instructions to their code that are otherwise tedious an uninformative as
-to the intended nature of their program. To abstract this away, we need an additional \emph{community}
-mechanism to detour to specific housekeeping machines while simultaneously preserving the current indices
-and our ability to return to the existing navigational path, furthermore without interfering with our
-ability to trampoline.
+As we are simulating on top of the compiler's computations, we are running overhead costs for our simulated register
+read/write operations, as well as our simulated program calls---especially recursive program calls.
+
+\item \strong{Community}: Our system of register machines assumes a \texttt{user-friendly interface} for architects to write,
+debug, and run their own compile time programs.
 
 \end{enumerate}
-
-Finally, the narrative design (specification and implementation) comes from both asking and answering the following
-questions: for each of the above narrative categories, we ask the same question: How do we translate using the C++17
-toolset?
+The details of this narrative will now be elaborated upon.
 
 \section*{Methodology}
 
-Ultimately the goal is to simulate a system of register machines using functions and function templates
-satisfying the C++17 standard toolset.
+We first need to discuss the idea of a \texttt{vehicle of transmission}.
 
-This means we need to first consider whether this is even theoretically possible, and if it is, we need to follow
-up in asking if it's also practical. In particular: What are the bottlenecks we need to mitigate? Can we mitigate
-those bottlenecks? How best can we mitigate them?
+As mentioned in the narrative specification, we are simulating our register machine system on top of the compiler's own
+computations, and as such we need to identify the mechanism or medium---our vehicle---in which our compile time computational
+information will be transmitted.
 
-The too long don't read answer is that it is in fact both theoretically and practically possible: The purpose of this
-essay then is to build a clean, minimal, theoretical narrative (a story to orient our reading of the system) along
-with proofs demonstrating the initial design constraints are satisfied accordingly.
-
-Function templates are our vehicle of transmission. What are we transmitting? The compile time computation.
+Foregoing the suspense, \emph{function templates} are our vehicle.
 
 \subsection*{Space Methods}
+
+Ultimately the goal here is to simulate a system of register machines using functions and function templates
+satisfying the C++17 standard toolset.
 
 \subsubsection*{Turing Completion}
 
@@ -426,6 +419,8 @@ We do this to satisfy the user-friendly design principle known as \emph{modulari
 
 \subsection*{Hardware Methods}
 
+although in the context of a compiler and our \strong{vehicle of transmission} this generally means \emph{nesting depth} constraints.
+
 \subsubsection*{Nesting Depths}
 
 To restate the second design constraint here:
@@ -472,6 +467,12 @@ traditional wisdom when it comes to compiler optimization theory as well.
 
 With a goal in mind, how do we design for program call optimization then?
 
+Secondly, in terms of compiler bottlenecks, the major one to consider is peformance costs for when our register machines
+make recursive (program) calls. As we are simulating on top of the compiler, this cost adds up more quickly than the
+rest. Given this, special care must be taken to minimize the cost of simulated recursion, ideally even to make use
+of the compiler's own recursive mechanisms without much in the way of our own overhead. As it turns out this is possible,
+and is why we privilege \emph{internal function template calls} over \emph{tail function template calls}.
+
 \strong{Tail call vs Internal Call}
 
 The other major performance bottleneck to consider as mentioned earlier is that of accessing registers within
@@ -482,6 +483,13 @@ machines required to achieve near-random memory access. These fall into the \emp
 as \emph{block} programs/machines.
 
 \subsection*{Community Methods}
+
+Unfortunatey it is a side effect of our vehicle of transmission that under the current design the architect
+is required to add housekeeping instructions to their code that are otherwise tedious an uninformative as
+to the intended nature of their program. To abstract this away, we need an additional \emph{community}
+mechanism to detour to specific housekeeping machines while simultaneously preserving the current indices
+and our ability to return to the existing navigational path, furthermore without interfering with our
+ability to trampoline.
 
 \strong{Detour Abstraction}
 
