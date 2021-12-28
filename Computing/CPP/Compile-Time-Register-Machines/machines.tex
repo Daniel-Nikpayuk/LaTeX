@@ -41,6 +41,7 @@
 
 \newcommand{\strong}[1]{{\bfseries #1}}
 \newcommand{\bfmbox}[1]{\mbox{\bfseries #1}}
+\newcommand{\pdfnote}[1]{\,\footnote{#1}}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
@@ -216,14 +217,14 @@ void safeLabel(picture pic = currentpicture, Label L, pair position, real width,
 
 \section*{Abstract}
 
-The intention of this essay is to introduce a specification along with key strategies for implementing
-a system of C++17 compile time register machines. By writing out the details in an essay style format
-it is also the intention here to provide a narrative story in the hopes of aiding in later on
-proof-verification as well as aiding general troubleshooting (debugging) following any actual implementation.
-It is assumed the reader has a reasonable understanding already of automata theory and finite state machines.
+The intention of this essay is to introduce a collection of specifications for implementing a system of C++17 compile
+time register machines. By writing out the details in an essay style format it is also the intention here to provide
+key strategies for narrowing down possible implementations further, as well as offering a narrative story in the hopes
+of aiding later on in both proof-verification and debugging. It is assumed the reader has a reasonable understanding
+of automata theory and finite state machines.
 
-The design considerations of the expected specification---which will be elaborated upon in the philosophy
-section below---are categorized as follows:
+This essay's specification---which will be elaborated upon in the philosophy section below---can be broadly categorized
+by the following design considerations:
 
 \begin{enumerate}
 \item \strong{Theory}
@@ -241,83 +242,103 @@ section below---are categorized as follows:
 
 \section*{Philosophy}
 
-Ultimately the goal here is to tell a narrative story that will eventually help us to verify a system of register
-machines implemented using the C++17 specification toolset.
+To take a step back from our \emph{specification as object}, we can restate the main goal of this essay here as that
+of telling a narrative story which will eventually help us to implement a system of register machines using C++17's
+toolset.\pdfnote{Implementing in C++17 is in fact the original application of this design.}
 
-Unfortunately it is not as simple as that, or at least this is the philosophy I'm basing things on: For me,
-such a system of Turing complete register machines suffers from complexity, which means no single narrative
-story (linear?  combinatorial?) is sufficient to describe all the patterns of interest. My compromise
-(and belief) is that at most two stories are in fact sufficient to tell the design wanting to be told.
+Unfortunately things are not as simple as that, or at least this is the philosophy I'm designing from: For me,
+such a system of Turing complete register machines suffers from complexity, which means no single narrative story
+is sufficient to describe all the patterns of interest. My compromise (and belief) is that we in fact need two
+narratives to tell the design wanting to be told.
+
+The philosophy of this essay can then be said to be a narrative stitched together from two others, which are themselves
+informed by three simpler stories.
 
 \subsection*{Story 1: A Humanities Perspective}
 
-The first way to navigate a system of register machines is to conceptualize them as a humanist inspired triple:
+The first story in navigating a system of register machines is to conceptualize it using a humanist inspired
+triple:\pdfnote{I suspect most readers (of this essay) are already familiar with what \emph{texts} and \emph{readers}
+are within natural language contexts, but the idea of \emph{hermeneutics} might be less well known: Mostly it's the idea
+that given a text, it can have more than one reading based on how you interpret it, and so there becomes a need to study
+the logic of possible interpretations of texts more generally.}
 $$ \{\,\mbox{text, reader, hermeneutic}\,\} $$
-I suspect most readers (of this essay) are already familiar with what a \emph{text} is, and what a \emph{reader}
-is but the idea of \emph{hermeneutics} might be less well known. Mostly it's the idea that given a text, it can
-have more than one reading based on how you interpret it, and so there becomes a need to study the logic
-of possible interpretations (of texts) more generally.
+How does this conceptualization work?
 
-How then do we conceptualize a system of register machines this way?
+We'll start with the \texttt{reader}: To put it most directly, register machines---as finite state machines---are expected
+to be equipped with memory devices known as registers, but from our above humanist perspective we will anthropomorphize
+this to in fact be our \texttt{reader}. Why? Reading is a passive act,\pdfnote{This is true even when a reader is associated
+with the idea of having \emph{agency}.} which for us suggests that whatever is read is expected to change the internal
+nature of the reader. This is no less true for a memory of registers to which we apply their respective state machines
+accordingly, and for which we expect those registers to be mutated as they ``read'' their given programs.
 
-To put it most directly, register machines---as finite state machines---are expected to be equipped with memory
-devices (known as registers), but from our above humanist perspective we will anthropomorphize this memory to be
-our \texttt{reader}. Why? Reading is a passive act,\,\footnote{This is true even when a reader is associated with
-the idea of having \emph{agency}.} which for us suggests that whatever is read is expected to change the internal
-nature of the reader. This is no less true of a memory of registers which when applying their state machines
-accordingly are expected to be mutated as they read their given programs.
+With this orientation, we can now associate our idea of a \texttt{text} with register machine programs---though often
+we tend to focus more specifically on program \emph{controllers} when no confusion arises.\pdfnote{The reason we don't
+associate texts directly with program controllers is that texts also have additional information we tend to take for
+granted but for which we otherwise shouldn't actually forget about---such as where we start, or where we currently are
+in our reading, etc.} This is reasonable as texts are fixed and unchanging, as are programs, and both are read to create
+changes in their respective readers.
 
-Resonating in adjunction with our reader, we can now also associate programs with our idea of a \texttt{text}---though
-often we tend to focus more specifically on program \emph{controllers}. In turn we're left with state machines which
-finally correspond to our \texttt{hermeneutic}---our given reading of the text. Why?
+All that's left to conceptualize in our triple then is the \texttt{hermeneutic}, which is our given reading of the text.
+How do we qualify this? In our register machine framework this would be our state machines. Why? The state machine
+(the interpretation) we're applying takes both the \texttt{reader} and the \texttt{text} and creates an interaction
+between them. The idea is that the application of the hermeneutic to the reader and the current location of the text
+changes the reader (as well as the current location of the text), but this is exactly what state machines and their
+transition functions do.
 
-The state machine (the interpretation) we're applying takes both the \texttt{reader} and the \texttt{text} and creates
-an interaction between them. Our text is made up of instructions that hold valuable but fixed content, and which are otherwise
-symbolic. Our reader already holds its own relevant and ever-changing content. The idea then is that the application of
-the hermeneutic to the reader and the current location of the text changes the reader, but this is exactly what state
-machines and their transition functions do.
-
-Finally, to complete the story, similar individual interactions continue this way, and so on and so on until
-the computation halts, and the reading of the text is considered successful and complete.
-
-This is a pretty lofty narrative, so let's summarize:
+To summarize, a system of register machines is decomposed as follows:
 
 \begin{itemize}
 \item \strong{text}: corresponds to programs, often with controllers in mind.
 \item \strong{reader}: corresponds to the registers.
 \item \strong{hermeneutic}: corresponds to the finite state machines (transition functions?) that act on both
-	controller instructions as well as the registers to return the updated register states.
+	controller instructions as well as the registers to return the updated register states, as well as the next
+	location within the program.
 \end{itemize}
+
+Finally, if we were to take this analogy to its logical conclusion, we would say that a reading of a text is a process
+where the reader goes from location to location, applies its chosen hermeneutics changing itself along the way, then moving
+on to the next location to repeat. Such interactions continue until the reading of the text is considered successful
+and complete. As such a process coincides with how register machines work to perform their respective computations,
+the intuition is confirmed (or at least not denied).
 
 With this story now told, I would like to add that the main purpose in framing register machine systems from
 a humanities lens is in fact to clarify the roles of the actors in this otherwise complex play.
 
-\subsection*{Story 2: A Relationship of Equals}
+\subsection*{Story 2: A Equivalence Subplot}
 
-Now that we know the main characters of our story, let's reorient and focus on the plot---which will itself ultimately
-help us understand the overarching narrative being presented.
+Now that we know the main characters, let's reorient and focus on a major subplot, one which itself will ultimately
+help us understand the first of the two narratives being presented.
 
-The plot comes from theoretical computing science and automata theory, and is all about ensuring our register machines
+This plot comes from theoretical computing science and automata theory, and is all about ensuring our register machines
 are Turing complete. The idea is since our reader---our memory of registers---takes the same shape regardless of texts
 or hermeneutics, we can hold it fixed and abstract it out. From here, we can then focus on telling the story of the
-relationship between the text and the hermeneutic, or rather between programs and finite state machines.
+relationship between such texts and hermeneutics, or rather between programs and finite state machines.
 
-In particular we are interested in the correspondence between programs and finite state machines that we will
-call \texttt{evaluators}. If we defined our programs from a mathematical lens as a \emph{space}, we would ask what
-the nature of all such \emph{objects} inhabiting this space to be? The consensus is that a given object belonging
-to this space is a program if and only if it is a ``list of instructions'' that we can actually compute. Putting
-this another way, we would say the object that is our program has an above mentioned \emph{evaluator}.
+In particular we are interested in the correspondence between programs and finite state machines that we will call
+\texttt{evaluators}. If we defined our programs from a mathematical lens as a \emph{space}, we would ask what the nature
+of all such \emph{objects} inhabiting this space could even be? The historical consensus is that a given object belonging
+to this space is a program if and only if it is a ``list of instructions'' that we can actually compute. Putting this
+another way, we would say the object that is our program has an above mentioned \emph{evaluator}.
 
 Without getting into specifics just yet, that's the basic idea of an evaluator. The thing to note here is that for each
 program in our space of programs we can consider the fact that there is a corresponding evaluator in a space of evaluators.
-Conceptually this is a nice clean plot point, but it's not a very interesting or even a useful story: A theory of computation
-isn't all that meaningful if we have to manually (with cleverness and originality) construct an unique evaluator for each
-program we want computed.
+Conceptually this is a nice clean plot point, but it's not a very interesting one, or even a useful story: A theory of
+computation isn't all that meaningful if we have to manually (with cleverness and originality) construct an unique
+evaluator for each program we want computed.
 
 The plot moves forward by asking if we can do better: Can we find a single ``meta-evaluator'' such that it is finitely
 described and can itself simulate all other evaluators in our infinite evaluator space?
 
-Spoilers: The answer to this is yes, but with some tradeoffs. Either way it is known as a universal Turing machine.
+Spoilers: The answer to this is yes, but with some tradeoffs. Either way it is known as a universal Turing machine,
+and it is our second story.
+
+\subsection*{Story 3: A Memory Arc}
+
+Our second story abstracted out the memory from our system, so we will want a third story to discuss it directly.
+
+Our memory system is a collection of registers for which we have random access to read and write their contents.
+Unlike math though, within the theory of computation we can't (and shouldn't) always abstract away from considerations
+of performance. This third story then is a story of practical memory access.
 
 \subsection*{The Narrative}
 
