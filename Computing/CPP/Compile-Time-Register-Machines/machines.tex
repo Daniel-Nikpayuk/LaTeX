@@ -41,7 +41,7 @@
 
 \newcommand{\strong}[1]{{\bfseries #1}}
 \newcommand{\bfmbox}[1]{\mbox{\bfseries #1}}
-\newcommand{\pdfnote}[1]{\,\footnote{#1}}
+\newcommand{\pdfnote}[1]{\:\footnote{#1}}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
@@ -252,7 +252,7 @@ is sufficient to describe all the patterns of interest. My compromise (and belie
 narratives to tell the design wanting to be told.
 
 The philosophy of this essay can then be said to be a narrative stitched together from two others, which are themselves
-informed by three simpler stories.
+informed by three canonical stories.
 
 \subsection*{Story 1: A Humanities Perspective}
 
@@ -314,71 +314,91 @@ are Turing complete. The idea is since our reader---our memory of registers---ta
 or hermeneutics, we can hold it fixed and abstract it out. From here, we can then focus on telling the story of the
 relationship between such texts and hermeneutics, or rather between programs and finite state machines.
 
-In particular we are interested in the correspondence between programs and finite state machines that we will call
+In particular we are interested in the \emph{correspondence} between programs and finite state machines that we will call
 \texttt{evaluators}. If we defined our programs from a mathematical lens as a \emph{space}, we would ask what the nature
-of all such \emph{objects} inhabiting this space could even be? The historical consensus is that a given object belonging
-to this space is a program if and only if it is a ``list of instructions'' that we can actually compute. Putting this
-another way, we would say the object that is our program has an above mentioned \emph{evaluator}.
+of all such \emph{objects} inhabiting this space could even be? We would also want to ask if our space is an \emph{algebra},
+but let's focus on the first question first: The historical consensus is that a given object belonging to this space is
+a program if and only if it is a ``list of instructions'' that we can actually compute. Putting this another way,
+we would say the object that is our program has an above mentioned \emph{evaluator}.
 
-Without getting into specifics just yet, that's the basic idea of an evaluator. The thing to note here is that for each
-program in our space of programs we can consider the fact that there is a corresponding evaluator in a space of evaluators.
-Conceptually this is a nice clean plot point, but it's not a very interesting one, or even a useful story: A theory of
-computation isn't all that meaningful if we have to manually (with cleverness and originality) construct an unique
-evaluator for each program we want computed.
+At this point we don't need to know the specifics of what evaluators are to say that for each program in our space of programs
+we can consider the fact that there is a corresponding evaluator in a space of evaluators. Conceptually this is a nice clean
+plot point, but it's not a very interesting one, or even a useful story: A theory of computation isn't all that meaningful
+if we have to manually (with cleverness and originality) construct an unique evaluator for each program we want computed.
 
 The plot moves forward by asking if we can do better: Can we find a single ``meta-evaluator'' such that it is finitely
-described and can itself simulate all other evaluators in our infinite evaluator space?
+described and can itself simulate all other evaluators in our infinite evaluator space? Spoilers: The answer to this
+is yes, but with some tradeoffs. Either way it is known as a universal Turing machine.
 
-Spoilers: The answer to this is yes, but with some tradeoffs. Either way it is known as a universal Turing machine,
-and it is our second story.
+With our correspondence now described, we still have the second question to answer regarding our space of programs:
+Is our space an algebra? It's easy enough to determine a catenation operator (a monoid) to construct composite programs
+from both atomic and other composite programs, but does this algebraic quality extend to the space of corresponding
+evaluators? Does it translate to our meta-evaluator? The answer here is yes and also yes.
+
+In any case, these questions and answers about our space of programs are our second story.
 
 \subsection*{Story 3: A Memory Arc}
 
-Our second story abstracted out the memory from our system, so we will want a third story to discuss it directly.
+Our second story abstracted out the memory from our system, so we will want a third story now to discuss it in detail.
 
-Our memory system is a collection of registers for which we have random access to read and write their contents.
-Unlike math though, within the theory of computation we can't (and shouldn't) always abstract away from considerations
-of performance. This third story then is a story of practical memory access.
+Our memory space is a collection of registers for which we have random access to both read and write their contents.
+Unlike our math lens though, the theory of computation doesn't shy away from practical considerations such as
+performance. This third story then is a story of the practical, and in particular the bottlenecks that
+are most commonly associated with memory access.
+
+In terms of practical memory access, the thing to realize here is that whatever our system ends up being it is intended
+to be compile time computable, and will thus be simulated on top of our compiler's own computations. Given this, we can
+already expect two constraints:
+
+\begin{itemize}
+\item First, it is our expectation that our system will inherit any and all of the practical hardware
+constraints that our compiler must itself consider---the most notable one for us being \emph{finite memory}.
+\item Secondly, even if we were to design our register machine programs performantly, we are still running overhead
+costs that add up at the compiler level. In particular, simulated read/write operations, as well as simulated program
+calls---given their frequency of use within evaluators---should be prioritized for mitigation.
+\end{itemize}
+
+Beyond that, we also have what might be called auxiliary memory access concerns---performance concerns not directly
+encoded in either the hardware or software, but decided on by the community of users. For the most part such value-systems
+cannot be determined in advance as they extend out to include our cultures, politics, and other contextual content,
+but there are some low-level policies of access or even user-friendliness that can still be predicted.
 
 \subsection*{The Narrative}
 
-With the plot now in motion, we have enough backstory that we can finally organize our narrative specification:
+With these substories now in motion, we have enough backstory that we can finally organize our narrative:
 
 \begin{enumerate}
-
-\item \strong{Space}: Our system of register machines assumes \texttt{Turing completeness}.
+\item \strong{Space}: Our system of register machines assumes \strong{Turing completeness}.
 
 We must identify the C++17 constructs we intend to use to implement our reader, our texts, and our hermeneutics,
 and further identify how to build a corresponding meta-hermeneutic (evaluator).
-
-\item \strong{Algebra}: Our system of register machines assumes \texttt{constructivity} and \texttt{callability} of programs.
+\item \strong{Algebra}: Our system of register machines assumes \strong{constructivity} and \strong{callability} of programs.
 
 This means that we should not only be able to build composite programs out of atomic programs (constructivity), but we should
 also be able to create composite programs out of other composite programs (callability).
+\item \strong{Hardware}: Our system of register machines assumes \strong{memory limits}.
 
-\item \strong{Hardware}: Our system of register machines assumes \texttt{finite memory}.
+In terms of C++17, this will often translate as \emph{nesting depth} limits for us. Such limits will be mitigated using
+the \texttt{trampolining paradigm}.
+\item \strong{Software}: Our system of register machines assumes \strong{reasonable performance}.
 
-Whatever our system ends up being, it is intended to be compile time computable, and will thus be simulated on top of
-our compiler's own computations. Given this, it is the expectation here that we will inherit any and all of the practical
-hardware constraints that the compiler must itself consider---the most notable one for us being \emph{nesting depth} limits.
-
-\item \strong{Software}: Our system of register machines assumes \texttt{reasonable performance}.
-
-As we are simulating on top of the compiler's computations, we are running overhead costs for our simulated register
-read/write operations, as well as our simulated program calls---especially recursive program calls.
-
-\item \strong{Community}: Our system of register machines assumes a \texttt{user-friendly interface} for architects to write,
+We will need to mitigate register read/write access using what's called the \texttt{blocking paradigm}. As for mitigating
+program calls we will prioritize internal function template calls over tail calls.
+\item \strong{Community}: Our system of register machines assumes a \strong{user-friendly interface} for architects to write,
 debug, and run their own compile time programs.
 
+This will be achieved using the \texttt{detour paradigm} which will allow us to hide housekeeping instructions---abstracting
+them away from general architect programs.
 \end{enumerate}
-The details of this narrative will now be elaborated upon.
+If you're wondering about certain details introduced in this narrative which weren't discussed in the canonical stories
+above, such details will now be elaborated upon.
 
 \section*{Methodology}
 
 We first need to discuss the idea of a \texttt{vehicle of transmission}.
 
-As mentioned in the narrative specification, we are simulating our register machine system on top of the compiler's own
-computations, and as such we need to identify the mechanism or medium---our vehicle---in which our compile time computational
+As mentioned in the narrative we are simulating our register machine system on top of the compiler's own computations,
+and as such we need to identify the mechanism or medium---our vehicle---in which our compile time computational
 information will be transmitted.
 
 Foregoing the suspense, \emph{function templates} are our vehicle.
@@ -388,7 +408,7 @@ Foregoing the suspense, \emph{function templates} are our vehicle.
 Ultimately the goal here is to simulate a system of register machines using functions and function templates
 satisfying the C++17 standard toolset.
 
-\subsubsection*{Turing Completion}
+\subsubsection*{Turing Completeness}
 
 Given access to C++ variadic packs, we can successfully simulate a Turing complete register machine system based off the
 theoretical (automata theory) result that says a finite state machine with two stacks as its memory system is sufficient
@@ -427,7 +447,7 @@ As such, we need a \emph{vehicle} to take the current state and pass it to the n
 (with associated instruction) so as it act on it next.
 
 A most natural design then is to use a continuation passing monad with enough complexity that we achieve Turing
-completion as an emergent effect.
+completeness as an emergent effect.
 
 \subsubsection*{Program Calls}
 
@@ -465,6 +485,14 @@ it needs to be considered within every other practical design, which is to say i
 other designs.
 
 \subsection*{Software Methods}
+
+It is my understanding the following two concerns:
+\begin{itemize}
+\item caching memory for faster access
+\item preferencing inlining over function calls
+\end{itemize}
+are two of the major concerns of compiler optimizers. Although I am not an expert myself in this area,
+these two concerns do inform my software methods here.
 
 \strong{Reasonable Performance}
 
