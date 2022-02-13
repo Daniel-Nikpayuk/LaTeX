@@ -422,12 +422,14 @@ With this in mind, the following provides a baseline anatomy for how we will imp
 state machines, making note that two main variadic packs are used to implement our theoretical stacks:
 
 $$ \def\arraystretch{2}
-\tab[0cm] \begin{array}{llll}
-\bfmbox{Stack 1:} \col[1em]   \texttt{controls}\mbox{ \{n, c, d, m, i, j\},}             \col\col[1em] \texttt{registers\ldots} \\
-\bfmbox{Stack 2:} \col[1em]   \texttt{heap 0, heap 1,}  \col[1em]   \texttt{heap 2, heap 3,} \col[1em] \texttt{arguments\ldots} \\[-2em]
-		  \col[1em]   \underbrace{\tab[2.5cm]}  \col[1em]   \underbrace{\tab[2.5cm]}                                    \\
-		  \col[2.5em] \bfmbox{Stage 1}          \col[2.5em] \bfmbox{Stage 2}                                            \\[-2ex]
-		  \col      \mbox{(register mutations)} \col[3ex] \mbox{(function calls)}
+\tab[0cm] \begin{array}{lllllll}
+\bfmbox{Stack 1:} \col[1em]   \texttt{controls}\mbox{ \{d, m, n, c, i, j\},}     \col\col\col\col   \texttt{registers\ldots} \\
+\bfmbox{Stack 2:} \col[1em]   \texttt{heap 0, heap 1,}  \col        \texttt{heap 2, heap 3,}
+		  \col[2em]   \texttt{heap 4,}          \col[2em]   \texttt{heap 5,}     \col       \texttt{arguments\ldots} \\[-2em]
+		  \col[1em]   \underbrace{\tab[2.5cm]}  \col        \underbrace{\tab[2.5cm]}				     \\
+		  \col[2.5em] \bfmbox{Stage 1}          \col[1.5em] \bfmbox{Stage 2}					     \\[-2ex]
+		  \col      \mbox{(register mutations)} \col[1ex] \mbox{(function calls)} \col[1.5em] \mbox{(constants)}
+		  \col[3ex] \mbox{(save/restore)}
 \end{array} $$
 
 \strong{Compound Machines}
