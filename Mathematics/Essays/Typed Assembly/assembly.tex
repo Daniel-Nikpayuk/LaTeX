@@ -313,4 +313,26 @@ $ Z $ such that each \emph{typed} register is given its own \emph{stack} so you 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\end{comment}
 
+\newpage
+
+$$ \begin{array}{lllll}
+\bfmbox{facade:}    \col[1em] \mathbf{x}                \col[1em] \mathbf{y}                                                    \\
+\bfmbox{signature:} \col[1em] \mathbf{x:\ }\bfmbox{int}	\col[1em] \mathbf{y:\ }\bfmbox{int} \col[1em] \mathbf{z:\ }\bfmbox{int} \\[1em]
+
+\mbox{constant}     \col[1em]                           \col[1em]                           \col[1em] 2
+		    \col[1em] \mbox{// } z \leftarrow 2                                                                         \\
+\mbox{multiply}     \col[1em]                           \col[1em] \lambda_2, \to            \col[1em] \lambda_1
+		    \col[1em] \mbox{// } y \leftarrow 2y                                                                        \\
+\mbox{square}       \col[1em] \lambda                   \col[1em]                           \col[1em]
+		    \col[1em] \mbox{// } - \ \leftarrow x^2                                                                     \\
+\mbox{add}          \col[1em]                           \col[1em] \lambda_2                 \col[1em]
+		    \col[1em] \mbox{// } - \ \leftarrow x+y                                                                     \\
+\mbox{return}       \col[1em]                          \col[1em]                            \col[1em]
+		    \col[1em] \mbox{// } x^2+2y
+\end{array} $$
+
+\newpage
+
+This page is temporary to make editing easier.
+
 \end{document}
